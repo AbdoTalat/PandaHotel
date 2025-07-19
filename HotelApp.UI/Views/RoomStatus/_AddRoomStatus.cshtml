@@ -1,0 +1,74 @@
+﻿@model AddRoomStatusDTO
+@{
+    int BranchId = ViewBag.BranchId;
+}
+
+<form class="form-basic ajaxForm" asp-action="AddRoomStatus" asp-controller="RoomStatus" method="post">
+    <input type="hidden" asp-for="BranchId" value="@BranchId" />
+    <div class="panel panel-flat border-left-lg border-left-teal ">
+        <div class="panel-body">
+            <div class="content">
+                <fieldset>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Status Name<span class="text-danger">*</span></label>
+                            <div class="form-group">
+                                <input asp-for="Name" class="form-control" required placeholder="Branch Name">
+                                <span asp-validation-for="Name" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label>Description</label>
+                            <div class="form-group">
+                                <textarea asp-for="Description" class="form-control" placeholder="Room Status Description"></textarea>
+                                <span asp-validation-for="Description" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="statusColor">Pick a color:</label>
+                            <div class="form-group">
+                                <input type="color" asp-for="Color" id="statusColor" value="#20BF7E" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">Setup</h6>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group ">
+
+                                    <div class="checkbox">
+                                        <label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+                                            <input type="checkbox" asp-for="IsActive" class="switchery">
+                                            Is Active
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+                                            <input type="checkbox" asp-for="IsReservable" class="switchery">
+                                            Is Reservable
+                                        </label>
+                                    </div>
+
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button class="btn btn-link" data-dismiss="modal"> Cancel</button>
+        <button class="btn bg-teal-400 btn-lg" type="submit"><i class="icon-plus2"></i> Add</button>
+    </div>
+</form>

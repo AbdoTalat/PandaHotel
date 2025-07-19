@@ -1,0 +1,278 @@
+﻿@model AddRateDTO
+@{
+	TempData["Title"] = "Add Rate";
+}
+<!-- Page header -->
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Add Rate</span></h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li><a asp-action="Index" asp-controller="Rate">Rates</a></li>
+			<li class="active">Add Rate</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- /page header -->
+
+
+
+<style>
+    .disabled-inputs input {
+        background-color #e9ecef;
+    }
+</style>
+
+@* <ul class="nav nav-lg nav-tabs nav-tabs-bottom search-results-tabs">
+    <li><a asp-action="Index" asp-controller="Room"><i class="icon-display4 position-left"></i> Rooms</a></li>
+    <li class="active"><a href="search_users.html"><i class="icon-people position-left"></i> Users</a></li>
+    <li><a href="search_images.html"><i class="icon-image2 position-left"></i> Images</a></li>
+    <li><a href="search_videos.html"><i class="icon-file-play position-left"></i> Videos</a></li>
+    <li class="dropdown pull-right">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i> <span class="visible-xs-inline-block position-right">Options</span> <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else</a></li>
+            <li class="divider"></li>
+            <li><a href="#">One more line</a></li>
+        </ul>
+    </li>
+</ul> *@
+
+<div class="content">
+	<div class="row">
+		<form class="" asp-action="AddRate" asp-controller="Rate" method="post">
+			<div class="col-md-12">
+				<div class="panel panel-flat border-left-md border-left-teal">
+
+					<div class="panel-heading">
+						<h6 class="panel-title ">
+							<a class="collapsed" >
+								<legend class="text-semibold text-grey">General Rate Info</legend>
+                            </a>
+
+						</h6>
+					</div>
+
+					<div class="panel-body">
+						<fieldset >
+							<div class="row">
+								<div class="col-md-3">
+										<label class="form-label">Rate Code<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<input asp-for="Code" class="form-control" placeholder="Rate Code">
+											<span class="text-danger validation-error-label" asp-validation-for="Code"></span>
+										</div>
+									</div>
+
+								<div class="col-md-3">
+									<label>Effective Date<span class="text-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-btn">
+											<button type="button" class="btn bg-teal-400 btn-icon" id="EffectiveDateButton"><i class="icon-calendar3"></i></button>
+										</span>
+										<input type="text" asp-for="EffectiveDate" class="form-control" id="EffectiveDateInput" placeholder="Select a date" readonly="">
+                                    </div>						
+									<span class="text-danger validation-error-label" asp-validation-for="EffectiveDate"></span>
+
+								</div>
+
+								<div class="col-md-3">
+									<label>End Date<span class="text-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-btn">
+											<button type="button" class="btn bg-teal-400 btn-icon" id="ButtonCreationDemoButton"><i class="icon-calendar3"></i></button>
+										</span>
+										<input type="text" asp-for="EndDate" class="form-control" id="ButtonCreationDemoInput" placeholder="Select a date" readonly="">
+                                    </div>
+									<span class="text-danger validation-error-label" asp-validation-for="EffectiveDate"></span>
+                                    </div>
+
+                                 <div class="col-md-3">
+                                        <label>Minimum Charge Dayes<span class="text-danger">*</span></label>
+                                        <div class="form-group">
+                                            <input asp-for="MinChargeDayes" class="form-control" placeholder="Minimum Charge Dayes">
+                                            <span class="text-danger validation-error-label" asp-validation-for="MinChargeDayes"></span>
+                                        </div>
+                                    </div>
+
+								
+							</div>
+							<div class="row">
+                                <div class="col-md-6">
+                                    <div class="panel panel-flat">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="checkbox-container">
+                                                    <input type="checkbox" asp-for="IsActive" class="checkbox-input">
+                                                    <div class="checkbox-custom"></div>
+                                                    <span>Is Active</span>
+                                                </label>
+                                                <label class="checkbox-container">
+                                                    <input type="checkbox" asp-for="SkipHourly" class="checkbox-input">
+                                                    <div class="checkbox-custom"></div>
+                                                    <span>Skip Hourly Rate</span>
+                                                </label>
+
+                                                <label class="checkbox-container">
+                                                    <input type="checkbox" asp-for="DisplayOnline" class="checkbox-input">
+                                                    <div class="checkbox-custom"></div>
+                                                    <span>Display Online</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+							</div>
+						</fieldset>
+						<br />
+					</div>
+
+				</div>
+			</div>
+			
+
+			<div class="col-md-12">
+				<div class="panel panel-flat border-left-md border-left-teal">
+
+					<div class="panel-heading">
+						<h6 class="panel-title">
+							<a class="collapsed" >
+								<legend class="text-semibold text-grey">Rooms To Be Soled At This Rate</legend>
+							</a>
+						</h6>
+					</div>
+
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12">
+								
+								<div>
+									<table class="table table-framed table-bordered">
+										<thead>
+											<tr class="border-double">
+												<th style="width250px">
+													<label class="checkbox-container">
+														<input type="checkbox" id="selectAll" class="checkbox-input">
+														<div class="checkbox-custom"></div>
+														<span>Select All Types</span>
+													</label>
+												</th>
+												<th>Hourly</th>
+												<th>Daily</th>
+												<th>Extra Daily</th>
+												<th>Weekly</th>
+												<th>Monthly</th>
+											</tr>
+										</thead>
+										<tbody>
+
+											@for (var i = 0; i < Model.RoomTypeRates.Count; i++)
+											{
+												<tr>
+													<td>
+														<label class="checkbox-container">
+															<input type="checkbox" asp-for="RoomTypeRates[i].IsSelected" class="checkbox-input room-checkbox">
+															<div class="checkbox-custom"></div>
+                                                            <span>@Model.RoomTypeRates[i].RoomTypeName</span>
+														</label>
+														<input type="hidden" asp-for="RoomTypeRates[i].RoomTypeId">
+													</td>
+													<td><input type="text" asp-for="RoomTypeRates[i].HourlyPrice" class="form-control rate-input" style="displaynone;"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].DailyPrice" class="form-control rate-input" style="displaynone;"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].ExtraDailyPrice" class="form-control rate-input" style="displaynone;"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].WeeklyPrice" class="form-control rate-input" style="displaynone;"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].MonthlyPrice" class="form-control rate-input" style="displaynone;"></td>
+												</tr>
+												
+											}
+										</tbody>
+									</table>
+								</div>
+
+								
+
+							</div>
+						</div>
+
+						<br />
+					</div>
+				</div>
+			</div>
+
+			<div class="text-center">
+					<a class="btn bg-teal-400 btn-lg" asp-action="Index" asp-controller="Rate"> Cancel</a>
+					<button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-plus2"></i> Add</button>
+			</div>
+		</form>
+
+	</div>
+
+</div>
+
+@section Scripts{
+
+
+
+	<script>
+		$(document).ready(function () {
+			// Handle individual room checkbox toggle
+			$(".room-checkbox").change(function () {
+				let row = $(this).closest("tr");
+				if (this.checked) {
+					row.find(".rate-input").fadeIn();
+				} else {
+					row.find(".rate-input").fadeOut();
+				}
+			});
+
+			// Handle "Select All" checkbox
+			$("#selectAll").change(function () {
+				let isChecked = this.checked;
+				$(".room-checkbox").prop("checked", isChecked).trigger("change"); // Trigger change event
+			});
+
+			// Update "Select All" state based on individual checkboxes
+			$(".room-checkbox").change(function () {
+				let allChecked = $(".room-checkbox").length === $(".room-checkboxchecked").length;
+				$("#selectAll").prop("checked", allChecked);
+			});
+		});
+
+	</script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

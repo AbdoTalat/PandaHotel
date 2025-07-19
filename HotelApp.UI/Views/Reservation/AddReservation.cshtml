@@ -1,0 +1,453 @@
+﻿@{
+	TempData["Title"] = "Add Reservation";
+	int BranchId = ViewBag.BranchId;
+
+}
+
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Add Reservation</span> </h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li><a href="#">Reservations</a></li>
+			<li class="active">Add Reservation</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="content">
+    <div class="panel">
+		<div class="panel-heading">
+			<div class="text-center">
+                <h4>Add Booking</h4>
+			</div>
+			
+		</div>
+        <div class="panel-body">
+				<div class="tabbable tab-content-bordered">
+					<ul class="nav nav-tabs nav-tabs-bottom nav-justified">
+					<li class="active"><a href="#tab1" data-toggle="tab" id="tab1-link">Book a Room</a></li>
+					<li class="disabled"><a href="#tab2" id="tab2-link">Manage Guests</a></li>
+						<li class="disabled"><a href="#tab3" id="tab3-link">Confirm</a></li>
+					</ul>
+				</div>
+
+
+            <div class="tab-content">
+                
+                <div class="tab-pane active has-padding" id="tab1">
+					@await Html.PartialAsync("_BookRoomPartial")
+                </div>
+
+                <div class="tab-pane  has-padding" id="tab2">
+						<div id="guestTab">
+						@await Html.PartialAsync("_ManageGuestsPartial")
+                        </div>
+                    </div>
+
+				<div class="tab-pane has-padding" id="tab3">
+					@await Html.PartialAsync("_ConfirmReservationPartial")
+				</div>
+
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-default" id="prevBtn"><i class="icon-arrow-left13 position-left"></i> Back</button>
+                <button class="btn bg-teal-400" id="nextBtn">Next <i class="icon-arrow-right14 position-right"></i> </button>
+            </div>
+        </div>         
+	</div>	
+</div>
+
+
+@section Scripts{
+	<script>
+		$(document).ready(function() {
+
+			// Initialize Select2
+			$('#emailSelect').select2({
+				placeholder: "Search and select guest email",
+				minimumInputLength: 2,
+				ajax: {
+					url: '/Guest/SearchGuestByEmail',
+					dataType: 'json',
+					delay: 250,
+					data: function (params) {
+						return {
+							email: params.term
+						};
+					},
+					processResults: function (data) {
+						return {
+							results: data.map(function (guest) {
+								return {
+									id: guest.id,
+									text: guest.email
+								};
+							})
+						};
+					},
+					cache: true
+				}
+			});
+
+			// Handle guest selection
+			$('#emailSelect').on('select2:select', function (e) { // <-- fix event name
+				var guestId = e.params.data.id;
+
+				if (guestId) {
+					$.ajax({
+						url: '/Guest/GetGuestJson/' + guestId,
+						type: 'GET',
+						success: function (guest) {
+							console.log("Guest Data", guest); // Debug
+
+							$('#guestId').val(guest.id);
+							$('#FirstName').val(guest.firstName);
+							$('#MiddleName').val(guest.middleName);
+							$('#LastName').val(guest.lastName);
+							$('#Email').val(guest.email);
+							$('#Phone').val(guest.phone);
+							$('#Address').val(guest.address);
+							$('#TypeOfProof').val(guest.typeOfProof);
+							$('#ProofNumber').val(guest.proofNumber);
+
+							// Handle DateOfBirth safely
+							if (guest.dateOfBirth) {
+								$('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
+							} else {
+								$('#DateOfBirth').val('');
+							}
+
+							// Clear the Select2 after selecting a guest
+							$('#emailSelect').val(null).trigger('change');
+						},
+						error: function () {
+							alert('Failed to fetch guest data.');
+						}
+					});
+				}
+			});
+
+		});
+
+	</script>
+
+	<script>
+		let guestList = [];
+		let guestCounter = 0;
+
+		$('#addGuestButton').click(function () {
+			const form = $('#guestForm');
+
+			if (!form.valid()) return;
+
+			const guestDto = {
+				id: $('#guestId').val() || Date.now(), // unique ID
+				isPrimary: $('#isPrimary').is(':checked'),
+				firstName: $('#FirstName').val(),
+				middleName: $('#MiddleName').val(),
+				lastName: $('#LastName').val(),
+				email: $('#Email').val(),
+				phone: $('#Phone').val(),
+				typeOfProof: $('#TypeOfProof').val(),
+				proofNumber: $('#ProofNumber').val(),
+				dateOfBirth: $('#DateOfBirth').val(),
+				address: $('#Address').val(),
+				branchId: @BranchId ?? 0
+			};
+
+			// Remove any existing primary if a new one is selected
+			if (guestDto.isPrimary) {
+				guestList = guestList.filter(g => !g.isPrimary);
+			}
+
+			// Remove duplicate (editing case)
+			guestList = guestList.filter(g => g.id != guestDto.id);
+
+			guestList.push(guestDto);
+
+			// Update AddGuest panel guest table
+			updateGuestTable();
+
+			// Update Confirm panel
+			renderGuestList();
+
+			// Reset form
+			form[0].reset();
+			$('#guestId').val(0);
+			$('#isPrimary').prop('checked', false);
+			form.validate().resetForm();
+		});
+
+		function updateGuestTable() {
+			const tbody = $('#normalGuestTable tbody');
+			tbody.empty();
+
+			const normalGuests = guestList.filter(g => !g.isPrimary);
+			guestCounter = normalGuests.length;
+			$('#guestCount').text(guestCounter);
+
+			normalGuests.forEach(guest => {
+				tbody.append(`
+						<tr data-guest-id="${guest.id}">
+							<td>${guest.firstName} ${guest.lastName}</td>
+							<td>${guest.email}</td>
+							<td>${guest.phone}</td>
+							<td>
+								<a type="button" class="text-teal-600 editGuestBtn"><i class="icon-pencil7"></i></a>
+								<a type="button" class="text-danger deleteGuestBtn"><i class="icon-trash"></i></a>
+							</td>
+						</tr>
+					`);
+			});
+
+			// Show primary guest
+			const primary = guestList.find(g => g.isPrimary);
+			if (primary) {
+				$('#primaryGuestContainer').html(`
+						<div class="row">
+							<div class="col-md-2">
+								<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+							</div>
+							<div class="col-md-10">
+								<h5 class="text-primary">${primary.firstName} ${primary.lastName}</h5>
+								<p>Email: ${primary.email}</p>
+								<p>Phone: ${primary.phone}</p>
+							</div>
+						</div>
+					`);
+			} else {
+				$('#primaryGuestContainer').html(`<p class="text-muted">No primary guest selected.</p>`);
+			}
+		}
+
+		function renderGuestList() {
+			const container = $('#guestDisplayList');
+			container.empty();
+
+			$('#guestCountLabel').text(`${guestList.length} guest${guestList.length !== 1 ? 's' : ''}`);
+			$('#guestCount').text(guestList.filter(g => !g.isPrimary).length);
+
+			guestList.forEach(guest => {
+				const isPrimary = guest.isPrimary;
+				//const colorClass = isPrimary ? "text-primary" : "text-default";
+				const badge = isPrimary ? `<span class="label label-primary">Primary Guest</span>` : '';
+
+				container.append(`
+						<li class="media">
+							<a href="#" class="media-left">
+								<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+							</a>
+							<div class="media-body">
+										<a href="#" class="media-heading text-default">
+									${guest.firstName} ${guest.lastName} ${badge}
+								</a>
+								<span class="text-size-small text-muted display-block">
+									<span class="status-mark ${isPrimary ? 'border-primary' : 'border-success'} position-left"></span>
+									${guest.email}
+								</span>
+							</div>
+							<div class="media-right media-middle">
+								<ul class="icons-list text-nowrap">
+									<li><a href="#" class="editGuestBtn" data-id="${guest.id}"><i class="icon-pencil7"></i></a></li>
+									<li><a href="#" class="deleteGuestBtn" data-id="${guest.id}"><i class="icon-trash"></i></a></li>
+								</ul>
+							</div>
+						</li>
+					`);
+			});
+		}
+
+		// Edit guest
+		$(document).on('click', '.editGuestBtn', function () {
+			var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
+			var guest = guestList.find(g => g.id == guestId);
+			if (!guest) return;
+
+			$('#guestId').val(guest.id);
+			$('#isPrimary').prop('checked', guest.isPrimary);
+			$('#FirstName').val(guest.firstName);
+			$('#MiddleName').val(guest.middleName);
+			$('#LastName').val(guest.lastName);
+			$('#Email').val(guest.email);
+			$('#Phone').val(guest.phone);
+			$('#TypeOfProof').val(guest.typeOfProof);
+			$('#ProofNumber').val(guest.proofNumber);
+			$('#DateOfBirth').val(guest.dateOfBirth);
+			$('#Address').val(guest.address);
+		});
+
+		// Delete guest
+		$(document).on('click', '.deleteGuestBtn', function () {
+			var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
+			guestList = guestList.filter(g => g.id != guestId);
+
+			updateGuestTable(); // remove from AddGuest tab
+			renderGuestList();  // remove from Confirm tab
+		});
+	</script>
+
+ 	<script>
+		let currentTab = 1;
+
+		function showTab(index) {
+			// Hide all tab content
+			$(".tab-pane").removeClass("show active");
+
+			// Show current tab content
+			$(`#tab${index}`).addClass("show active");
+
+			// Tab headers
+			$(".nav-tabs li").removeClass("active").addClass("disabled");
+			$(`#tab${index}-link`).parent("li").removeClass("disabled").addClass("active");
+
+			// Show/hide navigation buttons
+			$("#prevBtn").toggle(index > 1);
+			$("#nextBtn").html(index === 3 ? "Submit" : `Next <i class="icon-arrow-right14 position-right"></i>`);
+
+			// Load tab content dynamically
+			if (index === 2 && $("#guestTab").is(':empty')) {
+				$("#guestTab").load("/Reservation/LoadGuestForm", function () {
+					initializeSelect2(); // Re-initialize Select2 after loading guest form
+				});
+			}
+			if (index === 3) {
+				$("#confirmTab").load("/Reservation/LoadConfirmForm");
+			}
+		}
+
+		function goNext() {
+			if (currentTab === 1) {
+				$("#bookRoomForm").submit();
+			}
+			else if (currentTab === 2) {
+				$.ajax({
+					url: '/Guest/AddGuestsToReservation',
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify(guestList),
+					success: function (response) {
+						if (response.success) {
+							toastr.success(response.message);
+							$(document).trigger("guestFormSuccess");
+						} else {
+							Swal.fire({
+								position: 'top',
+								icon: 'warning',
+								title: 'Error!',
+								text: response.message,
+								showConfirmButton: true
+							});
+						}
+					},
+					error: function () {
+						Swal.fire("Error", "Failed to save guests. Please try again.", "error");
+					}
+				});
+			}
+
+			else if (currentTab === 3) {
+				const data = {
+					Comment: $('#reservationComment').val(),
+					IsConfirmed: $('#isConfirmed').is(':checked'),
+					IsPending: $('#isPending').is(':checked'),
+					IsStarted: $('#isStarted').is(':checked'),
+					IsCheckedIn: $('#isCheckedIn').is(':checked'),
+					IsCheckedOut: $('#isCheckedOut').is(':checked'),
+					IsClosed: $('#isClosed').is(':checked'),
+					IsCancelled: $('#isCancelled').is(':checked'),
+					CancellationReason: $('#cancellationReason').val()
+				};
+
+				$.ajax({
+					type: "POST",
+					url: "/Reservation/SubmitReservation",
+					data: JSON.stringify(data),
+					contentType: "application/json",
+					success: function (response) {
+						if (response.success) {
+							Swal.fire("Success!", response.message, "success")
+								.then(() => window.location.href = "/Reservation/Index");
+						} else {
+							Swal.fire("Error", response.message, "error");
+						}
+					},
+					error: function () {
+						Swal.fire("Error", "Failed to submit reservation.", "error");
+					}
+				});
+			}
+
+		}
+
+		function goPrev() {
+			if (currentTab > 1) {
+				currentTab--;
+				showTab(currentTab);
+			}
+		}
+
+		$(document).ready(function () {
+			showTab(currentTab);
+
+			$("#nextBtn").click(goNext);
+			$("#prevBtn").click(goPrev);
+
+			$(document).on("roomBookingSuccess", function () {
+				currentTab++;
+				showTab(currentTab);
+			});
+
+			$(document).on("guestFormSuccess", function () {
+				currentTab++;
+				showTab(currentTab);
+			});
+
+			// Prevent clicking on disabled tabs
+			$(".nav-tabs a").on("click", function (e) {
+				if ($(this).parent("li").hasClass("disabled")) {
+					e.preventDefault();
+					return false;
+				}
+			});
+		});
+	</script>
+ 
+
+
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+
+}

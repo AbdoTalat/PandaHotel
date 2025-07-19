@@ -1,0 +1,149 @@
+﻿@model SystemSettingDTO
+
+@{
+	TempData["Title"] = "Master System Setting";
+}
+
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Master System Settings</span></h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li class="active">Master System Settings</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<div class="content">
+	<form asp-action="Edit" asp-controller="SystemSetting" method="post">
+		<input type="hidden" asp-for="Id" value="@Model.Id"/>
+		<div class="panel panel-flat border-left-md border-left-teal">
+			<div class="panel-heading">
+				<h5 class="panel-title">System Settings<a class="heading-elements-toggle"><i class="icon-more"></i></a></h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse" class=""></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="panel-body" style="display block;">
+				<div class="row">
+					<div class="col-md-12">
+						<legend class="text-semibold"> Room Fields</legend>
+					</div>
+					<div class="col-md-12">
+						<div class="col-md-4">
+							<label>CheckIn Status<span class="text-danger">*</span></label>
+							<select asp-for="CheckInStatusId" id="CheckInStatusSelect" class="form-control select" required data-placeholder="Choose Check In Status">
+								<option></option>
+							</select>
+							<span asp-validation-for="CheckInStatusId" class="text-danger validation-error-label"></span>
+						</div>
+						<div class="col-md-4">
+							<label>CheckOut Status<span class="text-danger">*</span></label>
+							<select asp-for="CheckOutStatusId" id="CheckOutStatusSelect" class="form-control select" required data-placeholder="Choose Check Out Status">
+								<option></option>
+                            </select>
+                            <span asp-validation-for="CheckOutStatusId" class="text-danger validation-error-label"></span>
+                        </div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<div class="text-center">
+			<a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Home"> Cancel</a>
+			<button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-plus2"></i> Save</button>
+		</div>
+	</form>
+</div>
+
+
+@section Scripts{
+
+	<script>
+		toastr.options = {
+			"closeButton": true,
+			"progressBar": true,
+			"timeOut": "3000",
+		};
+	</script>
+
+	@if (TempData["Success"] != null)
+	{
+		<script>toastr.success('@TempData["Success"]');</script>
+	}
+	@if (TempData["Error"] != null)
+	{
+		<script>
+			Swal.fire({
+				icon: 'error',
+				position:'top',
+				title: 'Error',
+				text: '@TempData["Error"]'
+			});
+		</script>
+	}
+    <script>
+        function populateStatusSelect(selectId, selectedValue) {
+            $.ajax({
+                url: '/RoomStatus/GetRoomStatusWithOutBranchFilterJson',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    var select = $('#' + selectId);
+                    select.empty().append('<option value="">Select Status</option>');
+                    $.each(response, function (index, item) {
+                        var selected = item.id == selectedValue ? 'selected' : '';
+                        select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                    });
+                },
+                error: function () {
+                    console.error('Failed to load room statuses.');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            populateStatusSelect("CheckInStatusSelect", @Model.CheckInStatusId);
+            populateStatusSelect("CheckOutStatusSelect", @Model.CheckOutStatusId);
+        });
+    </script>
+}
+

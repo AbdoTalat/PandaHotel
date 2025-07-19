@@ -1,0 +1,78 @@
+﻿@model GetRoomByIdDTO
+
+
+<form class="form-basic ajaxForm" asp-action="AddRoom" asp-controller="Room" method="get">
+	<div class="panel panel-flat">
+		<div class="panel-body">
+			<div class="content">
+				<fieldset class="step" id="step1">
+
+					<div class="row">
+						<div class="col-md-6">
+							<label>Room Number<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.RoomNumber" class="form-control box-input" readonly>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<label>Room Type<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.TypeName" class="form-control" readonly>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<label>Room Status<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.StatusName" class="form-control box-input" readonly>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<label>Floor<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.Floor" class="form-control" readonly>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label>Max Num Of Adults<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.MaxNumOfAdults" class="form-control box-input" readonly>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<label>Max Num Of Childrens<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.MaxNumOfChildrens" class="form-control" readonly>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label>Price Per Night<span class="text-danger">*</span></label>
+							<div class="form-group">
+								<input value="@Model.PricePerNight" class="form-control box-input" readonly>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<label>Description<span class="text-danger">*</span></label>
+							<div class="form-group">
+                                <textarea class="form-control" style="min-width:780px" readonly>@Model.Description</textarea>
+							</div>
+						</div>
+					</div>
+
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	<div class="text-right">
+		<button type="button" class="btn bg-grey-300 btn-xlg">Back to List<i class="icon-arrow-right14 position-right"></i></button>
+	</div>
+</form>
+

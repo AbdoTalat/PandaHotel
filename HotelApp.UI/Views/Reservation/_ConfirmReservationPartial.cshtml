@@ -1,0 +1,181 @@
+﻿@model ConfirmReservationDTO
+
+<div class="row">
+	<div class="col-md-8">
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h6 class="panel-title">Reservation Details<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<li><a data-action="close"></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-4">
+						<div class="content-group">
+							<h6 class="text-default heading-divided"><i class="icon-calendar"></i> Dates Of Stay</h6>
+							<div class="list-group no-border">
+								<a href="#" class="list-group-item">
+									Check In: <span id="confirmCheckIn" >-</span>
+								</a>
+								<a href="#" class="list-group-item">
+									Check Out: <span id="confirmCheckOut" >-</span>
+								</a>
+								<a href="#" class="list-group-item">
+									Nights: <span id="confirmNights">-</span>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="content-group">
+							<h6 class="text-default heading-divided"><i class="icon-coins"></i> Balance </h6>
+							<div class="list-group no-border">
+								<a href="#" class="list-group-item">
+									Amount: <span id="confirmAmount" class="label bg-teal">$</span>
+								</a>
+
+								
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="content-group">
+							<h6 class="text-default heading-divided"><i class="icon-pencil6"></i> Comments And Notes</h6>
+							<div class="list-group no-border">
+								<textarea class="form-control" id="reservationComment" placeholder="Add Comment">@ViewBag.ReservationComment</textarea>
+                            </div>
+						</div>
+					</div>
+				</div>
+
+            </div>
+        </div>			
+		
+	</div>
+	<div class="col-md-4">
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h6 class="panel-title">Guests<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+				<div class="heading-elements">
+					<span class="label label-success heading-text" id="guestCountLabel">0 guests</span>
+				</div>
+			</div>
+			<div class="panel-body">
+				<ul class="media-list" id="guestDisplayList">
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+				<h6 class="panel-title">Reservation Status<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isConfirmed"> Confirmed
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isPending"> Pending
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isStarted"> Started
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isCheckedIn"> Checked In
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isCheckedOut"> Checked Out
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isClosed"> Closed
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="isCancelled"> Cancelled
+                        </label>
+                    </div>
+
+                    <!-- Cancellation Reason (conditionally shown) -->
+                    <div class="form-group" id="cancelReasonGroup" style="display:none;">
+                        <label for="cancellationReason">Cancellation Reason</label>
+                        <textarea class="form-control" id="cancellationReason" rows="2"></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+	$(document).ready(function () {
+		const checkboxes = [
+			"#isConfirmed",
+			"#isPending",
+			"#isStarted",
+			"#isCheckedIn",
+			"#isCheckedOut",
+			"#isClosed",
+			"#isCancelled"
+		];
+
+		// Disable all except the first
+		checkboxes.forEach((selector, index) => {
+			if (index !== 0) {
+				$(selector).prop("disabled", true);
+			}
+		});
+
+		// Handle enabling/disabling chain
+		checkboxes.forEach((selector, index) => {
+			$(selector).change(function () {
+				// If checked, enable next
+				if ($(this).is(":checked")) {
+					if (checkboxes[index + 1]) {
+						$(checkboxes[index + 1]).prop("disabled", false);
+					}
+				} else {
+					// Uncheck and disable all following checkboxes
+					for (let i = index + 1; i < checkboxes.length; i++) {
+						$(checkboxes[i]).prop("checked", false).prop("disabled", true);
+					}
+				}
+
+				// Show/hide cancellation reason
+				if ($("#isCancelled").is(":checked")) {
+					$("#cancelReasonGroup").slideDown();
+				} else {
+					$("#cancelReasonGroup").slideUp();
+					$("#cancellationReason").val('');
+				}
+			});
+		});
+	});
+</script>
+
+

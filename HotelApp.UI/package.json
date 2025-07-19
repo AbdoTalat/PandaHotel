@@ -1,0 +1,16 @@
+{
+  "name": "hotelapp.ui",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build-scss": "sass wwwroot/scss/panda.scss wwwroot/css/style.css --style=compressed",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "sass": "^1.83.4"
+  }
+}

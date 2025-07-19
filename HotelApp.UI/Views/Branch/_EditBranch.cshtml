@@ -1,0 +1,196 @@
+﻿@model EditBranchDTO
+
+<form class="form-basic ajaxEditForm" asp-action="EditBranch" asp-controller="Branch" method="post">
+	<input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+	<div class="panel panel-flat border-left-lg border-left-teal ">
+		<div class="panel-body">
+			<div class="content">
+				<fieldset>
+
+					<div class="row">
+						<div class="col-md-6">
+							<label>Branch Name:</label>
+							<div class="form-group">
+								<input asp-for="Name" class="form-control" required placeholder="Branch Name">
+								<span asp-validation-for="Name" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+                        <div class="col-md-6">
+                            <label>Country:</label>
+                            <div class="form-group">
+                                <select asp-for="CountryId" id="countrySelect" class="form-control" required data-selected-value="@Model.CountryId">
+                                    <option></option>
+                                </select>
+                                <span asp-validation-for="CountryId" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+						
+					</div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Governorate/State:</label>
+                            <div class="form-group">
+                                <select asp-for="StateId" id="stateSelect" class="form-control" required data-selected-value="@Model.StateId">
+                                    <option></option>
+                                </select>
+                                <span asp-validation-for="StateId" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+						<div class="col-md-6">
+							<label>City:</label>
+							<div class="form-group">
+								<input asp-for="City" class="form-control" required placeholder="City">
+								<span asp-validation-for="City" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+						
+					</div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>State:</label>
+                            <div class="form-group">
+                                <input asp-for="Street" class="form-control" required placeholder="Branch Street">
+                                <span asp-validation-for="Street" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Zip_Code:</label>
+                            <div class="form-group">
+                                <input asp-for="Zip_Code" id="zipCode" class="form-control" required placeholder="Zip_Code" readonly />
+                                <span asp-validation-for="Zip_Code" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+						
+
+					</div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Branch Contact-Number:</label>
+                            <div class="form-group">
+                                <input asp-for="ContactNumber" class="form-control" data-mask="+(99) 999-999-9999" placeholder="Enter Contact-Number #" required>
+                                <span asp-validation-for="ContactNumber " class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="panel panel-flat">
+								<div class="panel-heading">
+									<h6 class="panel-title">More Branch Setup<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+								</div>
+								<div class="panel-body">
+									<div class="alpaca-control checkbox">
+										<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+                                            <input type="checkbox" asp-for="IsActive" class="switchery">
+											Is Active
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	<div class="text-right">
+		<button class="btn btn-link" data-dismiss="modal"> Cancel</button>
+        <button type="submit" class="btn bg-teal-400 btn-lg"><i class="icon-checkmark4"></i> Save</button>
+	</div>
+</form>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#countrySelect').select2({
+            placeholder: "Select Country",
+            allowClear: true,
+        });
+    });
+
+    $(document).ready(function () {
+        $('#stateSelect').select2({
+            placeholder: "Select Status",
+            allowClear: true,
+        });
+    });
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        var selectedCountryId = $('#countrySelect').data('selected-value'); // Get existing CountryId
+        var selectedStateId = $('#stateSelect').data('selected-value'); // Get existing StateId
+
+        // Load countries on page load
+        $.ajax({
+            url: '/Location/GetAllCountriesJson',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                var select = $('#countrySelect');
+                select.empty();
+                select.append('<option value="">Select Country</option>');
+
+                $.each(response, function (index, item) {
+                    var isSelected = (item.id == selectedCountryId) ? 'selected' : '';
+                    select.append('<option value="' + item.id + '" data-phonecode="' + item.phoneCode + '" ' + isSelected + '>' + item.name + '</option>');
+                });
+
+                // Trigger change event if a country is preselected
+                if (selectedCountryId) {
+                    $('#countrySelect').trigger('change');
+                }
+            },
+            error: function () {
+                console.error('Failed to load countries.');
+            }
+        });
+
+        // When a country is selected, update Zip_Code with PhoneCode
+        $('#countrySelect').change(function () {
+            var selectedOption = $(this).find(':selected');
+            var phoneCode = selectedOption.data('phonecode');
+
+            if (phoneCode) {
+                $('#zipCode').val(phoneCode);
+            } else {
+                $('#zipCode').val('');
+            }
+
+            // Load states based on selected country
+            var countryId = $(this).val();
+            if (countryId) {
+                $.ajax({
+                    url: '/Location/GetAllStatesJson?countryId=' + countryId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        var stateSelect = $('#stateSelect');
+                        stateSelect.empty();
+                        stateSelect.append('<option value="">Select State</option>');
+
+                        $.each(response, function (index, item) {
+                            var isSelected = (item.id == selectedStateId) ? 'selected' : '';
+                            stateSelect.append('<option value="' + item.id + '" ' + isSelected + '>' + item.name + '</option>');
+                        });
+                    },
+                    error: function () {
+                        console.error('Failed to load states.');
+                    }
+                });
+            } else {
+                $('#stateSelect').empty().append('<option value="">Select State</option>');
+            }
+        });
+    });
+</script>
+
+
+@await Html.PartialAsync("_ValidationScriptsPartial")

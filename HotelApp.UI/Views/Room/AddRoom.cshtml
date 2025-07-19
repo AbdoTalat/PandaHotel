@@ -1,0 +1,337 @@
+﻿@model AddRoomDTO
+@{
+	TempData["Title"] = "Add Room";
+	int BranchId = ViewBag.BranchId;
+}
+
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Add Room</span></h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li><a asp-action="Index" asp-controller="Room">Rooms</a></li>
+			<li class="active">Add Room</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+ <div class="content">
+	<form  asp-action="AddRoom" asp-controller="Room" method="post">
+		<input type="hidden" asp-for="BranchId" value="@BranchId" />
+		<div class="panel panel-flat border-left-md border-left-teal">
+			<div class="panel-heading">
+				<h5 class="panel-title">Add Room<a class="heading-elements-toggle"><i class="icon-more"></i></a></h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse" class=""></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="panel-body" style="display block;">
+				<div class="row">
+					<div class="col-md-12">
+						<legend class="text-semibold"> Room Fileds</legend>
+                    </div>
+					<div class="col-md-6">
+						<fieldset>
+							<div class="form-group">
+								<label>Room number<span class="text-danger">*</span></label>
+									<input asp-for="RoomNumber" class="form-control" placeholder="First Name" required>
+								<span asp-validation-for="RoomNumber" class="text-danger validation-error-label"></span>
+								</div>
+
+							<div class="form-group">
+										<label>Floor<span class="text-danger">*</span></label>
+										<select asp-for="FloorId" id="floorSelect" name="FloorId" class="form-control select" required data-placeholder="Select Floor">
+											<option></option>
+										</select>
+								<span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
+									</div>
+
+							
+
+							<div class="form-group">
+								<label>Description<span class="text-danger">*</span></label>
+								<textarea asp-for="Description" class="form-control" placeholder="Room Description"></textarea>
+								<span class="text-danger validation-error-label" asp-validation-for="Description"></span>
+							</div>
+						</fieldset>
+					</div>
+
+					<div class="col-md-6">
+						<fieldset>
+
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Room Status<span class="text-danger">*</span></label>
+										<select asp-for="RoomStatusId" id="StatusSelect" name="RoomStatusId" class="form-control select" required data-placeholder="Choose Status">
+											<option value=""></option>
+										</select>
+										<span asp-validation-for="RoomStatusId" class="text-danger validation-error-label"></span>
+                                    </div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Room Type<span class="text-danger">*</span></label>
+                                        <select asp-for="RoomTypeId" id="roomTypeSelect" name="RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
+											<option value=""></option>
+										</select>
+										<span asp-validation-for="RoomTypeId" class="text-danger validation-error-label"></span>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-4">
+									<div class="form-group">
+                                        <label>
+                                            Max Adults<span class="text-danger">*</span>    
+											<a data-popup="popover" data-content="Max num of adults in the room" data-trigger="hover">
+												<i class="icon-info22" style="color#00796B"></i>
+											</a>
+                                        </label>
+										<input asp-for="MaxNumOfAdults" class="form-control" id="maxNumOfAdults" placeholder="Max Adults">
+										<span class="text-danger validation-error-label" asp-validation-for="MaxNumOfAdults"></span>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<div class="form-group">
+										<label>Max Childrens<span class="text-danger">*</span>
+											<a data-popup="popover" data-content="Max num of childrens in the room" data-trigger="hover">
+												<i class="icon-info22" style="color#00796B"></i>
+											</a>
+										</label>
+										<input  asp-for="MaxNumOfChildrens" class="form-control" id="maxNumOfChildren" placeholder="Max Childrens" />
+										<span class="text-danger validation-error-label" asp-validation-for="MaxNumOfChildrens"></span>
+									</div>
+								</div>
+								
+								<div class="col-md-4">
+									<div class="form-group">
+										<label>Price Per Night<span class="text-danger">*</span></label>
+										<input asp-for="PricePerNight" class="form-control" id="roomPrice" placeholder="Price per Night">
+										<span class="text-danger validation-error-label" asp-validation-for="PricePerNight"></span>
+										
+									</div>
+								</div>
+						</div>
+						
+					</fieldset>
+				</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+                        <legend class="text-semibold">Advanced Room Setup</legend>
+
+					</div>
+
+					<div class="col-md-6">
+						<div class="panel panel-flat">
+							<div class="panel-heading">
+								<h6 class="panel-title">Setup</h6>
+							</div>
+							<div class="panel-body">
+								<div class="form-group ">
+
+									<div class="checkbox">
+										<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+											<input type="checkbox" asp-for="IsActive" class="switchery">
+											Is Active
+										</label>
+									</div>
+									<div class="checkbox">
+										<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+											<input type="checkbox" asp-for="IsAffectedByRoomType" class="switchery">
+											Is Affected by Room Type
+										</label>
+									</div>
+
+								</div>
+								<a href="#more-info" data-toggle="collapse" class="collapsed" aria-expanded="false"><i class="icon-info3"></i>More Info</a>
+								<div class="mt-10 collapse" id="more-info" aria-expanded="false" style="height 0px;">
+									<span><i class="icon-arrow-right13 text-primary"></i>Checking <b> Is Affected By Room Type</b> will apply changes to this room</span>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<div class="panel panel-flat">
+							<div class="panel-heading">
+								<h6 class="panel-title">Options</h6>
+							</div>
+                            <div class="panel-body">
+                                <p>Check the options that the room has</p>
+								<div class="form-group ">
+
+									
+									@foreach(var item in ViewBag.Options)
+									{
+										<div class="checkbox">
+											<label class="checkbox-inline checkbox-left">
+												<input type="checkbox" name="SelectedOptions" value="@item.Id" class="styled">
+												@item.Name
+											</label>
+										</div>
+
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
+		
+		<div class="text-center">
+            <a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Room"> Cancel</a>
+            <button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-plus2"></i> Add</button>
+        </div>
+	</form>
+</div> 
+
+
+@section Scripts {
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '@TempData["Error"]'
+            });
+        </script>
+    }
+
+	<script>
+		$(document).ready(function () {
+			$.ajax({
+				url: '/RoomType/GetRoomTypesJson',
+				type: 'GET',
+				dataType: 'json',
+				success: function (response) {
+					var select = $('#roomTypeSelect');
+					select.empty();
+					select.append('<option value="">Select Room Type</option>');
+
+					$.each(response, function (index, item) {
+						select.append('<option value="' + item.id + '">' + item.typeName + '</option>');
+					});
+				},
+				error: function () {
+					console.error('Failed to load room types.');
+				}
+			});
+		});
+
+		$(document).ready(function () {
+			$.ajax({
+				url: '/Floor/GetFloorsJson',
+				type: 'GET',
+				dataType: 'json',
+				success: function (response) {
+					var select = $('#floorSelect');
+					select.empty();
+					select.append('<option value="">Select Floor</option>');
+
+					$.each(response, function (index, item) {
+						select.append('<option value="' + item.id + '">' + item.number + '</option>');
+					});
+				},
+				error: function () {
+					console.error('Failed to load room types.');
+				}
+			});
+		});
+
+		$(document).ready(function () {
+			$.ajax({
+				url: '/RoomStatus/GetRoomStatusJson',
+				type: 'GET',
+				dataType: 'json',
+				success: function (response) {
+					var select = $('#StatusSelect');
+					select.empty();
+					select.append('<option value="">Select Status</option>');
+
+					$.each(response, function (index, item) {
+						select.append('<option value="' + item.id + '">' + item.name + '</option>');
+					});
+				},
+				error: function () {
+					console.error('Failed to load room types.');
+				}
+			});
+		});
+
+
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			$('#roomTypeSelect').change(function () {
+				var roomTypeId = $(this).val();
+				if (roomTypeId) {
+					$.get('/RoomType/GetRoomTypeData', { roomTypeId roomTypeId }, function (response) {
+						if (response.success) {
+							$('#roomPrice').val(response.price);
+							$('#maxNumOfAdults').val(response.maxAdults);
+							$('#maxNumOfChildren').val(response.maxChildren);
+						} else {
+							alert(response.message);
+							$('#roomPrice').val('');
+							$('#maxNumOfAdults').val('');
+							$('#maxNumOfChildren').val('');
+						}
+					});
+				} else {
+					$('#roomPrice').val('');
+					$('#maxNumOfAdults').val('');
+					$('#maxNumOfChildren').val('');
+				}
+			});
+		});
+	</script>
+
+
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}

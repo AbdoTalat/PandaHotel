@@ -1,0 +1,416 @@
+﻿
+@model IEnumerable<GetAllRoomsDTO>
+@{
+	int rowNumber = 1;
+	TempData["Title"] = "Rooms";
+
+	var canView = (await AuthorizationService.AuthorizeAsync(User, "Room.View")).Succeeded;
+	var canEdit = (await AuthorizationService.AuthorizeAsync(User, "Room.Edit")).Succeeded;
+	var canDelete = (await AuthorizationService.AuthorizeAsync(User, "Room.Delete")).Succeeded;
+
+}
+
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Rooms </span></h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+	
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			@* <li><a asp-action="Index" asp-controller="Room">Rooms Management</a></li> *@
+			<li class="active">Rooms (@Model.Count())</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<div class="content ">
+
+	<!-- Cards -->
+	<div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-body bg-success-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-left media-middle">
+                        <i class="icon-pointer icon-3x opacity-75"></i>
+                    </div>
+
+                    <div class="media-body text-right">
+                        <h3 class="no-margin">@ViewBag.available</h3>
+                        <span class="text-uppercase text-size-mini">total available rooms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel panel-body bg-primary-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-left media-middle">
+						<i class="icon-enter6 icon-3x opacity-75"></i>
+                    </div>
+
+                    <div class="media-body text-right">
+                        <h3 class="no-margin">@ViewBag.Occupied</h3>
+                        <span class="text-uppercase text-size-mini">total occupied rooms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<div class="col-lg-4">
+			<div class="panel panel-body bg-danger-400 has-bg-image">
+				<div class="media no-margin">
+					<div class="media-left media-middle">
+						<i class="icon-cog3 icon-2x"></i>
+					</div>
+
+					<div class="media-body text-right">
+						<h3 class="no-margin">@ViewBag.Maintain</h3>
+						<span class="text-uppercase text-size-mini">total maintain rooms</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		
+		
+
+
+		
+	</div>
+
+
+	<div class="panel panel-flat ">
+		<div class="panel-heading">
+			<h5 class="panel-title">Rooms </h5>
+			
+			<div class="heading-elements">
+				@if ((await AuthorizationService.AuthorizeAsync(User, "Room.Add")).Succeeded)
+				{
+
+					<a asp-action="AddRoom" asp-controller="Room" type="button" class="btn bg-teal-400 btn-lg">
+				<i class="icon-plus-circle2" style="font-size:21px; margin-right:0px; margin-top:3px"></i>
+				Add Room 
+				</a>
+				}
+			</div>
+		</div>
+
+		<hr class="my-3" style="margin-top:5px">
+
+		<div class="panel-heading" style="margin-bottom:40px">
+			<div class="heading-elements">
+				<ul class="icons-list">
+					<li><button href="#filterForm" data-toggle="collapse" aria-expanded="false" id="toggleFilterBtn" class="btn bg-teal-400 "><i class="icon-filter3"></i> Filter</button></li>
+                    <li><a class="btn bg-teal-400" id="refreshRoomsBtn" style="color:#fff" data-action="reload"></a></li>
+					<li><a class="btn bg-teal-400" style="color:#fff" data-action="collapse"></a></li>
+				</ul>
+
+			</div>
+			
+		</div>
+		
+		<div class="row " style="padding-left:50px; padding-right:50px">
+			<div class="col-md-12">
+				<div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
+                    
+                            <div class="panel panel-flat">
+                                <div class="panel-heading">
+                                    <h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                                    <div class="heading-elements">
+                                        <ul class="icons-list">
+                                            <li><a data-action="collapse"></a></li>
+                                            <li><a data-action="reload"></a></li>
+                                            <li><a data-action="close"></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+								<div class="panel-body">
+							<form >
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+											<input type="text" class="form-control" name="roomNumber" placeholder="Room Number" value="@Context.Request.Query["roomNumber"]">
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<input type="number" class="form-control" name="maxAdults" placeholder="Max Adults" value="@Context.Request.Query["maxAdults"]">
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<input type="number" class="form-control" name="maxChildren" placeholder="Max Children" value="@Context.Request.Query["maxChildren"]">
+										</div>
+									</div>
+								</div>
+
+								<div class="text-right">
+									<button type="submit" class="btn btn-primary"> <i class="icon-search4"></i> Search</button>
+								</div>
+							</form>
+						</div>
+
+                            </div>
+                       
+                </div>
+
+			</div>
+		</div>
+
+
+		<table class="table datatable-button-html5-basic dataTable" id="MyTable">
+			<thead>
+				<tr class="border-double">
+					<th>#</th>
+					<th>Room Number</th>
+					<th>Floor</th>
+					<th>Room Type</th>
+					<th>Max Adults</th>
+					<th>Max Children</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody id="roomsTableBody">
+				@foreach (var item in Model)
+				{
+					<tr class="room-row">
+						<td>@rowNumber</td>
+						<td class="room-number">@item.RoomNumber</td>
+						<td>@item.Floor</td>
+						<td class="room-type">@item.TypeName</td>
+						<td>@item.MaxNumOfAdults</td>
+						<td>@item.MaxNumOfChildren</td>
+						<td><span class="label label-rounded" style="background-color:@item.RoomStatusColor">@item.RoomStatusName</span></td>
+						<td>
+							@if (canView)
+							{
+								<a data-title="Room Details" data-url="/Room/GetRoomDetails/@item.Id" class="btnEditOpenModal">
+									<i class="icon-info22" style="font-size:20px; margin-right:8px"></i>
+								</a>
+							}
+							@if (canEdit)
+							{
+								<a data-title="Edit Room" data-url="/Room/EditRoom/@item.Id" class="text-teal-600 btnEditOpenModal">
+									<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
+								</a>
+							}
+							@if (canDelete && !item.IsActive)
+							{
+								<a data-id="@item.Id" class="text-danger-600 btn-delete">
+									<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+								</a>
+							}
+						</td>
+					</tr>
+					rowNumber++;
+				}
+			</tbody>
+		</table>
+
+
+	</div>
+</div>
+
+
+@section Scripts {
+
+	 <script>
+		$(document).ready(function () {
+			const swalWithBootstrapButtons = Swal.mixin({
+				customClass: {
+					confirmButton: 'btn btn-danger',
+					cancelButton: 'btn btn-default custom-cancel-btn'
+				},
+				buttonsStyling: false
+			});
+
+			// Use event delegation for dynamically created elements
+			$('#MyTable tbody').on('click', '.btn-delete', function () {
+				let button = $(this);  // Reference to the clicked button
+				let itemId = button.data("id");
+				let row = button.closest("tr"); // Get the row that contains the button
+
+				swalWithBootstrapButtons.fire({
+					position: "top",
+					title: "Are you sure?",
+					text: "You won't be able to revert this!",
+					icon: "warning",
+					iconColor: "red",
+					showCancelButton: true,
+					confirmButtonText: "Delete!",
+					cancelButtonText: "Cancel",
+					reverseButtons: true
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$.ajax({
+							url: '/Room/DeleteRoom/' + itemId,
+							type: 'DELETE',
+							success: function (response) {
+								if (response.success) {
+									swalWithBootstrapButtons.fire({
+										position: "top",
+										title: "Deleted!",
+										text: response.message,
+										icon: "success",
+										customClass: {
+											confirmButton: 'btn btn-success'
+										}
+									}).then(() => {
+										row.fadeOut(400, function () { // Fade out the row smoothly
+											$(this).remove(); // Remove the row from DOM
+										});
+									});
+								} else {
+									swalWithBootstrapButtons.fire({
+										position: "top",
+										title: "Warning!",
+										text: response.message,
+										icon: "warning",
+										customClass: {
+											confirmButton: 'btn btn-warning'
+										}
+									});
+								}
+							},
+							error: function () {
+								swalWithBootstrapButtons.fire({
+									position: "top",
+									title: "Error!",
+									text: "Something went wrong!",
+									icon: "error"
+								});
+							}
+						});
+					}
+				});
+			});
+		});
+
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			let isFiltered = false;
+
+			// Initialize DataTable
+			let dataTable = $("#MyTable").DataTable();
+
+			function loadRooms(roomNumber = "", maxAdults = "", maxChildren = "", isRefresh = false) {
+				$.ajax({
+					url: '/Room/GetRoomsJson',
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						roomNumber: roomNumber,
+						maxAdults: maxAdults,
+						maxChildren: maxChildren
+					},
+					success: function (response) {
+						if (response.success) {
+							let roomsToShow = response.data;
+
+							// Clear table
+							dataTable.clear();
+
+							// Populate rows
+							$.each(roomsToShow, function (index, item) {
+								let statusLabel = getStatusBadge(item);
+								let actionButtons = getActionButtons(item);
+
+								dataTable.row.add([
+									index + 1,
+									item.roomNumber,
+									item.floor,
+									item.typeName,
+									item.maxNumOfAdults,
+									item.maxNumOfChildren,
+									statusLabel,
+									actionButtons
+								]);
+							});
+
+							dataTable.draw();
+						} else {
+							console.error("Failed to load rooms.");
+						}
+					},
+					error: function () {
+						console.error("Error while fetching rooms.");
+					}
+				});
+			}
+
+			// Filter button
+			$(".btn-primary").click(function (e) {
+				e.preventDefault();
+				let roomNumber = $("input[name='roomNumber']").val();
+				let maxAdults = $("input[name='maxAdults']").val();
+				let maxChildren = $("input[name='maxChildren']").val();
+				isFiltered = true;
+				loadRooms(roomNumber, maxAdults, maxChildren, false);
+			});
+
+			// Refresh button
+			$("#refreshRoomsBtn").click(function (e) {
+				e.preventDefault();
+				$("input[name='roomNumber'], input[name='maxAdults'], input[name='maxChildren']").val("");
+				isFiltered = false;
+				loadRooms("", "", "", true);
+			});
+
+			// Status badge using DB color
+			function getStatusBadge(item) {
+				let bg = item.roomStatusColor || '#999';
+				let text = item.roomStatus || 'Unknown';
+				return `<span class="label label-rounded" style="background-color:${bg}; color:#fff;">${text}</span>`;
+			}
+
+			// Action buttons
+			function getActionButtons(item) {
+				return (item.canViewRoom ? `<a data-title="Room Details" data-url="/Room/GetRoomDetails/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+					(item.canEditRoom ? `<a data-title="Edit Room" data-url="/Room/EditRoom/${item.id}" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+					(item.canDeleteRoom ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
+			}
+
+			// Optional: Load on page load
+			// loadRooms();
+		});
+	</script>
+
+}
+
+

@@ -1,0 +1,352 @@
+﻿@model BookRoomDTO
+@{
+    int BranchId = ViewBag.BranchId;
+}
+
+<div class="row">
+    
+    <form id="bookRoomForm">
+        <input type="hidden" asp-for="BranchId" value="@ViewBag.BranchId" />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <fieldset>
+            <div class="row">
+                <!-- Left Section -->
+                <div class="col-md-6">
+                    <!-- Check-in & Check-out Dates -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Check In Date<span class="text-danger">*</span></label>
+                                <input  asp-for="CheckInDate" class="form-control" />
+                                @* <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn bg-teal-400 btn-icon" id="CheckInDateButton"><i class="icon-calendar3"></i></button>
+                                    </span>
+                                    <input type="text" asp-for="CheckInDate" class="form-control" id="CheckInDate" placeholder="Select a date" readonly="">
+                                </div> *@
+                                <span class="text-danger validation-error-label" asp-validation-for="CheckInDate"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Check Out Date<span class="text-danger">*</span></label>
+                                <input  asp-for="CheckOutDate" class="form-control" />
+                               @*  <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn bg-teal-400 btn-icon" id="CheckOutDateButton"><i class="icon-calendar3"></i></button>
+                                    </span>
+                                    <input type="text" asp-for="CheckOutDate" class="form-control" id="CheckOutDate" placeholder="Select a date" readonly="">
+                                </div> *@
+                                <span class="text-danger validation-error-label" asp-validation-for="CheckOutDate"></span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adults & Children -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Adults<span class="text-danger">*</span></label>
+                                    <select asp-for="NumOfAdults" class="form-control select" required data-placeholder="Num of adults">
+                                        <option></option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                </select>
+                                <span asp-validation-for="NumOfAdults" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Children<span class="text-danger">*</span></label>
+                                    <select asp-for="NumOfChildrens" class="form-control select" required data-placeholder="Num of childrens">
+                                        <option></option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>                            
+                                    <span asp-validation-for="NumOfChildrens" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Choose Rate -->
+                    <div class="form-group">
+                        <label>Choose Rate<span class="text-danger">*</span></label>
+                        <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
+                    </div>
+
+                    <!-- Room Types Selection -->
+                    @foreach (var item in ViewBag.RoomTypes)
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" class="checkbox-input roomTypeCheckbox" data-roomtypeid="@item.Id">
+                                            <div class="checkbox-custom"></div>
+                                            <a class="text-default">@item.Name</a>
+                                        </label>
+                                        <span>@item.NumOfAvailableRooms room(s)</span>
+                                    </div>
+                                        <div class="col-md-6">
+                                        <input  type="number" class="form-control touchspin-empty roomCountInput" disabled min="1" data-roomtypeid="@item.Id">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right Section -->
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h6 class="panel-title">Rate Details <a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                            <div class="heading-elements">
+                                <ul class="icons-list">
+                                    <li><a data-action="collapse"></a></li>
+                                    <li><a data-action="reload"></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div id="rateDetails" class="col-md-12"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </fieldset>
+    </form>
+</div>
+
+<script>
+    $("#CheckInDate, #CheckOutDate").change(function () {
+        let checkIn = new Date($("#CheckInDate").val());
+        let checkOut = new Date($("#CheckOutDate").val());
+
+        if (checkIn >= checkOut) {
+            Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: 'Error!',
+                text: 'Check-out date must be after check-in date.',
+                showConfirmButton: true
+            });
+            $("#CheckOutDate").val("");
+        }
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        let selectedRoomTypes = [];
+
+        $('.roomTypeCheckbox').change(function () {
+            let roomTypeId = $(this).data('roomtypeid');
+            let roomCountInput = $('.roomCountInput[data-roomtypeid="' + roomTypeId + '"]');
+
+            if ($(this).is(':checked')) {
+                roomCountInput.prop('disabled', false);
+                if (!selectedRoomTypes.includes(roomTypeId)) {
+                    selectedRoomTypes.push(roomTypeId);
+                }
+            } else {
+                roomCountInput.prop('disabled', true).val('');
+                selectedRoomTypes = selectedRoomTypes.filter(id => id !== roomTypeId);
+            }
+
+            loadRatesDropdown();
+        });
+
+        function loadRatesDropdown() {
+            let checkInVal = $("#CheckInDate").val();
+            let checkOutVal = $("#CheckOutDate").val();
+
+
+            if (!checkInVal || !checkOutVal || selectedRoomTypes.length === 0) {
+                // Clear dropdown and details
+                $('#rateSelect').empty().append('<option value="">Select Rate</option>');
+                $('#rateDetails').html('');
+                return; // Do NOT make AJAX call
+            }
+
+            let checkInDate = new Date(checkInVal);
+            let checkOutDate = new Date(checkOutVal);
+            let roomTypeIds = selectedRoomTypes.map(id => Number(id));
+
+            $.ajax({
+                url: '/Rate/GetRatesByRoomTypes',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RoomTypeIds: roomTypeIds,
+                    CheckInDate: checkInDate,
+                    CheckOutDate: checkOutDate
+                }),
+                success: function (response) {
+                    var rateSelect = $('#rateSelect');
+                    rateSelect.empty().append('<option value="">Select Rate</option>');
+
+                    $.each(response, function (index, item) {
+                        rateSelect.append(`<option value="${item.id}">${item.name} - ($${item.price})</option>`);
+                    });
+                },
+                error: function (xhr) {
+                    console.error('Failed to load rates.', xhr.responseText);
+                }
+            });
+        }
+
+
+        $('#rateDetails').hide();
+
+        function loadRateDetails() {
+            let selectedRateId = $('#rateSelect').val();
+
+            if (!selectedRateId) {
+                Swal.fire({
+                    position: 'top',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Please select a rate first.',
+                    showConfirmButton: true
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/Rate/GetRateDetailsForReservation',
+                type: 'GET',
+                data: { rateId: selectedRateId },
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        let rateHtml = '';
+
+                        $.each(response, function (index, rateDetail) {
+                            rateHtml += `
+                                            <h4>${rateDetail.typeName}</h4>
+                                            <li><strong>Hourly Price:</strong> $${rateDetail.hourlyPrice}</li>
+                                            <li><strong>Daily Price:</strong> $${rateDetail.dailyPrice}</li>
+                                            <li><strong>Extra Daily Price:</strong> $${rateDetail.extraDailyPrice}</li>
+                                            <li><strong>Weekly Price:</strong> $${rateDetail.weeklyPrice}</li>
+                                            <li><strong>Monthly Price:</strong> $${rateDetail.monthlyPrice}</li>
+                                            <hr>
+                                        `;
+                        });
+
+                        rateHtml += '</ul></div>';
+                        $('#rateDetails').html(rateHtml).show();
+                    } 
+                    else{
+                        $('#rateDetails').html('<p>No rate details available.</p>').show();
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Failed to load rate details.', xhr.responseText);
+                    $('#rateDetails').html('<p>Error loading rate details.</p>').show();
+                }
+            });
+        }
+
+        $('.heading-elements [data-action="reload"]').click(function (e) {
+            e.preventDefault();
+            loadRateDetails();
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 3000,
+            positionClass: "toast-top-right"
+        };
+
+        $("#bookRoomForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = {
+                CheckInDate: $("#CheckInDate").val(),
+                CheckOutDate: $("#CheckOutDate").val(),
+                NumOfAdults: $("#NumOfAdults").val(),
+                NumOfChildrens: $("#NumOfChildrens").val(),
+                RateId: $("#rateSelect").val(),
+                BranchId: $("input[name='BranchId']").val(),
+                roomTypeToBookDTOs: []
+            };
+
+            $(".roomTypeCheckbox:checked").each(function () {
+                const roomTypeId = $(this).data("roomtypeid");
+                const numOfRooms = $(this).closest(".panel-body").find(".roomCountInput").val();
+                if (numOfRooms > 0) {
+                    formData.roomTypeToBookDTOs.push({ Id: roomTypeId, NumOfRooms: numOfRooms });
+                }
+            });
+
+            $.ajax({
+                url: '/Reservation/SaveRoomToBook',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message, 'Success');
+
+                        // Populate confirmation section
+                        $("#confirmCheckIn").text(formData.CheckInDate);
+                        $("#confirmCheckOut").text(formData.CheckOutDate);
+
+                        // Calculate number of nights
+                        const checkIn = new Date(formData.CheckInDate);
+                        const checkOut = new Date(formData.CheckOutDate);
+                        const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                        $("#confirmNights").text(nights);
+
+                        // Optionally show estimated amount (if returned from backend)
+                        if (response.amount) {
+                            $("#confirmAmount").text(response.amount + " EGP");
+                        }
+
+                        $(document).trigger("roomBookingSuccess"); // tab switch
+                    } else {
+                        Swal.fire("Error", response.message, "error");
+                        $("#bookRoomContainer").html(response);
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error", "Failed to save room booking.", "error");
+                }
+            });
+        });
+    });
+</script>
+
+

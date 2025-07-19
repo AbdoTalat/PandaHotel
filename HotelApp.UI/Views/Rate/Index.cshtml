@@ -1,0 +1,227 @@
+﻿@model IEnumerable<GetAllRatesDTO>
+@{
+    int rowNumber = 1;
+    TempData["Title"] = "Rates";
+}
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Room Type Rates</span> </h4>
+        </div>
+
+        <div class="heading-elements">
+            <div class="heading-btn-group">
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+            @* <li><a asp-action="Index" asp-controller="Option"> Settings</a></li> *@
+            @* <li><a asp-action="Index" asp-controller="Option"> Rates</a></li> *@
+            <li class="active">Rates  (@Model.Count())</li>
+        </ul>
+
+        <ul class="breadcrumb-elements">
+            <li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-gear position-left"></i>
+                    Settings
+                    <span class="caret"></span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                    <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                    <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+
+<div class="content">
+    
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title">Rates</h5>
+            <div class="heading-elements" style=" margin-right:0px">
+                @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Add")).Succeeded)
+                {
+                    <a asp-action="AddRate" asp-controller="Rate" type="button" class="btn bg-teal-400 btn-md">
+                        <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
+                        Add Rate
+                    </a>
+                }
+            </div>
+        </div>
+        <hr class="my-3" style="margin-top:5px; ">
+        @if (TempData["NotFound"] != null)
+        {
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Swal.fire({
+                        position:'top',
+                        icon: 'error',
+                        title: 'Not Found',
+                        text: '@TempData["NotFound"]',
+                        confirmButtonColor: '#00897B',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
+        }
+
+        <div class="panel-heading" style="margin-bottom:40px">
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><button id="toggleFilterBtn" class="btn bg-teal-400 "><i class="icon-filter3"></i> Filter</button> </li>
+                    <li><a class="btn bg-teal-400" id="refreshRoomsBtn" style="color:#fff" data-action="reload"></a></li>
+                    <li><a class="btn bg-teal-400" style="color:#fff" data-action="collapse"></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <table class="table datatable-button-html5-basic dataTable">
+            <thead>
+                <tr class="border-double">
+                    <th>#</th>
+                    <th>Rate Code</th>
+                    <th>Min Charge Dayes</th>
+                    <th>Is Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="item-@item.Id">
+                        <td>@item.Id</td>
+                        <td>@item.Code</td>
+                        <td>@item.MinChargeDayes</td>
+                        @if (item.IsActive)
+                        {
+                            <td><span class="label label-rounded label-success">Active</span></td>
+                        }
+                        else
+                        {
+                            <td><span class="label label-rounded label-danger">Not Active</span></td>
+                        }
+                        <td>
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Edit")).Succeeded)
+                            {
+                                <a asp-action="EditRate" asp-controller="Rate" asp-route-Id="@item.Id" class="text-teal-600 edit-rate-btn"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
+                            }
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Delete")).Succeeded)
+                            {
+                                <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
+                            }
+                        </td>
+                    </tr>
+                    rowNumber++;
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var successMessage = '@TempData["Success"]';
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-default custom-cancel-btn'
+                },
+                buttonsStyling: false
+            });
+
+            $(".btn-delete").click(function () {
+                let button = $(this);  // Reference to the clicked button
+                let itemId = button.data("id");
+                let row = button.closest("tr");
+
+                swalWithBootstrapButtons.fire({
+                    position: "top",
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    iconColor: "red",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete!",
+                    cancelButtonText: "Cancel",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Rate/DeleteRate/' + itemId,
+                            type: 'DELETE',
+                            success: function (response) {Rate
+                                if (response.success == true) {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        }
+                                    }).then(() => {
+                                        row.fadeOut(400, function () { // Fade out the row smoothly
+                                            $(this).remove(); // Remove the row from DOM
+                                        });
+                                    });
+                                }
+                                else if (response.success == false) {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "warning!",
+                                        text: response.message,
+                                        icon: "warning"
+                                    });
+                                }
+                                else {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Error!",
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                swalWithBootstrapButtons.fire({
+                                    position: "top",
+                                    title: "Error!",
+                                    text: "Something went wrong!",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+
+}

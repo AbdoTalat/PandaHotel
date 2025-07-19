@@ -1,0 +1,175 @@
+﻿@model AddGuestDTO
+
+ <div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-flat">
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Serach guest </label>
+                            <select id="emailSelect" class="form-control select" data-placeholder="Search by guest email...">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="guestForm">
+                    <input type="hidden" id="guestId" value="0" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="checkbox-container" id="primaryCheckboxContainer">
+                                <input asp-for="IsPrimary" id="isPrimary" type="checkbox" class="checkbox-input">
+                                <div class="checkbox-custom"></div>
+                                <span>Is Primary</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>First name</label>
+                                <input asp-for="FirstName" id="FirstName" required class="form-control" placeholder="First Name">
+                                <span class="text-danger validation-error-label" asp-validation-for="FirstName"></span>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Middle name</label>
+                                <input type="text" asp-for="MiddleName" id="MiddleName" class="form-control" placeholder="Middle Name">
+                                <span class="text-danger validation-error-label" asp-validation-for="MiddleName"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Last name</label>
+                                <input type="text" asp-for="LastName" id="LastName" class="form-control" placeholder="Last Name">
+                                <span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input asp-for="Email" id="Email" class="form-control" placeholder="Email">
+                                <span class="text-danger validation-error-label" asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone #</label>
+                                <input asp-for="Phone" id="Phone" class="form-control" placeholder="Phone Number">
+                                <span class="text-danger validation-error-label" asp-validation-for="Phone"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Type Of Proof</label>
+                                <select asp-for="TypeOfProof" id="TypeOfProof" class="form-control select" data-placeholder="Type of proof">
+                                    <option></option>
+                                    <option value="Passport">Passport</option>
+                                    <option value="National ID">National ID</option>
+                                </select>
+                                <span class="text-danger validation-error-label" asp-validation-for="TypeOfProof"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Proof number</label>
+                                <input asp-for="ProofNumber" id="ProofNumber" class="form-control" placeholder="Proof number">
+                                <span class="text-danger validation-error-label" asp-validation-for="ProofNumber"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input asp-for="DateOfBirth" type="date" id="DateOfBirth" class="form-control">
+                                <span class="text-danger validation-error-label" asp-validation-for="DateOfBirth"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input asp-for="Address" id="Address" class="form-control" placeholder="Address">
+                                <span class="text-danger validation-error-label" asp-validation-for="Address"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="text-right">
+                            <button type="button" id="addGuestButton" class="btn bg-teal-400 btn-lg">
+                                <i class="icon-plus-circle2"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </form> 
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Primary Guest Panel -->
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title text-grey-400">Primary Guest</h6>
+
+                <div class="heading-elements">
+                    <a><i class="icon-pencil"></i> Change</a>
+                </div>
+            </div>
+
+           
+            <div class="panel-body" id="primaryGuestContainer">
+                <!-- Primary guest info here -->
+            </div>
+        </div>
+
+        <!-- Normal Guests Panel -->
+        <div class="panel panel-flat panel-default">
+            <div class="panel-heading">
+                <h6 class="panel-title">
+                    Guests (<span id="guestCount">0</span>)
+                </h6>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table " id="normalGuestTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Normal guests will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

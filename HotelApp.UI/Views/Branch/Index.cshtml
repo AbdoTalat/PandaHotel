@@ -1,0 +1,323 @@
+﻿@model IEnumerable<GetAllBranches>
+@{
+    int rowNumber = 1;
+    TempData["Title"] = "Branches";
+}
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Branches</span>  </h4>
+        </div>
+
+        <div class="heading-elements">
+            <div class="heading-btn-group">
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+            @* <li><a asp-action="Index" asp-controller="Branch">Settings</a></li> *@
+            <li class="active">Branches  (@Model.Count())</li>
+        </ul>
+
+        <ul class="breadcrumb-elements">
+            <li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-gear position-left"></i>
+                    Settings
+                    <span class="caret"></span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                    <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                    <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+
+<!-- Content area -->
+<div class="content">
+
+    <div class="panel panel-flat ">
+
+        <div class="panel-heading">
+            <h5 class="panel-title">Branches</h5>
+            <div class="heading-elements" style=" margin-right:0px">
+                @if ((await AuthorizationService.AuthorizeAsync(User, "Branch.Add")).Succeeded)
+                {
+                <button data-title="Add New Branch" data-url="/Branch/AddBranch" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
+                    <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
+                    Add Branch
+                </button>
+                }
+            </div>
+        </div>
+
+        
+
+        <hr class="my-3" style="margin-top:5px">
+
+        <div class="panel-heading" style="margin-bottom:40px;">
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><button href="#filterForm" data-toggle="collapse" aria-expanded="false" id="toggleFilterBtn" class="btn bg-teal-400 "><i class="icon-filter3"></i> Filter</button></li>
+                    <li><a class="btn bg-teal-400" style="color:#fff" id="" data-action="reload"></a></li>
+                    <li><a class="btn bg-teal-400" style="color:#fff" data-action="collapse"></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row" style="padding-left:50px; padding-right:50px">
+            <div class="col-md-12">
+                <div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
+
+                    <div class="panel panel-flat">
+                        <div class="panel-heading">
+                            <h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                            <div class="heading-elements">
+                                <ul class="icons-list">
+                                    <li><a data-action="collapse"></a></li>
+                                    <li><a data-action="reload"></a></li>
+                                    <li><a data-action="close"></a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <form id="searchForm">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <input type="text" name="Name" class="form-control" placeholder="Branch Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <input type="text" name="Country" class="form-control" placeholder="Country">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <input type="text" name="State" class="form-control" placeholder="State">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="icon-search4"></i> Search
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+            
+        <table class="table datatable-button-html5-basic dataTable">
+            <thead >
+                <tr class="border-double">
+                    <th>#</th>
+                    <th >Name</th>
+                    <th>Contact Number</th>
+                    <th>Country</th>
+                    <th>Governorate</th>
+                    <th>Created By</th>
+                    <th>Last Modified By</th>
+                    <th>Is Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="item-@item.Id">
+                        <td>@rowNumber</td>
+                        <td>@item.Name</td>
+                        <td>@item.ContactNumber</td>
+                         <td>@item.Country</td>
+                        <td>@item.State</td>
+                        <td>@item.CreatedBy</td>
+                        <td>@item.LastModifiedBy</td>
+                        @if (item.IsActive)
+                        {
+                            <td><span class="label label-rounded label-success">Active</span></td>
+                        }
+                        else
+                        {
+                            <td><span class="label label-rounded label-danger">Not Active</span></td>
+                        }
+                        <td>
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "Branch.Edit")).Succeeded)
+                            {
+                            <a data-title="Edit Branch" data-url="/Branch/EditBranch/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
+                            }
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "Branch.Delete")).Succeeded && !item.IsActive)
+                            {
+                            <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
+                            }
+                        </td>
+                    </tr>
+                    rowNumber++;
+                }
+            </tbody>
+        </table>
+
+
+        
+
+
+    </div>
+</div>
+<!-- /content area -->
+
+
+
+
+
+
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-default custom-cancel-btn'
+                },
+                buttonsStyling: false
+            });
+
+            $(".btn-delete").click(function () {
+                let button = $(this);  // Reference to the clicked button
+                let itemId = button.data("id");
+                let row = button.closest("tr"); // Get the row that contains the button
+
+                swalWithBootstrapButtons.fire({
+                    position: "top",
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    iconColor: "red",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete!",
+                    cancelButtonText: "Cancel",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Branch/DeleteBranch/' + itemId,
+                            type: 'DELETE',
+                            success: function (response) {
+                                if (response.success) {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        }
+                                    }).then(() => {
+                                        row.fadeOut(400, function () {
+                                            $(this).remove(); 
+                                        });
+                                    });
+                                } else {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Error!",
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                swalWithBootstrapButtons.fire({
+                                    position: "top",
+                                    title: "Error!",
+                                    text: "Something went wrong!",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#searchForm").submit(function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                $.ajax({
+                    url: "/Branch/GetFilteredBranches", // Your controller action
+                    type: "GET",
+                    dataType: "json",
+                    data: $(this).serialize(), // Serialize form inputs
+                    success: function (response) {
+                        if (response.success) {
+                            var tbody = $("#branchTableBody");
+                            tbody.empty(); // Clear the table before appending new rows
+
+                            $.each(response.data, function (index, item) {
+                                var statusLabel = item.isActive
+                                    ? '<span class="label label-rounded label-success">Active</span>'
+                                    : '<span class="label label-rounded label-danger">Not Active</span>';
+
+                                var row = `<tr id="item-${item.id}">
+                                        <td>${index + 1}</td>
+                                        <td>${item.name}</td>
+                                        <td>${item.contactNumber}</td>
+                                        <td>${item.countryName ?? ''}</td>
+                                        <td>${item.stateName ?? ''}</td>
+                                        <td>${item.createdBy}</td>
+                                        <td>${item.lastModifiedBy}</td>
+                                        <td>${statusLabel}</td>
+                                        <td>
+                                            ${item.canEditBranch ? `<a data-title="Edit Branch" data-url="/Branch/EditBranch/${item.id}" class="text-teal-600 btnEditOpenModal">
+                                                <i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
+                                            </a>` : ''}
+                                            ${item.canDeleteBranch && !item.isActive ? `<a data-id="${item.id}" class="text-danger-600 btn-delete">
+                                                <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+                                            </a>` : ''}
+                                        </td>
+                                    </tr>`;
+
+                                tbody.append(row);
+                            });
+                        } else {
+                            console.error("Failed to load branches.");
+                        }
+                    },
+                    error: function () {
+                        console.error("Error while fetching branches.");
+                    }
+                });
+            });
+        });
+    </script>
+
+}

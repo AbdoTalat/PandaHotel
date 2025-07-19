@@ -1,0 +1,27 @@
+﻿@using HotelApp.PL
+
+
+@using HotelApp.Application.DTOs
+@using HotelApp.Application.DTOs.Account
+@using HotelApp.Application.DTOs.Rooms
+@using HotelApp.Application.DTOs.Users
+@using HotelApp.Application.DTOs.Branches
+@using HotelApp.Application.DTOs.RoleBased
+@using HotelApp.Application.DTOs.Guests
+@using HotelApp.Application.DTOs.Reservation
+@using HotelApp.Application.DTOs.RoomTypes
+@using HotelApp.Application.DTOs.Floor
+@using HotelApp.Application.DTOs.Options
+@using HotelApp.Application.DTOs.Rates
+@using HotelApp.Application.DTOs.RoomStatus
+@using HotelApp.Application.DTOs.SystemSetting
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+
+
+@using HotelApp.Domain.Entities
+@using HotelApp.Domain.Entities.RoleBased
+@using Microsoft.AspNetCore.Identity
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

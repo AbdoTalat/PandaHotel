@@ -1,0 +1,336 @@
+﻿@model EditUserDTO
+@{
+	TempData["Title"] = "Edit User";
+}
+
+<!-- Page header -->
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Administration</span> - Users - Edit User</h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+				<a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li><a asp-action="GetUsers" asp-controller="User">Administration</a></li>
+			<li class="active">Edit User</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- /page header -->
+
+<div class="content">
+	<div class="row">
+		<form id="editUserForm" class="form-basic" asp-action="EditUser" asp-controller="User" asp-route-userId="@Model.Id" method="post">
+            <div asp-validation-summary="All"></div>
+
+			<div class="col-md-12">
+				<div class="panel panel-flat border-left-lg border-left-teal">
+					<div class="panel-heading" style="height:70px">
+                        <h6 class="panel-title ">
+							<a class="collapsed" data-toggle="collapse" data-parent="#accordion-control-right"
+							   href="#editUser" aria-expanded="false">
+								<legend class="text-semibold "><i class="icon-reading position-left"></i> Edit User</legend>
+							</a>
+
+						</h6>
+					</div>
+					<div id="editUser" class="panel-collapse collapse in">
+						<div class="panel-body" >
+							<fieldset class="step" id="step1">
+								<div class="row">
+									<div class="col-md-6">
+										<label class="form-label">First Name <span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+												<input asp-for="FirstName" class="form-control" placeholder="First Name">
+												<span class="validation-badge" asp-validation-for="FirstName"></span>
+											</div>
+										</div>
+									</div>
+
+
+
+										<div class="col-md-6">
+											<label>Last Name</label>
+											<div class="form-group">
+												<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+													<input asp-for="LastName" class="form-control" placeholder="Last Name">
+												</div>
+											<span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
+											</div>
+										</div>
+
+									</div>
+
+								<div class="row">
+										<div class="col-md-6">
+											<label>User Name</label>
+											<div class="form-group">
+												<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+													<input asp-for="UserName" class="form-control" placeholder="User Name">
+												</div>
+											<span class="text-danger validation-error-label" asp-validation-for="UserName"></span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<label>E-mail Address</label>
+											<div class="form-group">
+												<div class="input-group input-group">
+													<span class="input-group-addon"><i class="fa-solid fa-envelope"></i></span>
+													<input asp-for="Email" class="form-control" placeholder="your@email.com">
+												</div>
+											<span class="text-danger validation-error-label" asp-validation-for="Email"></span>
+											</div>
+										</div>
+
+									</div>
+
+								<div class="row">
+									<div class="col-md-6">
+										<label>Default Branch</label>
+										<div class="form-group">
+											<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+												<select asp-for="DefaultBranchId" class="form-control select">
+													@foreach(var item in Model.AllBranches)
+													{
+														<option value="@item.Id">@item.Name</option>
+													}
+												</select>
+											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="DefaultBranchId"></span>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<div class="alpaca-control checkbox">
+											<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+												<input type="checkbox" asp-for="IsActive" class="switchery">
+												Is Active
+											</label>
+										</div>
+										<span class="text-danger validation-error-label" asp-validation-for="IsActive"></span>
+									</div>
+								</div>
+							</fieldset>
+							<br />
+						</div>
+					</div>
+				</div>
+			</div>
+           
+			<div class="col-md-6">
+				<div class="panel panel-flat border-left-lg border-left-teal">
+					<div class="panel-heading" style="height:70px">
+						<h6 class="panel-title">
+							<a class="collapsed" data-toggle="collapse" data-parent="#accordion-control-right"
+							   href="#assignBranches" aria-expanded="false">
+								<legend class="text-semibold"><i class="icon-pin-alt"></i> Assign Branches To User:</legend>
+							</a>
+						</h6>
+					</div>
+					<div class="collapse in">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+										@foreach (var branch in Model.AllBranches)
+										{
+											<div class="col-md-6">
+												<label class="checkbox-container">
+													<input type="checkbox"name="SelectedBranchIds"
+														class="checkbox-input roomTypeCheckbox"
+														value="@branch.Id"
+													@(Model.SelectedBranchIds.Contains(branch.Id) ? "checked" : "")>
+													<div class="checkbox-custom"></div>
+													<a class="text-default">@branch.Name</a>
+												</label>
+											</div>
+										}
+									</div>
+								</div>
+							</div>
+							<br />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel panel-flat border-left-lg border-left-teal">
+					<div class="panel-heading" style="height:70px">
+						<h6 class="panel-title">
+							<a class="collapsed" data-toggle="collapse" data-parent="#accordion-control-right"
+							   href="#assignRoles" aria-expanded="false">
+								<legend class="text-semibold"><i class="icon-user-lock"></i> Assign Roles To User:</legend>
+							</a>
+						</h6>
+					</div>
+					<div class="collapse in">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-md-12">
+
+									<div class="form-group">
+										@foreach (var role in Model.AllRoles)
+										{
+											<div class="col-md-6">
+												<label class="checkbox-container">
+													<input type="checkbox" name="SelectedRoles"
+														class="checkbox-input roomTypeCheckbox" value="@role"
+													@(Model.SelectedRoles.Contains(role) ? "checked" : "")>
+													<div class="checkbox-custom"></div>
+													<a class="text-default">@role</a>
+												</label>
+											</div>
+										}
+									</div>
+								</div>
+							</div>
+							<br />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="text-center">
+				<a class="btn btn-default btn-lg" asp-action="GetUsers" asp-controller="User"> Cancel</a>
+				<button type="submit" class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius"><i class="icon-checkmark4"></i> Save</button>
+			</div>
+    </form>
+
+</div>
+
+</div>
+
+
+
+<style>
+    /* Input field with validation error */
+    input.input-validation-error {
+        border: 1.5px solid #e74c3c !important;
+        background-color: #fff !important;
+    }
+
+    /* Ensure form group has relative positioning for absolute placement */
+    .form-group {
+        position: relative;
+    }
+
+    input.input-validation-error::placeholder {
+        color: #e74c3c !important;
+        opacity: 1; /* Ensure color is fully visible */
+    }
+    /* Validation badge (hidden by default) */
+    .validation-badge {
+        background-color: #e74c3c;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 5px 5px 0 0;
+        position: absolute;
+        top: -25px; /* Move above the input */
+        right: 2px; /* Align to the right */
+        z-index: 10;
+        display: none; /* Hide by default */
+    }
+
+    /* Show badge only when the input has a validation error */
+    .input-validation-error + .validation-badge {
+        display: inline-block;
+    }
+
+</style>
+<style>
+    .checkbox-container {
+        display: flex; /* Align checkbox and text in a row */
+        align-items: center; /* Align vertically */
+        gap: 8px; /* Space between checkbox and text */
+        cursor: pointer;
+    }
+
+    .checkbox-input {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+    }
+
+    .checkbox-custom {
+        width: 25px;
+        height: 25px;
+        background-color: #fff;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: solid #26A69A;
+        border-width: 2px;
+        position: relative; /* Ensure checkmark aligns correctly */
+    }
+
+    .checkbox-input:checked + .checkbox-custom {
+        background-color: #26A69A;
+        /* box-shadow: 0 1px 2px #00897B; */
+    }
+
+    .checkbox-custom::after {
+        content: "";
+        width: 7px;
+        height: 15px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+        position: absolute;
+        bottom: 4px; /* Adjusted for better centering */
+        left: 7px;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .checkbox-input:checked + .checkbox-custom::after {
+        opacity: 1;
+    }
+
+</style>
+
+@section Scripts{
+		
+
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}
