@@ -15,9 +15,9 @@ using HotelApp.Domain.Entities;
 
 namespace HotelApp.Application.Mapping
 {
-    public class MappingProfile : Profile
+    public class UserRoleMapping : Profile
 	{
-        public MappingProfile()
+        public UserRoleMapping()
         {
 
 			//User Mapping
@@ -43,11 +43,7 @@ namespace HotelApp.Application.Mapping
 			CreateMap<Role, GetRolesDTO>();
 
 
-			CreateMap<AddFloorDTO, Floor>();
-            CreateMap<EditFloorDTO, Floor>();
-			CreateMap<Floor, EditFloorDTO>();
-
-			CreateMap<Floor, GetFloorItemsDTO>();
+			
         }
 	}
 }

@@ -192,6 +192,11 @@ namespace HotelApp.Application.Services.RoomService
             return ServiceResponse<string>.ResponseSuccess("Rooms are available.");
         }
 
-        
-    }
+		public async Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end)
+        {
+            var roomsData = await _roomRepository.GetRoomsReportBetweenDatesAsync(start, end);
+
+            return roomsData;
+        }
+	}
 }

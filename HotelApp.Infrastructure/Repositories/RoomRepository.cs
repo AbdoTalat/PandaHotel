@@ -10,6 +10,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelApp.Domain.Enums;
 using HotelApp.Helper;
+using HotelApp.Domain.Entities;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -58,5 +59,33 @@ namespace HotelApp.Infrastructure.Repositories
 
             return availableRoomsCount;
         }
-    }
+        public async Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end)
+        {
+			var query = _context.Rooms
+				.Include(r => r.RoomStatus)
+				.Where(r => r.CreatedDate >= start && r.CreatedDate <= end);
+
+			var roomDetails = await query
+				.ProjectTo<RoomsDetailsDTO>(_mapper)
+				.ToListAsync();
+
+			var statusCounts = await query
+				.GroupBy(r => r.RoomStatus.Name)
+				.Select(g => new { Status = g.Key, Count = g.Count() })
+				.ToListAsync();
+
+			int available = statusCounts.FirstOrDefault(s => s.Status == "Available")?.Count ?? 0;
+			int occupied = statusCounts.FirstOrDefault(s => s.Status == "Occupied")?.Count ?? 0;
+			int maintenance = statusCounts.FirstOrDefault(s => s.Status == "Maintenance")?.Count ?? 0;
+
+			// ✅ 3. Return DTO
+			return new RoomReportDTO
+			{
+				roomsDetails = roomDetails,
+				NumOfAvailable = available,
+				NumOfOccupied = occupied,
+				NumOfMaintainable = maintenance
+			};
+		}
+	}
 }

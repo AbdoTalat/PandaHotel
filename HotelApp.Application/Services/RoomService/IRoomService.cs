@@ -19,5 +19,7 @@ namespace HotelApp.Application.Services.RoomService
 		Task<ServiceResponse<Room>> DeleteRoomAsync(int Id);
 		Task<ServiceResponse<string>> CheckRoomAvailabilityAsync(int roomTypeId, int numberOfRooms);
 
+		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
+
      }
 }

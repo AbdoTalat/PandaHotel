@@ -40,6 +40,7 @@ namespace HotelApp.Application.Mapping
 			.ForMember(dest => dest.AssignOptions,
 				opt => opt.MapFrom(src => src.RoomOptions.Select(ro => ro.OptionId)));
 
+			CreateMap<Room, RoomsDetailsDTO>();
 
 
 			/* Room Types */

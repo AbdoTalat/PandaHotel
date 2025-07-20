@@ -1,5 +1,6 @@
 ﻿using AspNetCore.Reporting;
 using HotelApp.Application.Services.ReportService;
+using HotelApp.Application.Services.RoomService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,13 @@ namespace HotelApp.UI.Controllers
 	{
 		private readonly IHostEnvironment _env;
 		private readonly IReportService _reportService;
+		private readonly IRoomService _roomService;
 
-		public ReportController(IHostEnvironment env, IReportService reportService)
+		public ReportController(IHostEnvironment env, IReportService reportService, IRoomService roomService)
         {
 			_env = env;
 			_reportService = reportService;
+			_roomService = roomService;
 		}
 
 		[Authorize(Policy = "Report.View")]
@@ -21,17 +24,38 @@ namespace HotelApp.UI.Controllers
 		{
 			return View();
 		}
-		public IActionResult RoomsReport()
+		//public IActionResult RoomsReport()
+		//{
+		//	var parameters = new Dictionary<string, string>
+		//	{
+		//		{ "pr1", "Welcome to the New Rooms Report." }
+		//	};
+
+		//	string reportPath  = Path.Combine(_env.ContentRootPath, "Reports", "RoomsReport.rdlc");
+
+
+		//	var reportBytes = _reportService.GeneratePdfReport(reportPath, parameters);
+		//	return File(reportBytes, "application/pdf", "RoomsReport.pdf");
+		//}
+
+		[HttpPost]
+		public async Task<IActionResult> RoomsReport(DateTime StartDate, DateTime EndDate)
 		{
+			var data = await _roomService.GetRoomsReportBetweenDatesAsync(StartDate, EndDate);
+
 			var parameters = new Dictionary<string, string>
 			{
-				{ "pr1", "Welcome to the Rooms Report." }
+				{ "StartDate", StartDate.ToString("yyyy-MM-dd") },
+				{ "EndDate", EndDate.ToString("yyyy-MM-dd") },
+				{ "NumOfAvailable", data.NumOfAvailable.ToString() },
+				{ "NumOfMaintain", data.NumOfMaintainable.ToString() },
+				{ "NumOfOccupied", data.NumOfOccupied.ToString() }
 			};
 
-			string reportPath  = Path.Combine(_env.ContentRootPath, "Reports", "RoomsReport.rdlc");
+			string reportPath = Path.Combine(_env.ContentRootPath, "Reports", "RoomsReport.rdlc");
 
+			var reportBytes = _reportService.GeneratePdfReport(reportPath, parameters, data.roomsDetails, "RoomDataSet");
 
-			var reportBytes = _reportService.GeneratePdfReport(reportPath, parameters);
 			return File(reportBytes, "application/pdf", "RoomsReport.pdf");
 		}
 

@@ -1,7 +1,6 @@
 ﻿using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.Configurations;
 using HotelApp.Infrastructure.Configurations.Locations;
-using HotelApp.Infrastructure.Configurations.RoleBased;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -73,9 +72,6 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<Room> Rooms { get; set; }
 		public DbSet<RoomType> RoomTypes { get; set; }
 		public DbSet<RoomStatus> RoomStatuses { get; set; }
-		//public DbSet<Entity> Entities { get; set; }
-		//public DbSet<Permission> Permissions { get; set; }
-		//public DbSet<RolePermission> RolePermissions { get; set; }
 		public DbSet<Guest> Guests { get; set; }
 		public DbSet<Reservation> Reservations { get; set; }
 		public DbSet<GuestReservation> guestReservations { get; set; }

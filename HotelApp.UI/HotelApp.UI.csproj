@@ -22,13 +22,9 @@
     <None Remove="Reports\RoomsReport.rdlc" />
     <None Remove="wwwroot\Reports\RoomsReport.rdlc" />
   </ItemGroup>
-
+	
   <ItemGroup>
-    <Content Include="Reports\RoomsReport.rdlc">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <EmbeddedResource Include="Reports\RoomsReport.rdlc" />
   </ItemGroup>
 
   <ItemGroup>

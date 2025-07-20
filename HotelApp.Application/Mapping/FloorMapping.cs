@@ -18,6 +18,10 @@ namespace HotelApp.Application.Mapping
 
             CreateMap<Floor, EditFloorDTO>();
 			CreateMap<EditFloorDTO, Floor>();
+
+			CreateMap<AddFloorDTO, Floor>();
+
+			CreateMap<Floor, GetFloorItemsDTO>();
 		}
     }
 }
