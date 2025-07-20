@@ -60,12 +60,6 @@ namespace HotelApp.UI.Controllers
                 return View(model);
             }
 
-            //var userBranches = await _branchService.GetBranchesByUserId(user.Id);
-            //var branchData = await _branchService.GetBranchByIdAsync(user.DefaultBranchId);
-
-            //HttpContext.Session.SetString("UserBranches", JsonConvert.SerializeObject(userBranches));
-            //HttpContext.Session.SetInt32("DefaultBranchId", user.DefaultBranchId);
-            //HttpContext.Session.SetString("BranchData", JsonConvert.SerializeObject(branchData));
 
 			await _signInManager.SignInAsync(user, isPersistent: model.rememberMe); // ← this adds all claims via your factory
 
