@@ -1,5 +1,4 @@
-﻿using HotelApp.Domain.Entities.RoleBased;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HotelApp.Domain

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelApp.Infrastructure.Configurations.RoleBased
+namespace HotelApp.Infrastructure.Configurations
 {
     public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {

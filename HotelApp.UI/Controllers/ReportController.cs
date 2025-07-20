@@ -24,19 +24,6 @@ namespace HotelApp.UI.Controllers
 		{
 			return View();
 		}
-		//public IActionResult RoomsReport()
-		//{
-		//	var parameters = new Dictionary<string, string>
-		//	{
-		//		{ "pr1", "Welcome to the New Rooms Report." }
-		//	};
-
-		//	string reportPath  = Path.Combine(_env.ContentRootPath, "Reports", "RoomsReport.rdlc");
-
-
-		//	var reportBytes = _reportService.GeneratePdfReport(reportPath, parameters);
-		//	return File(reportBytes, "application/pdf", "RoomsReport.pdf");
-		//}
 
 		[HttpPost]
 		public async Task<IActionResult> RoomsReport(DateTime StartDate, DateTime EndDate)

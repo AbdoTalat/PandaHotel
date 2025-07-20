@@ -1,5 +1,4 @@
 ﻿using HotelApp.Domain.Entities;
-using HotelApp.Domain.Entities.RoleBased;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
