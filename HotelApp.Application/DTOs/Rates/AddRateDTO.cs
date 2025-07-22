@@ -21,6 +21,7 @@ namespace HotelApp.Application.DTOs.Rates
 		public bool IsActive { get; set; }
 		public bool SkipHourly { get; set; }
 		public bool DisplayOnline { get; set; }
+		public int BranchId { get; set; }
 
 		public List<RoomTypeRateDTO> RoomTypeRates { get; set; } = new List<RoomTypeRateDTO>();
 	}

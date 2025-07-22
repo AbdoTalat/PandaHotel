@@ -36,54 +36,21 @@ namespace HotelApp.Application.Services.RateService
 		{
 			var rate = await _rateRepository.GetRateToEditByIdAsync(Id);
 
-			//var rate = await _unitOfWork.Repository<Rate>().GetByIdAsDtoAsync<EditRateDTO>(Id);
 			return rate;
 		}
 
 		public async Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model)
 		{
 			var roomTypeCount = model.RoomTypeIds.Count();
-
-			var rates = await _unitOfWork.Repository<RoomTypeRate>()
-				.GetAllIQueryable()
-				.Include(rtr => rtr.Rate)
-				.Where(rtr => model.RoomTypeIds.Contains(rtr.RoomTypeId) &&
-					rtr.Rate.BranchId == 2 &&
-					rtr.Rate != null &&
-					rtr.Rate.IsActive &&
-					rtr.Rate.EffectiveDate <= model.CheckInDate &&
-					rtr.Rate.EndDate >= model.CheckOutDate)
-				.GroupBy(rtr => new 
-				{
-					rtr.Rate.Id,
-					rtr.Rate.Code 
-				})
-				.Where(group => group.Select(rtr => rtr.RoomTypeId).Distinct().Count() == roomTypeCount)
-				.Select(group => new GetRatesForReservationResponseDTO
-				{
-					Id = group.Key.Id,
-					Name = group.Key.Code
-				})
-				.Distinct()
-				.ToListAsync();
+			var rates = await _rateRepository.GetRatesForReservationAsync(model);
 
 			return rates;
 		}
 
         public async Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId)
 		{
-            var rateDetails = await _unitOfWork.Repository<RoomTypeRate>().GetAllIQueryable()
-                .Where(rtr => rtr.Rate.Id == rateId)
-                .Select(rtr => new GetRateDetailsForReservationDTO
-                {
-                    typeName = rtr.RoomType.Name,
-                    hourlyPrice = rtr.HourlyPrice,
-                    dailyPrice = rtr.DailyPrice,
-                    extraDailyPrice = rtr.ExtraDailyPrice,
-                    weeklyPrice = rtr.WeeklyPrice,
-                    monthlyPrice = rtr.MonthlyPrice
-                })
-                .ToListAsync();
+			var rateDetails = await _unitOfWork.Repository<RoomTypeRate>()
+				.GetAllAsDtoAsync<GetRateDetailsForReservationDTO>(rtr => rtr.RateId == rateId);
 
 			return rateDetails;
         }
@@ -97,7 +64,9 @@ namespace HotelApp.Application.Services.RateService
                 await _unitOfWork.CommitAsync();
 
 
-                var roomTypeRate = rateDTO.RoomTypeRates.Where(rt => rt.IsSelected).Select(rt => new RoomTypeRate
+                var roomTypeRate = rateDTO.RoomTypeRates
+					.Where(rt => rt.IsSelected)
+					.Select(rt => new RoomTypeRate
                 {
                     RateId = rate.Id,
                     RoomTypeId = rt.RoomTypeId,
@@ -129,15 +98,11 @@ namespace HotelApp.Application.Services.RateService
 
 			try
 			{
-				// Update the Rate entity
 				var rate = _mapper.Map(rateDTO, OldRate);
 				_unitOfWork.Repository<Rate>().Update(OldRate);
 
-				// Fetch existing RoomTypeRates from the database
 				var existingRoomTypeRates = await _unitOfWork.Repository<RoomTypeRate>()
-					.GetAllIQueryable()
-					.Where(rtr => rtr.RateId == rateDTO.Id)
-					.ToListAsync();
+					.GetAllAsync(rtr => rtr.RateId == rateDTO.Id);
 
 				var updatedRoomTypeRates = new List<RoomTypeRate>();
 				var newRoomTypeRates = new List<RoomTypeRate>();
@@ -147,29 +112,26 @@ namespace HotelApp.Application.Services.RateService
 				{
 					if (!roomTypeRateDTO.IsSelected)
 					{
-						// Mark for deletion if it's in the database
 						var existing = existingRoomTypeRates.FirstOrDefault(rtr => rtr.Id == roomTypeRateDTO.Id);
 						if (existing != null)
 						{
 							roomTypeRatesToDelete.Add(existing);
 						}
-						continue; // Skip processing further for unselected items
+						continue; 
 					}
 
 					if (roomTypeRateDTO.Id == 0)
 					{
-						// Add new RoomTypeRate if Id == 0
 						var newRoomTypeRate = _mapper.Map<RoomTypeRate>(roomTypeRateDTO);
 						newRoomTypeRate.RateId = rateDTO.Id;
 						newRoomTypeRates.Add(newRoomTypeRate);
 					}
 					else
 					{
-						// Update existing RoomTypeRate if Id > 0
 						var existing = existingRoomTypeRates.FirstOrDefault(rtr => rtr.Id == roomTypeRateDTO.Id);
 						if (existing != null)
 						{
-							_mapper.Map(roomTypeRateDTO, existing); // Update existing entity
+							_mapper.Map(roomTypeRateDTO, existing); 
 							updatedRoomTypeRates.Add(existing);
 						}
 					}

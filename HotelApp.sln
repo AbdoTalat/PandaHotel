@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05-HotelApp.UI", "05-HotelA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-HotelApp.Helper", "02-HotelApp.Helper", "{2EF5873D-0533-49B5-B627-8603F2A7E303}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelApp.Helper", "Helper\HotelApp.Helper.csproj", "{445995F2-9785-4C58-AC3F-8B4A24795F34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelApp.Helper", "HotelApp.Helper\HotelApp.Helper.csproj", "{445995F2-9785-4C58-AC3F-8B4A24795F34}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06-HotelApp.Reports", "06-HotelApp.Reports", "{96FBB556-77EB-4DC1-A4FA-1F06366116C2}"
 EndProject

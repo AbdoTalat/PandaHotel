@@ -16,9 +16,6 @@ namespace HotelApp.Domain
 
 
 
-
-		IQueryable<T> GetAllIQueryable();
-
         Task AddNewAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
 

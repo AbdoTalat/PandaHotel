@@ -122,10 +122,6 @@ namespace HotelApp.Infrastructure
 		public async Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate)
             =>await _dbSet.AnyAsync(predicate);
         
-        public IQueryable<T> GetAllIQueryable()
-        {
-            return _dbSet;
-        }
 		#endregion
 
 	}

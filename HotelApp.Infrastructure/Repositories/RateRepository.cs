@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HotelApp.Application.DTOs.RoleBased;
 using Microsoft.AspNetCore.Http;
+using HotelApp.Helper;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -96,27 +97,31 @@ namespace HotelApp.Infrastructure.Repositories
 		{
 			var roomTypeCount = model.RoomTypeIds.Count();
 
-            int? branchId = _httpContextAccessor.HttpContext.Session.GetInt32("DefaultBranchId");
 
-			var rates = await _context.RoomTypeRates
-				.Where(rtr => model.RoomTypeIds.Contains(rtr.RoomTypeId) &&
-					rtr.Rate != null &&
-					rtr.Rate.IsActive &&
-					rtr.Rate.EffectiveDate <= model.CheckInDate &&
-					rtr.Rate.EndDate >= model.CheckOutDate)
-				.GroupBy(rtr => new
-				{
-					rtr.Rate.Id,
-					rtr.Rate.Code
-				})
-				.Where(group => group.Select(rtr => rtr.RoomTypeId).Distinct().Count() == roomTypeCount)
-				.Select(group => new GetRatesForReservationResponseDTO
-				{
-					Id = group.Key.Id,
-					Name = group.Key.Code
-				})
-				.Distinct()
-				.ToListAsync();
+			var rates = await _context.Rates
+	            .BranchFilter() 
+	            .Where(rate =>
+		            rate.IsActive &&
+		            rate.EffectiveDate <= model.CheckInDate &&
+		            rate.EndDate >= model.CheckOutDate)
+	            .Select(rate => new
+	            {
+		            Rate = rate,
+		            RoomTypeRates = rate.RoomTypeRates
+			            .Where(rtr => model.RoomTypeIds.Contains(rtr.RoomTypeId))
+	            })
+	            .Where(x => x.RoomTypeRates
+		            .Select(rtr => rtr.RoomTypeId)
+		            .Distinct()
+		            .Count() == roomTypeCount)
+	            .Select(x => new GetRatesForReservationResponseDTO
+	            {
+		            Id = x.Rate.Id,
+		            Name = x.Rate.Code
+	            })
+	            .Distinct()
+	            .ToListAsync();
+
 
 			return rates;
 		}
