@@ -1,0 +1,79 @@
+﻿using HotelApp.Application.DTOs.Company;
+using HotelApp.Application.Services.CompanyService;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace HotelApp.UI.Controllers
+{
+	//[Authorize]
+	public class CompanyController : BaseController
+	{
+		private readonly ICompanyService _companyService;
+
+		public CompanyController(ICompanyService companyService)
+        {
+			_companyService = companyService;
+		}
+
+		[Authorize( Policy = "Company.View")]
+		[HttpGet]
+		public async Task<IActionResult> Index()
+		{
+			var model = await _companyService.GetAllCompaniesAsync();
+			return View(model);
+		}
+
+		[HttpGet]		
+		[Authorize(Policy = "Company.Add")]
+		public IActionResult AddCompany()
+		{
+			return PartialView("_AddCompany");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[Authorize(Policy = "Company.Add")]
+		public async Task<IActionResult> AddCompany(AddCompanyDTO model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return PartialView("_AddCompany", model);
+			}
+
+			var result = await _companyService.AddCompanyAsync(model);
+
+			return Json(new { success = result.Success, message = result.Message });
+		}
+
+		[HttpGet]
+		[Authorize(Policy = "Company.Edit")]
+		public async Task<IActionResult> EditCompany(int Id)
+		{
+			var company = await _companyService.GetCompanyToEditByIdAsync(Id);
+
+			return PartialView("_EditCompany", company);
+		}
+
+        [HttpPost]
+		[ValidateAntiForgeryToken]     
+		[Authorize(Policy = "Company.Edit")]
+        public async Task<IActionResult> EditCompany(EditCompanyDTO model)
+        {
+			if (!ModelState.IsValid)
+			{
+				return PartialView("_EditCompany", model);
+			}
+            
+			var result = await _companyService.EditCompanyAsync(model);
+			return Json(new { success = result.Success, message = result.Message});
+        }
+
+        #region JSON Methods
+        public async Task<IActionResult> GetCompaniesDropDown()
+		{
+			var Companies = await _companyService.GetCompaniesDropDownAsync();
+			return Json(Companies);
+		}
+		#endregion
+	}
+}

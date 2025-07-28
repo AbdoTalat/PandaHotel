@@ -4,11 +4,14 @@ using HotelApp.Application.DTOs.Rates;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.Services.GuestService;
 using HotelApp.Application.Services.ReservationService;
+using HotelApp.Application.Services.ReservationSourceService;
 using HotelApp.Application.Services.RoomService;
 using HotelApp.Application.Services.RoomTypeService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace HotelApp.UI.Controllers
@@ -19,15 +22,17 @@ namespace HotelApp.UI.Controllers
 		private readonly IRoomService _roomService;
 		private readonly IGuestService _guestService;
 		private readonly IRoomTypeService _roomTypeService;
+        private readonly IReservationSourceService _reservationSourceService;
 
-		public ReservationController(IReservationService reservationService, IRoomService roomService,
-			IGuestService guestService, IRoomTypeService roomTypeService)
+        public ReservationController(IReservationService reservationService, IRoomService roomService,
+			IGuestService guestService, IRoomTypeService roomTypeService, IReservationSourceService reservationSourceService)
 		{
 			_reservationService = reservationService;
 			_roomService = roomService;
 			_guestService = guestService;
 			_roomTypeService = roomTypeService;
-		}
+            _reservationSourceService = reservationSourceService;
+        }
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
@@ -43,6 +48,7 @@ namespace HotelApp.UI.Controllers
 		public async Task<IActionResult> AddReservation()
 		{
 			ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
+			ViewBag.ReservationSource = await _reservationSourceService.GetAllReservationSourcesAsync();
 			return View();
 		}
 
@@ -115,6 +121,12 @@ namespace HotelApp.UI.Controllers
 		[HttpGet]
 		public IActionResult LoadConfirmForm()
 		{
+			var commentMax = typeof(ConfirmReservationDTO)
+	.GetProperty(nameof(ConfirmReservationDTO.Comment))?
+	.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? 200;
+
+			ViewBag.CommentMaxLength = commentMax;
+			//ViewBag.ReservationComment = yourCommentText; // Optional
 			return PartialView("_ConfirmReservationPartial");
 		}
 

@@ -43,7 +43,8 @@ namespace HotelApp.UI.Controllers
 
 			var reportBytes = _reportService.GeneratePdfReport(reportPath, parameters, data.roomsDetails, "RoomDataSet");
 
-			return File(reportBytes, "application/pdf", "RoomsReport.pdf");
+			//Response.Headers.Append("Content-Disposition", "inline; filename=RoomsReport.pdf");
+			return File(reportBytes, "application/pdf");
 		}
 
 	}

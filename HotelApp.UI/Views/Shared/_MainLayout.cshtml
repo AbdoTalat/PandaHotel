@@ -41,6 +41,7 @@
 	bool canViewRates = (await AuthorizationService.AuthorizeAsync(User, "Rate.View")).Succeeded;
 	bool canViewSystemSettings = (await AuthorizationService.AuthorizeAsync(User, "SystemSetting.Edit")).Succeeded;
 	bool canViewReports = (await AuthorizationService.AuthorizeAsync(User, "Report.View")).Succeeded;
+	bool canViewCompanies = (await AuthorizationService.AuthorizeAsync(User, "Company.View")).Succeeded;
 }
 
 <!DOCTYPE html>
@@ -537,7 +538,7 @@
 									</li>
 								}
 
-								@if (canViewBranches || canViewFloors || canViewOptions || canViewRates || canViewSystemSettings)
+								@if (canViewBranches || canViewFloors || canViewOptions || canViewRates || canViewSystemSettings || canViewCompanies)
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Branch") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-hammer-wrench"></i> <span>System Settings</span></a>
@@ -558,6 +559,12 @@
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Floor" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Floor"><i class="icon-package"></i> Floors</a>
+												</li>
+											}
+											@if (canViewCompanies)
+											{
+												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Company" ? "active" : "")">
+													<a asp-action="Index" asp-controller="Company"><i class="icon-city"></i> Companies</a>
 												</li>
 											}
 											@if (canViewOptions || canViewRates)

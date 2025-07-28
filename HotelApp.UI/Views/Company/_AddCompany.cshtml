@@ -1,0 +1,61 @@
+﻿@model AddCompanyDTO
+
+@{
+	int? BranchId = ViewBag.BranchId;
+
+}
+
+<form class="form-basic ajaxForm" asp-action="AddCompany" asp-controller="Company" method="post">
+	<input type="hidden" asp-for="BranchId" value="@BranchId" />
+	<div class="panel panel-flat border-left-lg border-left-teal">
+		<div class="panel-body">
+			<div class="content">
+				<fieldset>
+					<div class="row">
+						<div class="col-md-6">
+							<label>Name:</label>
+							<div class="form-group">
+								<input asp-for="Name" class="form-control" required placeholder="Name">
+								<span asp-validation-for="Name" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<label>Phone:</label>
+							<div class="form-group">
+								<input asp-for="Phone" class="form-control" required placeholder="Phone">
+								<span asp-validation-for="Phone" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label>Address:</label>
+							<div class="form-group">
+								<input asp-for="Address" class="form-control" required placeholder="Address">
+								<span asp-validation-for="Address" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<label>Notes:</label>
+							<div class="form-group">
+								<input asp-for="Notes" class="form-control" required placeholder="Notes">
+								<span asp-validation-for="Notes" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="text-center">
+		<button class="btn btn-link" data-dismiss="modal"> Cancel</button>
+		<button class="btn bg-teal-400 btn-lg " type="submit"><i class="icon-plus2"></i> Add</button>
+	</div>
+
+</form>
+
+
+
+@await Html.PartialAsync("_ValidationScriptsPartial")

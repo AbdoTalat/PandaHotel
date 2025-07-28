@@ -31,12 +31,16 @@ namespace HotelApp.Domain.Entities
 		public bool IsCancelled { get; set; }
 		public string? CancellationReason { get; set; }
 
+        public int ReservationSourceId { get; set; }
+        public ReservationSource? ReservationSource { get; set; }
+
+        public int? CompanyId { get; set; }
+        public Company? Company { get; set; }
+
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }
 
 		public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();
 		public ICollection<GuestReservation> guestReservations { get; set; } = new HashSet<GuestReservation>();
     }
-
-
 }

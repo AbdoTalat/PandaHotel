@@ -11,5 +11,6 @@
   "Rate": [ "Rate.View", "Rate.Add", "Rate.Edit", "Rate.Delete" ],
   "RoomStatus": [ "RoomStatus.View", "RoomStatus.Add", "RoomStatus.Edit", "RoomStatus.Delete" ],
   "SystemSetting": [ "SystemSetting.View", "SystemSetting.Add", "SystemSetting.Edit", "SystemSetting.Delete" ],
+  "Company": [ "Company.View", "Company.Add", "Company.Edit", "Company.Delete" ],
   "Report" : ["Report.View"]
 }

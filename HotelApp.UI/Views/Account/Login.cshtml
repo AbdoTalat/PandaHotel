@@ -36,20 +36,19 @@
 				<input asp-for="email" type="text">
 				<br />
 				<span asp-validation-for="email" ></span>
-				<br><br>
+				<br>
 
 				<i class="fa fa-unlock-alt" aria-hidden="true">&nbsp;&nbsp;</i>
 				<input asp-for="password" type="password">
 				<br />
 				<span asp-validation-for="password"></span>
-				@* <div class="remember-me" >
+
+				<br />
+				<div class="remember-me" >
 					<input asp-for="rememberMe" type="checkbox" style="width:15px">
                     <label asp-for="rememberMe">Remember me</label>
-				</div> *@
-
-                <input asp-for="rememberMe" type="checkbox">
-				<i>remember me</i>
-				<br><br>
+				</div>
+				<br>
 
 				<button type="submit" style="cursor: pointer">Login</button>
             </form>

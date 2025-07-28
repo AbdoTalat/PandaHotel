@@ -1,0 +1,90 @@
+﻿using AutoMapper;
+using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Company;
+using HotelApp.Domain;
+using HotelApp.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HotelApp.Application.Services.CompanyService
+{
+    public class CompanyService : ICompanyService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+		private readonly IMapper _mapper;
+
+		public CompanyService(IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _unitOfWork = unitOfWork;
+			_mapper = mapper;
+		}
+
+        public async Task<IEnumerable<GetAllCompaniesDTO>> GetAllCompaniesAsync()
+        {
+            var companies = await _unitOfWork.Repository<Company>()
+                .GetAllAsDtoAsync<GetAllCompaniesDTO>();
+
+            return companies;
+        }
+
+        public async Task<IEnumerable<DropDownDTO<string>>> GetCompaniesDropDownAsync()
+        {
+            var companies = await _unitOfWork.Repository<Company>()
+                .GetAllAsDtoAsync<DropDownDTO<string>>();
+
+            return companies;
+        }
+
+		public async Task<ServiceResponse<AddCompanyDTO>> AddCompanyAsync(AddCompanyDTO companyDTO)
+        {
+            try
+            {
+                var company = _mapper.Map<Company>(companyDTO);
+
+                await _unitOfWork.Repository<Company>().AddNewAsync(company);
+                await _unitOfWork.CommitAsync();
+
+                return ServiceResponse<AddCompanyDTO>.ResponseSuccess("new company added successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<AddCompanyDTO>.ResponseFailure(ex.InnerException.Message);
+            }
+        }
+
+        public async Task<EditCompanyDTO?> GetCompanyToEditByIdAsync(int Id)
+        {
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByIdAsDtoAsync<EditCompanyDTO>(Id);
+
+            return company;
+        }
+        public async Task<ServiceResponse<EditCompanyDTO>> EditCompanyAsync(EditCompanyDTO companyDTO)
+        {
+            var OldCompany = await _unitOfWork.Repository<Company>().GetByIdAsync(companyDTO.Id);
+            if (OldCompany == null)
+            {
+                return ServiceResponse<EditCompanyDTO>.ResponseFailure("Company not found.");
+            }
+            try
+            {
+                _mapper.Map(companyDTO, OldCompany);
+                _unitOfWork.Repository<Company>().Update(OldCompany);
+                await _unitOfWork.CommitAsync();
+
+                return ServiceResponse<EditCompanyDTO>.ResponseSuccess("Company uodated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<EditCompanyDTO>.ResponseFailure(ex.Message);
+            }
+        }
+        //public async Task<ServiceResponse<object>> DeleteCompanyByIdAsync(int Id)
+        //{
+
+        //}
+    }
+}

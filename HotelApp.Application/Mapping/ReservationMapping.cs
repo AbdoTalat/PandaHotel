@@ -18,7 +18,9 @@ namespace HotelApp.Application.Mapping
 		   .ForMember(dest => dest.CheckInDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckInDate))
 		   .ForMember(dest => dest.CheckOutDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckOutDate))
 		   .ForMember(dest => dest.NumberOfPeople, opt => opt.MapFrom(src => src.bookRoomDTO.NumOfAdults + src.bookRoomDTO.NumOfChildrens))
+		   .ForMember(dest => dest.NumberOfNights, opt => opt.MapFrom(src => src.bookRoomDTO.NumOfNights))
 		   .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.bookRoomDTO.BranchId))
+		   .ForMember(dest => dest.ReservationSourceId, opt => opt.MapFrom(src => src.bookRoomDTO.ReservationSourceId))
 		   .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.confirmReservationDTO.Comment))
 		   .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsConfirmed))
 		   .ForMember(dest => dest.IsPending, opt => opt.MapFrom(src => src.confirmReservationDTO.IsPending))
@@ -54,6 +56,13 @@ namespace HotelApp.Application.Mapping
                     .Select(gr => gr.Guest.FirstName + " " + gr.Guest.LastName)
                     .FirstOrDefault()))
                 .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(dst => dst.CreatedBy.UserName));
+
+
+
+
+			/* Reservation Source */
+			CreateMap<ReservationSource, GetAllReservationSourceDTO>();
+
         }
     }
 }

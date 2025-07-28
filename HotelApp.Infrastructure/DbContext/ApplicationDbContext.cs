@@ -81,10 +81,12 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<RoomOption> RoomOptions { get; set; }
 		public DbSet<Rate> Rates { get; set; }
 		public DbSet<RoomTypeRate> RoomTypeRates { get; set; }
+		public DbSet<ReservationSource> ReservationSources { get; set; }
 		public DbSet<Country> Countries { get; set; }
 		public DbSet<State> States { get; set; }
 		public DbSet<ReservationRoomType> ReservationRoomTypes { get; set; }
 		public DbSet<SystemSetting> SystemSettings { get; set; }
+		public DbSet<Company> Companies { get; set; }	
 		#endregion
 
 
@@ -101,9 +103,17 @@ namespace HotelApp.Infrastructure.DbContext
 				new RoomStatus { Id = 5, Name = "Cleaning", Description = "Room is being cleaned", BranchId = 2, Color = "#20BF7E" }
 				);
 
-			builder.Entity<User>().ToTable("Users");
+            builder.Entity<ReservationSource>().HasData(
+                new ReservationSource { Id = 1, Name = "Walk In" },
+                new ReservationSource { Id = 2, Name = "Hotel website" },
+                new ReservationSource { Id = 3, Name = "Admin panel" },
+                new ReservationSource { Id = 4, Name = "Government" },
+                new ReservationSource { Id = 5, Name = "Mobile App"}
+                );
+
+            builder.Entity<User>().ToTable("Users");
 			builder.Entity<Role>().ToTable("Roles");
-			//builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
+			builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
 
 			//builder.Ignore<IdentityUserClaim<int>>();
 			//builder.Ignore<IdentityUserLogin<int>>();
@@ -113,8 +123,6 @@ namespace HotelApp.Infrastructure.DbContext
 
 			builder.ApplyConfiguration(new UserConfiguration());
 			builder.ApplyConfiguration(new RoleConfiguration());
-			//builder.ApplyConfiguration(new PermissionConfiguration());
-			//builder.ApplyConfiguration(new EntityConfiguration());
 
 			builder.ApplyConfiguration(new BranchConfiguration());
 			builder.ApplyConfiguration(new RoomConfiguration());
@@ -129,12 +137,13 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new RoomOptionConfiguration());
 			builder.ApplyConfiguration(new RateConfiguration());
 			builder.ApplyConfiguration(new RoomTypeRateConfiguration());
+			builder.ApplyConfiguration(new ReservationSourceConfiguration());
 
 			builder.ApplyConfiguration(new CountryConfiguration());
 			builder.ApplyConfiguration(new StateConfiguration());
 			builder.ApplyConfiguration(new ReservationRoomTypeConfiguration());
 			builder.ApplyConfiguration(new SystemSettingConfiguration());
-
+			builder.ApplyConfiguration(new CompanyConfiguration());
 			
 
 		}

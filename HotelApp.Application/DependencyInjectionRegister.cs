@@ -1,5 +1,6 @@
 ﻿using HotelApp.Application.Authorization;
 using HotelApp.Application.Services.BranchService;
+using HotelApp.Application.Services.CompanyService;
 using HotelApp.Application.Services.FloorService;
 using HotelApp.Application.Services.GuestService;
 using HotelApp.Application.Services.LocationsService;
@@ -7,6 +8,7 @@ using HotelApp.Application.Services.OptionService;
 using HotelApp.Application.Services.RateService;
 using HotelApp.Application.Services.ReportService;
 using HotelApp.Application.Services.ReservationService;
+using HotelApp.Application.Services.ReservationSourceService;
 using HotelApp.Application.Services.RoleService;
 using HotelApp.Application.Services.RoomService;
 using HotelApp.Application.Services.RoomStatusService;
@@ -16,6 +18,7 @@ using HotelApp.Application.Services.UserService;
 using HotelApp.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -44,6 +47,8 @@ namespace HotelApp.Application
 			services.AddScoped<ILocationsService, LocationsService>();
             services.AddScoped<ISystemSettingService, SystemSettingService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IReservationSourceService, ReservationSourceService>();
+            services.AddScoped<ICompanyService, CompanyService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

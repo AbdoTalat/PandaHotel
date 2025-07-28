@@ -7,14 +7,42 @@
     
     <form id="bookRoomForm">
         <input type="hidden" asp-for="BranchId" value="@ViewBag.BranchId" />
-        <div asp-validation-summary="All" class="text-danger"></div>
+        @* <div asp-validation-summary="All" class="text-danger"></div> *@
         <fieldset>
+
             <div class="row">
                 <!-- Left Section -->
-                <div class="col-md-6">
-                    <!-- Check-in & Check-out Dates -->
+                <div class="col-md-8">
+                    <legend class="text-semibold"><i class="icon-reading position-left"></i> Reservation Info</legend>
+
                     <div class="row">
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reservation Source<span class="text-danger">*</span></label>
+                                <select asp-for="ReservationSourceId" id="ReservationSourceId" class=" form-control select" required data-placeholder="Reservation Source">
+                                    <option></option>
+                                    @foreach(var item in ViewBag.ReservationSource)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label" ></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Company</label>
+                                <select id="companySelect" asp-for="CompanyId" name="CompanyId" class="form-control select" data-placeholder="Companies">
+                                    <option></option>
+                                </select>
+                                <span asp-validation-for="CompanyId" class="text-danger validation-error-label"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check-in & Check-out Dates -->
+                    <div class="row">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Check In Date<span class="text-danger">*</span></label>
                                 <input  asp-for="CheckInDate" class="form-control" />
@@ -27,7 +55,7 @@
                                 <span class="text-danger validation-error-label" asp-validation-for="CheckInDate"></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Check Out Date<span class="text-danger">*</span></label>
                                 <input  asp-for="CheckOutDate" class="form-control" />
@@ -39,6 +67,13 @@
                                 </div> *@
                                 <span class="text-danger validation-error-label" asp-validation-for="CheckOutDate"></span>
 
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>No. Of Nights<span class="text-danger">*</span></label>
+                                <input id="NumOfNights"  asp-for="NumOfNights" name="NumOfNights" class="form-control" readonly />
+                                <span class="text-danger validation-error-label"></span>
                             </div>
                         </div>
                     </div>
@@ -87,6 +122,7 @@
                         </div>
                     </div>
 
+                    <legend class="text-semibold"><i class="icon-reading position-left"></i> Rooms Selection</legend>
                     <!-- Choose Rate -->
                     <div class="form-group">
                         <label>Choose Rate<span class="text-danger">*</span></label>
@@ -97,30 +133,31 @@
                     </div>
 
                     <!-- Room Types Selection -->
-                    @foreach (var item in ViewBag.RoomTypes)
-                    {
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="checkbox-container">
-                                            <input type="checkbox" class="checkbox-input roomTypeCheckbox" data-roomtypeid="@item.Id">
-                                            <div class="checkbox-custom"></div>
-                                            <a class="text-default">@item.Name</a>
-                                        </label>
-                                        <span>@item.NumOfAvailableRooms room(s)</span>
-                                    </div>
-                                        <div class="col-md-6">
-                                        <input  type="number" class="form-control touchspin-empty roomCountInput" disabled min="1" data-roomtypeid="@item.Id">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                    <div class="form-group">
+                        <button type="button" style="width:100px" id="singleBtn" class="btn text-teal-800 border-teal btn-flat" onclick="setToSingleMode()">Single</button>
+                        <button type="button" style="width:100px" id="groupBtn" class="btn bg-teal" onclick="setToGroupMode()">Group</button>
+                    </div>
+
+                    <table class="table table-borderless" id="roomTable">
+                        <thead style="background-color:#F5F5F5">
+                            <tr>
+                                <th>Room Type</th>
+                                <th>No. of Rooms</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <div id="addRoomWrapper">
+                        <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
+                    </div>
+
                 </div>
 
                 <!-- Right Section -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h6 class="panel-title">Rate Details <a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
@@ -134,16 +171,155 @@
                         <div class="panel-body">
                             <div id="rateDetails" class="col-md-12"></div>
                         </div>
-                    </div>
                 </div>
             </div>
+                    
 
-
+            </div>
         </fieldset>
     </form>
 </div>
 
 <script>
+    let isGroupMode = false; // Default mode is Single
+
+    function setToSingleMode() {
+        isGroupMode = false;
+
+        $('#addRoomWrapper').hide();
+
+        $('#singleBtn')
+            .addClass('text-teal-800 border-teal btn-flat')
+            .removeClass('bg-teal');
+
+        $('#groupBtn')
+            .removeClass('text-teal-800 border-teal btn-flat')
+            .addClass('bg-teal');
+
+        const rows = $('#roomTable tbody tr');
+        if (rows.length > 1) {
+            rows.slice(1).remove();
+        }
+    }
+
+    function setToGroupMode() {
+        isGroupMode = true;
+
+        $('#addRoomWrapper').show();
+
+        $('#groupBtn')
+            .addClass('text-teal-800 border-teal btn-flat')
+            .removeClass('bg-teal');
+
+        $('#singleBtn')
+            .removeClass('text-teal-800 border-teal btn-flat')
+            .addClass('bg-teal');
+    }
+
+    // Custom display of Room Type options with colored count
+    function formatRoomOption(data) {
+    if (!data.id) return data.text;
+
+    const $option = $(data.element);
+    const name = $option.data('name') || data.text;
+    const count = $option.data('count');
+
+    return $(`
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <span class="text-start">${name}</span>
+            <span class="label bg-primary ">${count}</span>
+        </div>
+    `);
+}
+
+
+    function formatRoomSelection(data) {
+        return data.text;
+    }
+
+    function initializeSelect2(container) {
+        $(container).find('.room-type-select').select2({
+            width: '100%',
+            placeholder: function () {
+                return $(this).data('placeholder');
+            },
+            templateResult: formatRoomOption,
+            templateSelection: formatRoomSelection
+        });
+
+        $(container).find('select:not(.room-type-select)').select2({
+            width: '100%',
+            placeholder: function () {
+                return $(this).data('placeholder');
+            }
+        });
+    }
+
+    function addRoomRow() {
+        const tbody = document.querySelector('#roomTable tbody');
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td style="padding: 4px;">
+                <select class="form-control select room-type-select" data-placeholder="Room Type">
+                    <option></option>
+    @foreach (var item in ViewBag.RoomTypes)
+    {
+                            <option value="@item.Id" data-name="@item.Name" data-count="@item.NumOfAvailableRooms">
+            @item.Name
+                            </option>
+    }
+                </select>
+            </td>
+            <td style="padding: 4px;">
+                <select class="form-control select" data-placeholder="Num Of Rooms">
+                    <option></option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </td>
+            <td style="padding: 4px; vertical-align: middle;">
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="btn btn-sm btn-danger remove-room-btn" onclick="removeRoomRow(this)">
+                        &minus;
+                    </button>
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(newRow);
+        initializeSelect2(newRow);
+        updateRemoveButtons();
+    }
+
+    function removeRoomRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        updateRemoveButtons();
+    }
+
+    function updateRemoveButtons() {
+        const rows = document.querySelectorAll('#roomTable tbody tr');
+        const removeButtons = document.querySelectorAll('.remove-room-btn');
+
+        if (rows.length === 1) {
+            removeButtons.forEach(btn => btn.style.display = 'none');
+        } else {
+            removeButtons.forEach(btn => btn.style.display = 'inline-block');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setToSingleMode(); // Default to Single
+        addRoomRow();      // Add one initial row
+        updateRemoveButtons();
+    });
+</script>
+
+ <script>
     $("#CheckInDate, #CheckOutDate").change(function () {
         let checkIn = new Date($("#CheckInDate").val());
         let checkOut = new Date($("#CheckOutDate").val());
@@ -158,58 +334,59 @@
             });
             $("#CheckOutDate").val("");
         }
+        else {
+            const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            $("#NumOfNights").val(nights);
+        }
     });
 
 </script>
 
 <script>
     $(document).ready(function () {
-        let selectedRoomTypes = [];
+        $('#rateDetails').hide();
 
-        $('.roomTypeCheckbox').change(function () {
-            let roomTypeId = $(this).data('roomtypeid');
-            let roomCountInput = $('.roomCountInput[data-roomtypeid="' + roomTypeId + '"]');
-
-            if ($(this).is(':checked')) {
-                roomCountInput.prop('disabled', false);
-                if (!selectedRoomTypes.includes(roomTypeId)) {
-                    selectedRoomTypes.push(roomTypeId);
-                }
-            } else {
-                roomCountInput.prop('disabled', true).val('');
-                selectedRoomTypes = selectedRoomTypes.filter(id => id !== roomTypeId);
-            }
-
-            loadRatesDropdown();
+        // 🔁 Listen for room type changes in any row (even dynamically added)
+        $(document).on('change', '#roomTable select.room-type-select', function () {
+            updateSelectedRoomTypesAndLoadRates();
         });
 
-        function loadRatesDropdown() {
-            let checkInVal = $("#CheckInDate").val();
-            let checkOutVal = $("#CheckOutDate").val();
+        // ✅ Gather selected RoomType IDs from all rows and load rates
+        function updateSelectedRoomTypesAndLoadRates() {
+            const roomTypeIds = [];
 
+            $('#roomTable select.room-type-select').each(function () {
+                const val = $(this).val();
+                if (val) {
+                    roomTypeIds.push(Number(val));
+                }
+            });
+
+            loadRatesDropdown(roomTypeIds);
+        }
+
+        // ✅ Load rates from server and populate the Rate dropdown
+        function loadRatesDropdown(selectedRoomTypes) {
+            const checkInVal = $("#CheckInDate").val();
+            const checkOutVal = $("#CheckOutDate").val();
 
             if (!checkInVal || !checkOutVal || selectedRoomTypes.length === 0) {
-                // Clear dropdown and details
                 $('#rateSelect').empty().append('<option value="">Select Rate</option>');
-                $('#rateDetails').html('');
-                return; // Do NOT make AJAX call
+                $('#rateDetails').html('').hide();
+                return;
             }
-
-            let checkInDate = new Date(checkInVal);
-            let checkOutDate = new Date(checkOutVal);
-            let roomTypeIds = selectedRoomTypes.map(id => Number(id));
 
             $.ajax({
                 url: '/Rate/GetRatesByRoomTypes',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    RoomTypeIds: roomTypeIds,
-                    CheckInDate: checkInDate,
-                    CheckOutDate: checkOutDate
+                    RoomTypeIds: selectedRoomTypes,
+                    CheckInDate: new Date(checkInVal),
+                    CheckOutDate: new Date(checkOutVal)
                 }),
                 success: function (response) {
-                    var rateSelect = $('#rateSelect');
+                    const rateSelect = $('#rateSelect');
                     rateSelect.empty().append('<option value="">Select Rate</option>');
 
                     $.each(response, function (index, item) {
@@ -217,16 +394,14 @@
                     });
                 },
                 error: function (xhr) {
-                    console.error('Failed to load rates.', xhr.responseText);
+                    console.error('❌ Failed to load rates:', xhr.responseText);
                 }
             });
         }
 
-
-        $('#rateDetails').hide();
-
+        // ✅ Load rate details when user selects a rate
         function loadRateDetails() {
-            let selectedRateId = $('#rateSelect').val();
+            const selectedRateId = $('#rateSelect').val();
 
             if (!selectedRateId) {
                 Swal.fire({
@@ -246,107 +421,133 @@
                 success: function (response) {
                     if (response && response.length > 0) {
                         let rateHtml = '';
-
                         $.each(response, function (index, rateDetail) {
                             rateHtml += `
-                                            <h4>${rateDetail.typeName}</h4>
-                                            <li><strong>Hourly Price:</strong> $${rateDetail.hourlyPrice}</li>
-                                            <li><strong>Daily Price:</strong> $${rateDetail.dailyPrice}</li>
-                                            <li><strong>Extra Daily Price:</strong> $${rateDetail.extraDailyPrice}</li>
-                                            <li><strong>Weekly Price:</strong> $${rateDetail.weeklyPrice}</li>
-                                            <li><strong>Monthly Price:</strong> $${rateDetail.monthlyPrice}</li>
-                                            <hr>
-                                        `;
+                                <h4>${rateDetail.typeName}</h4>
+                                <li><strong>Hourly Price:</strong> $${rateDetail.hourlyPrice}</li>
+                                <li><strong>Daily Price:</strong> $${rateDetail.dailyPrice}</li>
+                                <li><strong>Extra Daily Price:</strong> $${rateDetail.extraDailyPrice}</li>
+                                <li><strong>Weekly Price:</strong> $${rateDetail.weeklyPrice}</li>
+                                <li><strong>Monthly Price:</strong> $${rateDetail.monthlyPrice}</li>
+                                <hr>
+                            `;
                         });
 
-                        rateHtml += '</ul></div>';
                         $('#rateDetails').html(rateHtml).show();
-                    } 
-                    else{
+                    } else {
                         $('#rateDetails').html('<p>No rate details available.</p>').show();
                     }
                 },
                 error: function (xhr) {
-                    console.error('Failed to load rate details.', xhr.responseText);
+                    console.error('❌ Failed to load rate details.', xhr.responseText);
                     $('#rateDetails').html('<p>Error loading rate details.</p>').show();
                 }
             });
         }
 
+        // 🔁 If you have a reload button
         $('.heading-elements [data-action="reload"]').click(function (e) {
             e.preventDefault();
             loadRateDetails();
+        });
+
+        // 🔁 Optionally: auto-load rates when check-in/out changes
+        $('#CheckInDate, #CheckOutDate').change(function () {
+            updateSelectedRoomTypesAndLoadRates();
         });
     });
 </script>
 
 <script>
+    $("#bookRoomForm").on("submit", function (e) {
+    e.preventDefault();
+
+    const formData = {
+        CheckInDate: $("#CheckInDate").val(),
+        CheckOutDate: $("#CheckOutDate").val(),
+        NumOfNights: $("#NumOfNights").val(),
+        NumOfAdults: $("#NumOfAdults").val(),
+        NumOfChildrens: $("#NumOfChildrens").val(),
+        ReservationSourceId: $("#ReservationSourceId").val(),
+        RateId: $("#rateSelect").val(),
+        BranchId: $("input[name='BranchId']").val(),
+        roomTypeToBookDTOs: []
+    };
+
+    // ✅ Extract selected room types from the new dynamic table rows
+    $("#roomTable tbody tr").each(function () {
+        const roomTypeId = $(this).find("select").eq(0).val();
+        const numOfRooms = $(this).find("select").eq(1).val();
+
+        if (roomTypeId && numOfRooms > 0) {
+            formData.roomTypeToBookDTOs.push({
+                Id: roomTypeId,
+                NumOfRooms: parseInt(numOfRooms)
+            });
+        }
+    });
+
+    $.ajax({
+        url: '/Reservation/SaveRoomToBook',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function (response) {
+            if (response.success) {
+                toastr.success(response.message, 'Success');
+
+                // Confirmation info
+                $("#confirmCheckIn").text(formData.CheckInDate);
+                $("#confirmCheckOut").text(formData.CheckOutDate);
+
+                const checkIn = new Date(formData.CheckInDate);
+                const checkOut = new Date(formData.CheckOutDate);
+                const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                $("#confirmNights").text(nights);
+
+                if (response.amount) {
+                    $("#confirmAmount").text(response.amount + " EGP");
+                }
+
+                $(document).trigger("roomBookingSuccess");
+            } else {
+                Swal.fire("Error", response.message, "error");
+                $("#bookRoomContainer").html(response);
+            }
+        },
+        error: function () {
+            Swal.fire("Error", "Failed to save room booking.", "error");
+        }
+    });
+});
+
+</script>
+<script>
     $(document).ready(function () {
+        $.ajax({
+            url: '/Company/GetCompaniesDropDown',
+            method: 'GET',
+            success: function (data) {
+                var $select = $('#companySelect');
+                $select.empty();
 
-        toastr.options = {
-            closeButton: true,
-            progressBar: true,
-            timeOut: 3000,
-            positionClass: "toast-top-right"
-        };
+                // Set default "no company" option with empty string ("") as value
+                $select.append('<option value="">-- No Company --</option>');
 
-        $("#bookRoomForm").on("submit", function (e) {
-            e.preventDefault();
-
-            const formData = {
-                CheckInDate: $("#CheckInDate").val(),
-                CheckOutDate: $("#CheckOutDate").val(),
-                NumOfAdults: $("#NumOfAdults").val(),
-                NumOfChildrens: $("#NumOfChildrens").val(),
-                RateId: $("#rateSelect").val(),
-                BranchId: $("input[name='BranchId']").val(),
-                roomTypeToBookDTOs: []
-            };
-
-            $(".roomTypeCheckbox:checked").each(function () {
-                const roomTypeId = $(this).data("roomtypeid");
-                const numOfRooms = $(this).closest(".panel-body").find(".roomCountInput").val();
-                if (numOfRooms > 0) {
-                    formData.roomTypeToBookDTOs.push({ Id: roomTypeId, NumOfRooms: numOfRooms });
-                }
-            });
-
-            $.ajax({
-                url: '/Reservation/SaveRoomToBook',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function (response) {
-                    if (response.success) {
-                        toastr.success(response.message, 'Success');
-
-                        // Populate confirmation section
-                        $("#confirmCheckIn").text(formData.CheckInDate);
-                        $("#confirmCheckOut").text(formData.CheckOutDate);
-
-                        // Calculate number of nights
-                        const checkIn = new Date(formData.CheckInDate);
-                        const checkOut = new Date(formData.CheckOutDate);
-                        const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-                        $("#confirmNights").text(nights);
-
-                        // Optionally show estimated amount (if returned from backend)
-                        if (response.amount) {
-                            $("#confirmAmount").text(response.amount + " EGP");
-                        }
-
-                        $(document).trigger("roomBookingSuccess"); // tab switch
-                    } else {
-                        Swal.fire("Error", response.message, "error");
-                        $("#bookRoomContainer").html(response);
-                    }
-                },
-                error: function () {
-                    Swal.fire("Error", "Failed to save room booking.", "error");
-                }
-            });
+                $.each(data, function (index, item) {
+                    $select.append($('<option>', {
+                        value: item.id,
+                        text: item.displayText
+                    }));
+                });
+            },
+            error: function () {
+                alert("Failed to load companies.");
+            }
         });
     });
 </script>
+
+
 
 

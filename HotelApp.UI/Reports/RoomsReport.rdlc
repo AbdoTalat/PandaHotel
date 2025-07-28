@@ -448,8 +448,8 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>RoomDataSet</DataSetName>
-            <Top>3.27237cm</Top>
-            <Left>0.66186cm</Left>
+            <Top>3.8227cm</Top>
+            <Left>1.01486cm</Left>
             <Height>1.5175cm</Height>
             <Width>15.90698cm</Width>
             <Style>
@@ -465,27 +465,30 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Num Of Available Rooms:</Value>
+                    <Value>Num Of Available Rooms:  </Value>
                     <Style />
                   </TextRun>
                   <TextRun>
                     <Value>=Parameters!NumOfAvailable.Value</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox21</rd:DefaultName>
-            <Top>1.17687cm</Top>
+            <Top>0.60537cm</Top>
             <Left>1.40269cm</Left>
-            <Height>1.0445cm</Height>
-            <Width>4.53901cm</Width>
+            <Height>0.74817cm</Height>
+            <Width>5.99636cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
               </Border>
+              <BackgroundColor>Gold</BackgroundColor>
               <PaddingLeft>2pt</PaddingLeft>
               <PaddingRight>2pt</PaddingRight>
               <PaddingTop>2pt</PaddingTop>
@@ -499,7 +502,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Num Of Maintainable Rooms: </Value>
+                    <Value>Num Of Maintainable Rooms:  </Value>
                     <Style />
                   </TextRun>
                   <TextRun>
@@ -511,15 +514,16 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox22</rd:DefaultName>
-            <Top>1.17687cm</Top>
-            <Left>6.11809cm</Left>
-            <Height>1.0445cm</Height>
-            <Width>5.19203cm</Width>
+            <Top>1.52992cm</Top>
+            <Left>1.40269cm</Left>
+            <Height>0.727cm</Height>
+            <Width>5.99636cm</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
               </Border>
+              <BackgroundColor>Gold</BackgroundColor>
               <PaddingLeft>2pt</PaddingLeft>
               <PaddingRight>2pt</PaddingRight>
               <PaddingTop>2pt</PaddingTop>
@@ -533,7 +537,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Num Of Occupied Rooms: </Value>
+                    <Value>Num Of Occupied Rooms:  </Value>
                     <Style />
                   </TextRun>
                   <TextRun>
@@ -545,15 +549,16 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox23</rd:DefaultName>
-            <Top>1.17687cm</Top>
-            <Left>11.48651cm</Left>
-            <Height>1.0445cm</Height>
-            <Width>4.70133cm</Width>
+            <Top>2.43331cm</Top>
+            <Left>1.40269cm</Left>
+            <Height>0.70583cm</Height>
+            <Width>5.99636cm</Width>
             <ZIndex>3</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
               </Border>
+              <BackgroundColor>Gold</BackgroundColor>
               <PaddingLeft>2pt</PaddingLeft>
               <PaddingRight>2pt</PaddingRight>
               <PaddingTop>2pt</PaddingTop>
@@ -567,7 +572,7 @@
       <Width>6.86667in</Width>
       <Page>
         <PageHeader>
-          <Height>2.54cm</Height>
+          <Height>3.00567cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -683,8 +688,8 @@
         </PageHeader>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
-        <LeftMargin>2cm</LeftMargin>
-        <RightMargin>2cm</RightMargin>
+        <LeftMargin>1cm</LeftMargin>
+        <RightMargin>1cm</RightMargin>
         <TopMargin>2cm</TopMargin>
         <BottomMargin>2cm</BottomMargin>
         <ColumnSpacing>0.13cm</ColumnSpacing>

@@ -28,10 +28,10 @@ namespace HotelApp.Infrastructure.Configurations
 			builder.Property(b => b.CancellationReason)
 			   .HasMaxLength(200);
 
-			builder.Property(rtr => rtr.TotalPrice)
+			builder.Property(r => r.TotalPrice)
 				.HasColumnType("decimal(18,2)");
 
-			builder.Property(rtr => rtr.PricePerNight)
+			builder.Property(r => r.PricePerNight)
 				.HasColumnType("decimal(18,2)");
 
 			builder.HasOne(r => r.Branch)
@@ -39,6 +39,15 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasForeignKey(r => r.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			builder.HasOne(r => r.ReservationSource)
+				.WithMany(rs => rs.Reservations)
+				.HasForeignKey(r => r.ReservationSourceId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(r => r.Company)
+				.WithMany(c => c.Reservations)
+				.HasForeignKey(r => r.CompanyId)
+				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(b => b.CreatedBy)
 			   .WithMany()

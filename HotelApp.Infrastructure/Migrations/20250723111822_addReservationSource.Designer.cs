@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250719123433_AlterUserRoles")]
-    partial class AlterUserRoles
+    [Migration("20250723111822_addReservationSource")]
+    partial class addReservationSource
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -450,6 +450,11 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<decimal>("PricePerNight")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ReservationSourceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -460,6 +465,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("LastModifiedById");
+
+                    b.HasIndex("ReservationSourceId");
 
                     b.ToTable("Reservations");
                 });
@@ -488,6 +495,51 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("RoomTypeId");
 
                     b.ToTable("ReservationRoomTypes");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.ReservationSource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReservationSources");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Walk In"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Hotel website"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Admin panel"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Government"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Mobile App"
+                        });
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Role", b =>
@@ -1119,7 +1171,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -1309,11 +1361,19 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasForeignKey("LastModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("HotelApp.Domain.Entities.ReservationSource", "ReservationSource")
+                        .WithMany("Reservations")
+                        .HasForeignKey("ReservationSourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Branch");
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("LastModifiedBy");
+
+                    b.Navigation("ReservationSource");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ReservationRoomType", b =>
@@ -1680,6 +1740,11 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Navigation("ReservationRoomTypes");
 
                     b.Navigation("guestReservations");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.ReservationSource", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Room", b =>

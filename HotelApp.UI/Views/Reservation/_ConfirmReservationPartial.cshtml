@@ -49,9 +49,17 @@
 					<div class="col-md-4">
 						<div class="content-group">
 							<h6 class="text-default heading-divided"><i class="icon-pencil6"></i> Comments And Notes</h6>
-							<div class="list-group no-border">
-								<textarea class="form-control" id="reservationComment" placeholder="Add Comment">@ViewBag.ReservationComment</textarea>
-                            </div>
+
+							<div class="form-group">
+								<textarea id="comment" style="min-height:150px" class="form-control" maxlength="200" rows="4" oninput="updateCharCount()"></textarea>
+
+								<div class="d-flex justify-content-end mt-1">
+									<label for="comment" class="form-label mb-0">
+										<span id="charCount" class="text-muted">(0/200)</span>
+									</label>
+								</div>
+							</div>
+
 						</div>
 					</div>
 				</div>
@@ -132,6 +140,8 @@
     </div>
 
 </div>
+
+
 <script>
 	$(document).ready(function () {
 		const checkboxes = [
@@ -177,5 +187,17 @@
 		});
 	});
 </script>
+
+<script>
+	function updateCharCount() {
+		const textarea = document.getElementById('comment');
+		const current = textarea.value.length;
+		const max = textarea.getAttribute('maxlength');
+		document.getElementById('charCount').textContent = `(${current}/${max})`;
+	}
+
+	document.addEventListener('DOMContentLoaded', updateCharCount);
+</script>
+
 
 

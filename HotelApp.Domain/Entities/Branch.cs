@@ -33,5 +33,6 @@ namespace HotelApp.Domain.Entities
         public ICollection<RoomStatus> RoomStatuses { get; set; } = new HashSet<RoomStatus>();
         public ICollection<Rate> Rates { get; set; } = new HashSet<Rate>();
         public ICollection<Option> Options { get; set; } = new HashSet<Option>();   
+        public ICollection<Company> Companies { get; set; } = new HashSet<Company>();   
     }
 }

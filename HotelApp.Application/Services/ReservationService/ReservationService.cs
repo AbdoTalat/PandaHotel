@@ -34,13 +34,11 @@ namespace HotelApp.Application.Services.ReservationService
 		{
 			try
 			{
-				//Calculate Total Price & Per Night Price
 				var roomTypeIds = reservationDTO.bookRoomDTO.roomTypeToBookDTOs.Select(rt => rt.Id).ToList();
 				var roomTypes = await _roomTypeRepository.GetRoomTypesByIDsAsync(roomTypeIds);
 
 				var checkIn = reservationDTO.bookRoomDTO.CheckInDate;
 				var checkOut = reservationDTO.bookRoomDTO.CheckOutDate;
-				var nights = (checkOut - checkIn).Days;
 
 				decimal totalPrice = 0;
 				decimal totalRatePerNight = 0;
@@ -54,7 +52,7 @@ namespace HotelApp.Application.Services.ReservationService
 					{
 						int numOfRooms = matchingDto.NumOfRooms;
 						totalRatePerNight += roomType.PricePerNight * numOfRooms;
-						totalPrice += roomType.PricePerNight * numOfRooms * nights;
+						totalPrice += roomType.PricePerNight * numOfRooms * reservationDTO.bookRoomDTO.NumOfNights;
 					}
 				}
 
@@ -62,7 +60,6 @@ namespace HotelApp.Application.Services.ReservationService
 				var reservation = _mapper.Map<Reservation>(reservationDTO);
 				reservation.PricePerNight = totalRatePerNight;
 				reservation.TotalPrice = totalPrice;
-				reservation.NumberOfNights = nights;
 
 				await _unitOfWork.Repository<Reservation>().AddNewAsync(reservation);
 				await _unitOfWork.CommitAsync();
