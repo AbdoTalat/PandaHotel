@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Floor;
 using HotelApp.Domain.Entities;
 using System;
@@ -21,7 +22,8 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<AddFloorDTO, Floor>();
 
-			CreateMap<Floor, GetFloorItemsDTO>();
+            CreateMap<Floor, DropDownDTO<int>>()
+                .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Number));
 		}
     }
 }

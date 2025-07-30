@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Application.DTOs.RoomStatus;
 using HotelApp.Application.DTOs.RoomTypes;
@@ -51,13 +52,14 @@ namespace HotelApp.Application.Mapping
 			CreateMap<EditRoomTypeDTO, RoomType>();
 			CreateMap<AddRoomTypeDTO, RoomType>();
 
-			CreateMap<RoomType, GetRoomTypeItemsDTO>()
-				.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+			CreateMap<RoomType, DropDownDTO<string>>()
+				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
 
 			/* Room Status */
 			CreateMap<RoomStatus, GetAllRoomStatusDTO>();
-			CreateMap<RoomStatus, GetRoomStatusItemsDTO>();
+			CreateMap<RoomStatus, DropDownDTO<string>>()
+				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
 			CreateMap<AddRoomStatusDTO, RoomStatus>();
 			CreateMap<EditRoomStatusDTO, RoomStatus>();

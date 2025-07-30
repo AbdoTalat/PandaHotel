@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Branches;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
@@ -31,9 +32,9 @@ namespace HotelApp.Application.Services.BranchService
 
             return branch;
 		}
-		public async Task<IEnumerable<GetBranchItemsDTO>> GetBranchSelectListAsync()
+		public async Task<IEnumerable<DropDownDTO<string>>> GetBranchsDropDownAsync()
         {
-            var branches = await _unitOfWork.Repository<Branch>().GetAllAsDtoAsync<GetBranchItemsDTO>(SkipBranchFilter:true);
+            var branches = await _unitOfWork.Repository<Branch>().GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
             return branches;
         }
 		public async Task<IEnumerable<GetAllBranches>> GetAllBranchesAsync()

@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs.Reservation;
+﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -18,10 +19,10 @@ namespace HotelApp.Application.Services.ReservationSourceService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<GetAllReservationSourceDTO>> GetAllReservationSourcesAsync()
+        public async Task<IEnumerable<DropDownDTO<string>>> GetReservationSourcesDropDownAsync()
         {
             var reservationSources = await _unitOfWork.Repository<ReservationSource>()
-                .GetAllAsDtoAsync<GetAllReservationSourceDTO>(SkipBranchFilter:true);
+                .GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
 
             return reservationSources;
         }

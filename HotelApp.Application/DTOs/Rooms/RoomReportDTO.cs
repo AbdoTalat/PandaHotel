@@ -9,16 +9,16 @@ namespace HotelApp.Application.DTOs.Rooms
 	public class RoomReportDTO
 	{
 		public List<RoomsDetailsDTO> roomsDetails = new List<RoomsDetailsDTO>();
-		public int NumOfAvailable {  get; set; }
-		public int NumOfOccupied { get; set; }
-		public int NumOfMaintainable { get; set; }
+		public int NumOfAvailable { get; set; } = 0;
+		public int NumOfOccupied { get; set; } = 0;
+		public int NumOfMaintainable { get; set; } = 0;
 	}
 	public class RoomsDetailsDTO
 	{
-		public string RoomNumber { get; set; }
-		public string Description { get; set; }
-		public int MaxNumOfAdults { get; set; }
-		public int MaxNumOfChildrens { get; set; }
-		public bool IsActive { get; set; }
+		public string RoomNumber { get; set; } = "";
+		public string Description { get; set; } = "";
+		public int MaxNumOfAdults { get; set; } = 0;
+		public int MaxNumOfChildrens { get; set; } = 0;
+		public bool IsActive { get; set; } = false;
 	}
 }

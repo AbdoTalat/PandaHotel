@@ -68,12 +68,12 @@ namespace HotelApp.UI.Controllers
 
 		public async Task<IActionResult> GetRoomStatusJson()
 		{
-			var roomStatus = await _roomStatusService.GetRoomStatusItemsAsync();
+			var roomStatus = await _roomStatusService.GetRoomStatusDropDownAsync();
 
 			var result = roomStatus.Select(rs => new
 			{
 				Id = rs.Id,
-				Name = rs.Name
+				Name = rs.DisplayText
 			});
 
 			return Json(result);
@@ -81,12 +81,12 @@ namespace HotelApp.UI.Controllers
 
 		public async Task<IActionResult> GetRoomStatusWithOutBranchFilterJson()
 		{
-			var roomStatus = await _roomStatusService.GetRoomStatusItemsWithoutBranchFilterAsync();
+			var roomStatus = await _roomStatusService.GetRoomStatusDropDownWithoutBranchFilterAsync();
 
 			var result = roomStatus.Select(rs => new
 			{
 				Id = rs.Id,
-				Name = rs.Name
+				Name = rs.DisplayText
 			});
 
 			return Json(result);

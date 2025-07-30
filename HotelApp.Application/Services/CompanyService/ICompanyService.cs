@@ -16,5 +16,10 @@ namespace HotelApp.Application.Services.CompanyService
 		Task<ServiceResponse<AddCompanyDTO>> AddCompanyAsync(AddCompanyDTO companyDTO);
 		Task<ServiceResponse<EditCompanyDTO>> EditCompanyAsync(EditCompanyDTO companyDTO);
 		//Task<ServiceResponse<object>> DeleteCompanyByIdAsync(int Id);
-	}
+
+		Task<IEnumerable<DropDownDTO<string>>> SerachCompanyByNameAsync(string Name);
+		Task<GetSearchedCompanyDTO?> GetSearchedCompanyDataAsync(int Id);
+		Task<ServiceResponse<ReservationCompanyDTO>> CreateOrUpdateCompanyAsync(ReservationCompanyDTO companyDTO);
+
+    }
 }

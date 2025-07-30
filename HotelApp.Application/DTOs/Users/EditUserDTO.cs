@@ -27,7 +27,7 @@ namespace HotelApp.Application.DTOs.Users
 		public List<int> SelectedBranchIds { get; set; } = new List<int>();
 
 		public List<string> AllRoles { get; set; } = new();
-		public IEnumerable<GetBranchItemsDTO> AllBranches { get; set; } = Enumerable.Empty<GetBranchItemsDTO>();
+		public IEnumerable<DropDownDTO<string>> AllBranches { get; set; } = Enumerable.Empty<DropDownDTO<string>>();
 
 
 

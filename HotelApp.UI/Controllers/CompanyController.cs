@@ -74,6 +74,42 @@ namespace HotelApp.UI.Controllers
 			var Companies = await _companyService.GetCompaniesDropDownAsync();
 			return Json(Companies);
 		}
-		#endregion
-	}
+
+		[HttpGet]
+		public async Task<IActionResult> GetSerachedCompaniesByName(string Name)
+		{
+			var companies = await _companyService.SerachCompanyByNameAsync(Name);
+			return Json(companies);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetSerachedCompanyData(int Id)
+		{
+			var company = await _companyService.GetSearchedCompanyDataAsync(Id);
+			return Json(company);
+		}
+
+        [HttpPost]
+        public async Task<IActionResult> SaveCompany([FromBody] ReservationCompanyDTO companyDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+			if(companyDto.BranchId == 0)
+			{
+				companyDto.BranchId = BranchId;
+            }
+            var result = await _companyService.CreateOrUpdateCompanyAsync(companyDto);
+
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message,
+                companyId = result.Data?.Id,
+                name = result.Data?.Name
+            });
+        }
+        #endregion
+
+    }
 }

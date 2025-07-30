@@ -28,12 +28,12 @@ namespace HotelApp.UI.Controllers
 
 		public async Task<IActionResult> GetFloorsJson()
 		{
-			var floors = await _floorService.GetFloorItemsAsync();
+			var floors = await _floorService.GetFloorsDropDownAsync();
 
 			var result = floors.Select(f => new
 			{
 				Id = f.Id,
-				Number = f.Number
+				Number = f.DisplayText
 			});
 			return Json(result);
 		}

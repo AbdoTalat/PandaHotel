@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
@@ -35,9 +36,10 @@ namespace HotelApp.Application.Services.RoomTypeService
 
 			return roomTypes;
 		}
-		public async Task<IEnumerable<GetRoomTypeItemsDTO>> GetRoomTypeSelectListAsync()
+		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomTypesDropDownAsync()
 		{
-			var roomTypes = await _unitOfWork.Repository<RoomType>().GetAllAsDtoAsync<GetRoomTypeItemsDTO>();
+			var roomTypes = await _unitOfWork.Repository<RoomType>()
+				.GetAllAsDtoAsync<DropDownDTO<string>>();
 
 			return roomTypes;
 		}

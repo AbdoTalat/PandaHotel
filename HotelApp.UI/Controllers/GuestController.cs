@@ -100,8 +100,12 @@ namespace HotelApp.UI.Controllers
             return Json(guests);
         }
 
-
-		[HttpPost]
+        [HttpGet]
+        public IActionResult LoadGuestForm()
+        {
+            return PartialView("_ManageGuestsPartial");
+        }
+        [HttpPost]
 		public IActionResult AddGuestsToReservation([FromBody] List<AddGuestDTO> guests)
 		{
 			if (!guests.Any(g => g.IsPrimary))

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.RoomStatus;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
@@ -28,15 +29,17 @@ namespace HotelApp.Application.Services.RoomStatusService
 
             return roomStatus;
         }
-		public async Task<IEnumerable<GetRoomStatusItemsDTO>> GetRoomStatusItemsAsync()
-        {
-            var roomStatus = await _unitOfWork.Repository<RoomStatus>().GetAllAsDtoAsync<GetRoomStatusItemsDTO>();
+		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownAsync()
+		{
+            var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+                .GetAllAsDtoAsync<DropDownDTO<string>>();
             
             return roomStatus;
         }
-		public async Task<IEnumerable<GetRoomStatusItemsDTO>> GetRoomStatusItemsWithoutBranchFilterAsync()
+		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownWithoutBranchFilterAsync()
         {
-            var roomStatus = await _unitOfWork.Repository<RoomStatus>().GetAllAsDtoAsync<GetRoomStatusItemsDTO>(SkipBranchFilter:true);
+            var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+                .GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
 
             return roomStatus;
         }

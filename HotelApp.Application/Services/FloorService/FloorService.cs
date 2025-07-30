@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Annotations;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Floor;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
@@ -25,9 +26,9 @@ namespace HotelApp.Application.Services.FloorService
             _mapper = mapper;
 		}
          
-        public async Task<IEnumerable<GetFloorItemsDTO>> GetFloorItemsAsync()
+        public async Task<IEnumerable<DropDownDTO<int>>> GetFloorsDropDownAsync()
         {
-			var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<GetFloorItemsDTO>();
+			var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<DropDownDTO<int>>();
             return floors;
         }
 		public async Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync()

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Branches;
 using HotelApp.Application.DTOs.Users;
 using HotelApp.Domain.Entities;
@@ -29,9 +30,8 @@ namespace HotelApp.Application.Mapping
 				.ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.UserName : "N/A"))
 				.ForMember(dest => dest.LastModifiedBy, opt => opt.MapFrom(src => src.LastModifiedBy != null ? src.LastModifiedBy.UserName : "N/A"));
 
-			CreateMap<Branch, GetBranchItemsDTO>()
-				.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-				.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+			CreateMap<Branch, DropDownDTO<string>>()
+				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
 		}
     }

@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs.Reservation;
+﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Reservation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace HotelApp.Application.Services.ReservationSourceService
 {
     public interface IReservationSourceService
     {
-        Task<IEnumerable<GetAllReservationSourceDTO>> GetAllReservationSourcesAsync();
+        Task<IEnumerable<DropDownDTO<string>>> GetReservationSourcesDropDownAsync();
     }
 }

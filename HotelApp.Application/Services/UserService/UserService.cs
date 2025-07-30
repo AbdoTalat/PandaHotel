@@ -65,7 +65,7 @@ namespace HotelApp.Application.Services.UserService
 				dto.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
 				dto.SelectedRoles = (await _userManager.GetRolesAsync(user)).ToList();
 				dto.AllBranches = await _unitOfWork.Repository<Branch>()
-					.GetAllAsDtoAsync<GetBranchItemsDTO>(SkipBranchFilter: true);
+					.GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter: true);
 
 				return ServiceResponse<EditUserDTO>.ResponseSuccess("Success",dto);
 			}

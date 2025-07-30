@@ -340,7 +340,7 @@
 
 			// Load tab content dynamically
 			if (index === 2 && $("#guestTab").is(':empty')) {
-				$("#guestTab").load("/Reservation/LoadGuestForm", function () {
+				$("#guestTab").load("/Guest/LoadGuestForm", function () {
 					initializeSelect2(); // Re-initialize Select2 after loading guest form
 				});
 			}

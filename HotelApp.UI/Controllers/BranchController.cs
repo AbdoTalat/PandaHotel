@@ -34,16 +34,16 @@ namespace HotelApp.UI.Controllers
             var branches = await _branchService.GetAllBranchesAsync();
             return View(branches);
         }
-		//public async Task<IActionResult> GetBranchesJson()
-		//{
-		//	var branches = await _branchService.GetBranchSelectListAsync();
-  //          var result = branches.Select(b => new
-  //          {
-  //              id = b.Id,
-  //              name = b.Name
-  //          });
-		//	return Json(result);
-		//}
+        public async Task<IActionResult> GetBranchesJson()
+        {
+            var branches = await _branchService.GetBranchsDropDownAsync();
+            var result = branches.Select(b => new
+            {
+                id = b.Id,
+                name = b.DisplayText
+            });
+            return Json(result);
+        }
 
         public async Task<IActionResult> GetFilteredBranches(string? name, string? country, string? state)
         {

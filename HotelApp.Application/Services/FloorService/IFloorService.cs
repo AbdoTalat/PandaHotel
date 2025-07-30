@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs.Floor;
+﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Floor;
 using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace HotelApp.Application.Services.FloorService
 {
     public interface IFloorService
     {
-        Task<IEnumerable<GetFloorItemsDTO>> GetFloorItemsAsync();
+        Task<IEnumerable<DropDownDTO<int>>> GetFloorsDropDownAsync();
         Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync();
         Task<GetFloorByIdDTO?> GetFloorByIdAsync(int Id);
         Task<ServiceResponse<AddFloorDTO>> AddFloorAsync(AddFloorDTO floor);

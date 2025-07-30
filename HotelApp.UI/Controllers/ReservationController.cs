@@ -48,7 +48,7 @@ namespace HotelApp.UI.Controllers
 		public async Task<IActionResult> AddReservation()
 		{
 			ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
-			ViewBag.ReservationSource = await _reservationSourceService.GetAllReservationSourcesAsync();
+			ViewBag.ReservationSource = await _reservationSourceService.GetReservationSourcesDropDownAsync();
 			return View();
 		}
 
@@ -130,10 +130,6 @@ namespace HotelApp.UI.Controllers
 			return PartialView("_ConfirmReservationPartial");
 		}
 
-		[HttpGet]
-		public IActionResult LoadGuestForm()
-		{
-			return PartialView("_ManageGuestsPartial");
-		}
+
 	}
 }

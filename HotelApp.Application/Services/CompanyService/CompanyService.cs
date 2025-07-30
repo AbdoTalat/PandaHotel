@@ -86,5 +86,51 @@ namespace HotelApp.Application.Services.CompanyService
         //{
 
         //}
+
+
+        public async Task<IEnumerable<DropDownDTO<string>>> SerachCompanyByNameAsync(string Name)
+        {
+            var companies = await _unitOfWork.Repository<Company>()
+                .GetAllAsDtoAsync<DropDownDTO<string>>(c => c.Name.ToLower().Contains(Name.ToLower()));
+
+            return companies;
+        }
+
+        public async Task<GetSearchedCompanyDTO?> GetSearchedCompanyDataAsync(int Id)
+        {
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByIdAsDtoAsync<GetSearchedCompanyDTO>(Id);
+
+            return company;
+        }
+
+        public async Task<ServiceResponse<ReservationCompanyDTO>> CreateOrUpdateCompanyAsync(ReservationCompanyDTO companyDTO)
+        {
+            try
+            {
+                Company? company = new Company();
+                if (companyDTO.Id == 0)
+                {
+                    company = _mapper.Map<Company>(companyDTO);
+                    await _unitOfWork.Repository<Company>().AddNewAsync(company);
+                }
+                else
+                {
+                    company = await _unitOfWork.Repository<Company>().GetByIdAsync(companyDTO.Id);
+
+                    _mapper.Map(companyDTO, company);
+                    _unitOfWork.Repository<Company>().Update(company);
+                }
+
+                await _unitOfWork.CommitAsync();
+                var result = _mapper.Map<ReservationCompanyDTO>(company);
+                return ServiceResponse<ReservationCompanyDTO>.ResponseSuccess("Company saved successfully.", result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<ReservationCompanyDTO>.ResponseFailure(ex.Message);
+            }
+        }
+
     }
 }

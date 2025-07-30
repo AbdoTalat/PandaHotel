@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Options;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
@@ -22,9 +23,9 @@ namespace HotelApp.Application.Services.OptionService
 			_mapper = mapper;
 		}
 
-		public async Task<IEnumerable<GetOptionItemsDTO>> GetOptionItemsAsync()
+		public async Task<IEnumerable<DropDownDTO<string>>> GetOptionsDropDownAsync()
 		{
-			var options = await _unitOfWork.Repository<Option>().GetAllAsDtoAsync<GetOptionItemsDTO>();
+			var options = await _unitOfWork.Repository<Option>().GetAllAsDtoAsync<DropDownDTO<string>>();
 			return options;
 		}
 

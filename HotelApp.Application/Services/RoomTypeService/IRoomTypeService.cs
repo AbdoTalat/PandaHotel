@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs.RoomTypes;
+﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Domain.Entities;
 
 namespace HotelApp.Application.Services.RoomTypeService
@@ -8,7 +9,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 		Task<IEnumerable<GetAllRoomTypesDTO>> GetAllRoomTypesAsync();
 		Task<GetRoomTypeByIdDTO?> GetRoomTypeByIdAsync(int Id);
         Task<EditRoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id);
-        Task<IEnumerable<GetRoomTypeItemsDTO>> GetRoomTypeSelectListAsync();
+        Task<IEnumerable<DropDownDTO<string>>> GetRoomTypesDropDownAsync();
 		Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync();
 		Task<ServiceResponse<AddRoomTypeDTO>> AddRoomTypeAsync(AddRoomTypeDTO roomTypeDTO);
 		Task<ServiceResponse<EditRoomTypeDTO>> EditRoomTypeAsync(EditRoomTypeDTO roomTypeDTO);

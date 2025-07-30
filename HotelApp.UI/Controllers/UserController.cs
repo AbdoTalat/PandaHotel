@@ -123,7 +123,7 @@ namespace HotelApp.UI.Controllers
             if (!ModelState.IsValid)
             {
                 model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
-                model.AllBranches = await _branchService.GetBranchSelectListAsync();
+                model.AllBranches = await _branchService.GetBranchsDropDownAsync();
                 return View(model);
             }
 

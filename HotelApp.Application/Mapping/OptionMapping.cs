@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Options;
 using HotelApp.Domain.Entities;
 using System;
@@ -14,9 +15,11 @@ namespace HotelApp.Application.Mapping
         public OptionMapping()
         {
             CreateMap<Option, GetAllOptionsDTO>();
-            CreateMap<Option, GetOptionItemsDTO>();
+            CreateMap<Option, DropDownDTO<string>>()
+				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
-            CreateMap<AddOptionDTO, Option>();
+
+			CreateMap<AddOptionDTO, Option>();
 
             CreateMap<EditOptionDTO, Option>();
             CreateMap<Option, EditOptionDTO>();

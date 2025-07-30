@@ -25,12 +25,12 @@ namespace HotelApp.UI.Controllers
 
         public async Task<IActionResult> GetRoomTypesJson()
         {
-            var roomTypes = await _roomTypeService.GetRoomTypeSelectListAsync();
+            var roomTypes = await _roomTypeService.GetRoomTypesDropDownAsync();
 
             var result = roomTypes.Select(rt => new
             {
                 Id = rt.Id,
-                typeName = rt.Name
+                typeName = rt.DisplayText
             });
 
 			return Json(result);

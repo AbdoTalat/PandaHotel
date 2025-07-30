@@ -23,7 +23,7 @@
                                     <option></option>
                                     @foreach(var item in ViewBag.ReservationSource)
                                     {
-                                        <option value="@item.Id">@item.Name</option>
+                                        <option value="@item.Id">@item.DisplayText</option>
                                     }
                                 </select>
                                 <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label" ></span>
@@ -32,13 +32,98 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Company</label>
-                                <select id="companySelect" asp-for="CompanyId" name="CompanyId" class="form-control select" data-placeholder="Companies">
-                                    <option></option>
-                                </select>
+                                <div class="form-group has-feedback">
+                                    <input type="text" class="form-control" id="selectedCompanyName" readonly placeholder="Company" data-toggle="modal" data-target="#modal_large">
+                                    <div class="form-control-feedback">
+                                        <i class="icon-search4 text-size-base"></i>
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="CompanyId" id="CompanyId" />
                                 <span asp-validation-for="CompanyId" class="text-danger validation-error-label"></span>
                             </div>
                         </div>
                     </div>
+
+
+
+                    <div id="modal_large" class="modal fade in" style="display: none; padding-right: 15px;">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">×</button>
+                                    <h5 class="modal-title">Company</h5>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Serach company </label>
+                                                <select id="companyNameSelect" class="form-control select" data-placeholder="Search by company name...">
+                                                    <option></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form id="companyForm">
+                                        <input type="hidden" id="companyId"  value="0" />
+                                        <input type="hidden" id="companyBranchId" value="0" />
+                                        
+                                        <div class="panel panel-flat border-left-sm border-left-teal ">
+                                            <div class="panel-body">
+                                                <div class="content">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="CompanyName">Name <span class="text-danger">*</span></label>
+                                                                <input type="text" id="CompanyName" name="CompanyName" class="form-control" required />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="CompanyPhone">Phone <span class="text-danger">*</span></label>
+                                                                <input type="text" id="CompanyPhone" name="CompanyPhone" class="form-control" required />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="CompanyAddress">Address</label>
+                                                                <input type="text" id="CompanyAddress" name="CompanyAddress" class="form-control" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="CompanyNotes">Notes</label>
+                                                                <textarea id="CompanyNotes" name="CompanyNotes" class="form-control" rows="2"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn bg-teal-400" id="saveCompanySelection">Save</button>
+
+                                        </div>
+                                    </form>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
 
                     <!-- Check-in & Check-out Dates -->
                     <div class="row">
@@ -123,14 +208,7 @@
                     </div>
 
                     <legend class="text-semibold"><i class="icon-reading position-left"></i> Rooms Selection</legend>
-                    <!-- Choose Rate -->
-                    <div class="form-group">
-                        <label>Choose Rate<span class="text-danger">*</span></label>
-                        <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
-                            <option></option>
-                        </select>
-                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
-                    </div>
+                   
 
                     <!-- Room Types Selection -->
                     <div class="form-group">
@@ -154,6 +232,17 @@
                         <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
                     </div>
 
+                    <!-- Choose Rate -->
+                    <div class="form-group" style="margin-top:30px">
+                        <label>Rate<span class="text-danger">*</span></label>
+                        <a data-popup="popover" data-content="Select check-in/out dates and room type to see rates" data-trigger="hover">
+                            <i class="icon-info22" style="color#00796B"></i>
+                        </a>
+                        <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
+                    </div>
                 </div>
 
                 <!-- Right Section -->
@@ -179,6 +268,108 @@
         </fieldset>
     </form>
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        // Initialize Select2
+        $('#companyNameSelect').select2({
+            placeholder: "Search and select company name",
+            minimumInputLength: 2,
+            ajax: {
+                url: '/Company/GetSerachedCompaniesByName',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        name: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (company) {
+                            return {
+                                id: company.id,
+                                text: company.displayText
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#companyNameSelect').on('select2:select', function (e) { // <-- fix event name
+            var companyId = e.params.data.id;
+
+            if (companyId) {
+                $.ajax({
+                    url: '/Company/GetSerachedCompanyData/' + companyId,
+                    type: 'GET',
+                    success: function (company) {
+                        console.log("Company Data", company); // Debug
+
+                        $('#companyId').val(company.id);
+                        $('#CompanyName').val(company.name);
+                        $('#CompanyPhone').val(company.phone);
+                        $('#CompanyAddress').val(company.address);
+                        $('#CompanyNotes').val(company.notes);
+                        $('#companyBranchId').val(company.branchId);
+
+                        // Clear the Select2 after selecting a company
+                        $('#companyNameSelect').val(null).trigger('change');
+                    },
+                    error: function () {
+                        alert('Failed to fetch company data.');
+                    }
+                });
+            }
+        });
+
+        $('#saveCompanySelection').on('click', function () {
+
+
+
+            const payload = {
+                Id: $('#companyId').val() || 0,
+                Name: $('#CompanyName').val(),
+                Phone: $('#CompanyPhone').val(),
+                Address: $('#CompanyAddress').val(),
+                Notes: $('#CompanyNotes').val(),
+                BranchId: $('#companyBranchId').val()
+                };
+
+            $.ajax({
+                url: '/Company/SaveCompany',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (response) {
+                    if (response.success) {
+                        $('#selectedCompanyName').val(response.name);
+                        $('#CompanyId').val(response.companyId);
+
+                        $('#companyId').val(0);
+                        $('#companyBranchId').val(0);
+                        $('#CompanyName').val('');
+                        $('#CompanyPhone').val('');
+                        $('#CompanyAddress').val('');
+                        $('#CompanyNotes').val('');
+                        
+
+                        $('#modal_large').modal('hide');
+                    } else {
+                        alert('Error saving company.');
+                    }
+                },
+                error: function () {
+                    alert('Error contacting server.');
+                }
+            });
+        });
+
+    });
+</script>
 
 <script>
     let isGroupMode = false; // Default mode is Single
@@ -258,17 +449,28 @@
     function addRoomRow() {
         const tbody = document.querySelector('#roomTable tbody');
 
+        // 🟢 Step 1: Get already selected RoomType IDs
+        const selectedIds = Array.from(document.querySelectorAll('.room-type-select'))
+            .map(select => select.value)
+            .filter(val => val !== "");
+
+        // 🟢 Step 2: Build options excluding already selected
+        let optionsHtml = `<option></option>`;
+    @foreach (var item in ViewBag.RoomTypes)
+    {
+        <text>
+                    if (!selectedIds.includes("@item.Id")) {
+                optionsHtml += `<option value="@item.Id" data-name="@item.Name" data-count="@item.NumOfAvailableRooms">@item.Name</option>`;
+            }
+        </text>
+    }
+
+        // 🟢 Step 3: Create new row with filtered options
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
             <td style="padding: 4px;">
                 <select class="form-control select room-type-select" data-placeholder="Room Type">
-                    <option></option>
-    @foreach (var item in ViewBag.RoomTypes)
-    {
-                            <option value="@item.Id" data-name="@item.Name" data-count="@item.NumOfAvailableRooms">
-            @item.Name
-                            </option>
-    }
+                    ${optionsHtml}
                 </select>
             </td>
             <td style="padding: 4px;">
@@ -295,10 +497,12 @@
         updateRemoveButtons();
     }
 
+
     function removeRoomRow(button) {
         const row = button.closest('tr');
         row.remove();
         updateRemoveButtons();
+        refreshAllRoomTypeOptions(); // 🟢 Refresh disabled options
     }
 
     function updateRemoveButtons() {
@@ -312,6 +516,31 @@
         }
     }
 
+
+    function refreshAllRoomTypeOptions() {
+        const allSelects = $('.room-type-select');
+        const selectedValues = allSelects.map(function () {
+            return $(this).val();
+        }).get().filter(v => v);
+
+        allSelects.each(function () {
+            const currentVal = $(this).val();
+            const $select = $(this);
+
+            $select.find('option').each(function () {
+                const optionVal = $(this).val();
+                if (optionVal === "" || optionVal === currentVal) {
+                    $(this).prop('disabled', false);
+                } else if (selectedValues.includes(optionVal)) {
+                    $(this).prop('disabled', true);
+                } else {
+                    $(this).prop('disabled', false);
+                }
+            });
+        });
+    }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         setToSingleMode(); // Default to Single
         addRoomRow();      // Add one initial row
@@ -319,7 +548,7 @@
     });
 </script>
 
- <script>
+<script>
     $("#CheckInDate, #CheckOutDate").change(function () {
         let checkIn = new Date($("#CheckInDate").val());
         let checkOut = new Date($("#CheckOutDate").val());
@@ -471,6 +700,7 @@
         ReservationSourceId: $("#ReservationSourceId").val(),
         RateId: $("#rateSelect").val(),
         BranchId: $("input[name='BranchId']").val(),
+        companyId: $("#CompanyId").val(),
         roomTypeToBookDTOs: []
     };
 
@@ -522,6 +752,7 @@
 });
 
 </script>
+
 <script>
     $(document).ready(function () {
         $.ajax({
@@ -547,7 +778,4 @@
         });
     });
 </script>
-
-
-
 

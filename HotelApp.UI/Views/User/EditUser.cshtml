@@ -127,7 +127,7 @@
 												<select asp-for="DefaultBranchId" class="form-control select">
 													@foreach(var item in Model.AllBranches)
 													{
-														<option value="@item.Id">@item.Name</option>
+														<option value="@item.Id">@item.DisplayText</option>
 													}
 												</select>
 											</div>
@@ -177,7 +177,7 @@
 														value="@branch.Id"
 													@(Model.SelectedBranchIds.Contains(branch.Id) ? "checked" : "")>
 													<div class="checkbox-custom"></div>
-													<a class="text-default">@branch.Name</a>
+													<a class="text-default">@branch.DisplayText</a>
 												</label>
 											</div>
 										}

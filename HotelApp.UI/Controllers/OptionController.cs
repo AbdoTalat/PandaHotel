@@ -26,7 +26,7 @@ namespace HotelApp.UI.Controllers
 
 		public async Task<IActionResult> GetAllOptionsJson()
 		{
-			var options = await _optionService.GetOptionItemsAsync();
+			var options = await _optionService.GetOptionsDropDownAsync();
 
 			return Json(options);
 		}

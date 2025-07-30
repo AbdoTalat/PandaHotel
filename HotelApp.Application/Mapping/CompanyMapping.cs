@@ -23,6 +23,11 @@ namespace HotelApp.Application.Mapping
 
             CreateMap<Company, EditCompanyDTO>();
             CreateMap<EditCompanyDTO, Company>();
+
+            CreateMap<Company, GetSearchedCompanyDTO>();
+
+            CreateMap<ReservationCompanyDTO, Company>();
+            CreateMap<Company, ReservationCompanyDTO>();
         }
     }
 }
