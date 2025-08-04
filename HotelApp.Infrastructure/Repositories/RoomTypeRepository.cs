@@ -44,7 +44,9 @@ namespace HotelApp.Infrastructure.Repositories
 			   {
 				   Id = rt.Id,
 				   Name = rt.Name,
-				   NumOfAvailableRooms = rt.Rooms.Count(r => r.RoomStatusId == (int)RoomStatusEnum.Available)
+				   NumOfAvailableRooms = rt.Rooms.Count(r => r.RoomStatusId == (int)RoomStatusEnum.Available),
+				   MaxNumOfAdults = rt.MaxNumOfAdults,
+				   MaxNumOfChildrens = rt.MaxNumOfChildrens
 			   })
 			   .ToListAsync();
 

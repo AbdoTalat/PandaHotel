@@ -69,7 +69,9 @@ namespace HotelApp.Application.Services.ReservationService
 				{
 					RoomTypeId = rt.Id,
 					ReservationId = reservation.Id,
-					Quantity = rt.NumOfRooms
+					Quantity = rt.NumOfRooms,
+					NumOfAdults = rt.NumOfAdults,
+					NumOfChildren = rt.NumOfChildren
 				}).ToList();
 
 				await _unitOfWork.Repository<ReservationRoomType>().AddRangeAsync(reservationRoomTypes);

@@ -16,5 +16,8 @@ namespace HotelApp.Application.DTOs.Company
 
         [MaxLength(100, ErrorMessage = "Max Length is 100")]
         public string? Notes { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+        public bool IsActive { get; set; }
     }
 }

@@ -135,9 +135,7 @@
 							console.log("Guest Data", guest); // Debug
 
 							$('#guestId').val(guest.id);
-							$('#FirstName').val(guest.firstName);
-							$('#MiddleName').val(guest.middleName);
-							$('#LastName').val(guest.lastName);
+							$('#FullName').val(guest.fullName);
 							$('#Email').val(guest.email);
 							$('#Phone').val(guest.phone);
 							$('#Address').val(guest.address);
@@ -177,9 +175,7 @@
 			const guestDto = {
 				id: $('#guestId').val() || Date.now(), // unique ID
 				isPrimary: $('#isPrimary').is(':checked'),
-				firstName: $('#FirstName').val(),
-				middleName: $('#MiddleName').val(),
-				lastName: $('#LastName').val(),
+				fullName: $('#FullName').val(),
 				email: $('#Email').val(),
 				phone: $('#Phone').val(),
 				typeOfProof: $('#TypeOfProof').val(),
@@ -223,7 +219,7 @@
 			normalGuests.forEach(guest => {
 				tbody.append(`
 						<tr data-guest-id="${guest.id}">
-							<td>${guest.firstName} ${guest.lastName}</td>
+							<td>${guest.fullName}</td>
 							<td>${guest.email}</td>
 							<td>${guest.phone}</td>
 							<td>
@@ -243,7 +239,7 @@
 								<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
 							</div>
 							<div class="col-md-10">
-								<h5 class="text-primary">${primary.firstName} ${primary.lastName}</h5>
+								<h5 class="text-primary">${primary.fullName}</h5>
 								<p>Email: ${primary.email}</p>
 								<p>Phone: ${primary.phone}</p>
 							</div>
@@ -273,7 +269,7 @@
 							</a>
 							<div class="media-body">
 										<a href="#" class="media-heading text-default">
-									${guest.firstName} ${guest.lastName} ${badge}
+									${guest.fullName}  ${badge}
 								</a>
 								<span class="text-size-small text-muted display-block">
 									<span class="status-mark ${isPrimary ? 'border-primary' : 'border-success'} position-left"></span>
@@ -299,9 +295,7 @@
 
 			$('#guestId').val(guest.id);
 			$('#isPrimary').prop('checked', guest.isPrimary);
-			$('#FirstName').val(guest.firstName);
-			$('#MiddleName').val(guest.middleName);
-			$('#LastName').val(guest.lastName);
+			$('#FullName').val(guest.fullName);
 			$('#Email').val(guest.email);
 			$('#Phone').val(guest.phone);
 			$('#TypeOfProof').val(guest.typeOfProof);

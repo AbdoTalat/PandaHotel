@@ -28,9 +28,9 @@ namespace HotelApp.Infrastructure.Configurations
             builder.Property(c => c.Notes)
                 .HasMaxLength(100);
 
-            //builder.Property(c => c.Email)
-            //    .IsRequired()
-            //    .HasMaxLength(30);
+            builder.Property(c => c.Email)
+                .IsRequired()
+                .HasMaxLength(30);
 
             builder.HasOne(c => c.Branch)
                 .WithMany(b => b.Companies)

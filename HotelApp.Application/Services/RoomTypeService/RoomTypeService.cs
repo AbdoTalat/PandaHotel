@@ -32,7 +32,8 @@ namespace HotelApp.Application.Services.RoomTypeService
 
 		public async Task<IEnumerable<GetAllRoomTypesDTO>> GetAllRoomTypesAsync()
 		{
-			var roomTypes = await _unitOfWork.Repository<RoomType>().GetAllAsDtoAsync<GetAllRoomTypesDTO>();	
+			var roomTypes = await _unitOfWork.Repository<RoomType>()
+				.GetAllAsDtoAsync<GetAllRoomTypesDTO>();
 
 			return roomTypes;
 		}

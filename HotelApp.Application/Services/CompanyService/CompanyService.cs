@@ -91,7 +91,8 @@ namespace HotelApp.Application.Services.CompanyService
         public async Task<IEnumerable<DropDownDTO<string>>> SerachCompanyByNameAsync(string Name)
         {
             var companies = await _unitOfWork.Repository<Company>()
-                .GetAllAsDtoAsync<DropDownDTO<string>>(c => c.Name.ToLower().Contains(Name.ToLower()));
+                .GetAllAsDtoAsync<DropDownDTO<string>>
+                (c => c.Name.ToLower().Contains(Name.ToLower()) && c.IsActive);
 
             return companies;
         }

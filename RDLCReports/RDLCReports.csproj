@@ -131,11 +131,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HotelApp.Application\HotelApp.Application.csproj">
-      <Project>{65bfe1fb-bab6-4d5a-8c94-1f82c8998d75}</Project>
-      <Name>HotelApp.Application</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

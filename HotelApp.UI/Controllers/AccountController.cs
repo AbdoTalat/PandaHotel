@@ -11,9 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using HotelApp.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotelApp.UI.Controllers
 {
+
     public class AccountController : Controller
 	{
         private readonly UserManager<User> _userManager;

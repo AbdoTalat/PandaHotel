@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
+using HotelApp.Helper;
 
 namespace HotelApp.Infrastructure
 {
@@ -31,8 +32,6 @@ namespace HotelApp.Infrastructure
 			services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, unitOfWork>();
 
-			services.AddHttpContextAccessor();
-
 			services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
@@ -43,8 +42,9 @@ namespace HotelApp.Infrastructure
 
 			services.AddScoped<IPermissionLoader, PermissionLoader>();
 
+            services.AddHttpContextAccessor();
 
-			return services;
+            return services;
         }
     }
 }

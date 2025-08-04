@@ -11,29 +11,38 @@
 				<fieldset class="step" id="step1">
 					<legend class="text-semibold"><i class="icon-reading position-left"></i> Personal details</legend>
 
-					<div class="row">
-							<div class="col-md-4">
-                                <label>First Name<span class="text-danger">*</span></label>
-								<div class="form-group">
-										<input asp-for="FirstName" class="form-control box-input" placeholder="First Name" required>
-								<span asp-validation-for="FirstName" class="text-danger validation-error-label"></span>
-								</div>
-                            </div>
-							<div class="col-md-4">
-							<label>Middle Name (Optional)</label>
-                                <div class="form-group">
-								<input asp-for="MiddleName" class="form-control"placeholder="Middle Name">
-								<span class="text-danger validation-error-label" asp-validation-for="MiddleName"></span>
-                                </div>
-                            </div>
-                        <div class="col-md-4">
-                            <label>Last Name<span class="text-danger">*</span></label>
+                    <div class="row">
+
+
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <input asp-for="LastName" class="form-control box-input" placeholder="Last Name" required>
-                                <span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
-                            </div>
+                                <label for="GuestFullName">Guest Name</label>
+                                <div class="input-group">
+                                    <!-- Title Dropdown -->
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            Mr. <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Mr.</a></li>
+                                            <li><a href="#">Mrs.</a></li>
+                                            <li><a href="#">Ms.</a></li>
+                                            <li><a href="#">Dr.</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <input type="text" asp-for="FullName" id="FullName" class="form-control" required placeholder="Full Name" />
+										
+									<span class="input-group-addon"><i class="icon-vcard"></i></span>
+                                        
+                                </div>							
+								<span class="text-danger validation-error-label" asp-validation-for="FullName"></span>
+
+                            </div>                                 
+
+
                         </div>
-						</div>
+                    </div>
 
 					<div class="row">
 							<div class="col-md-6">

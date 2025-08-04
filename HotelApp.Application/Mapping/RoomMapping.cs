@@ -46,6 +46,7 @@ namespace HotelApp.Application.Mapping
 
 			/* Room Types */
 			CreateMap<RoomType, GetAllRoomTypesDTO>();
+
 			CreateMap<RoomType, GetRoomTypesForReservationDTO>();
 
 			CreateMap<RoomType, EditRoomTypeDTO>();

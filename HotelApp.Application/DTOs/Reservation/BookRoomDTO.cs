@@ -1,5 +1,7 @@
-﻿using System;
+﻿using HotelApp.Helper.Validation;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,15 +10,20 @@ namespace HotelApp.Application.DTOs.Reservation
 {
 	public class BookRoomDTO
 	{
+		[RequiredEx]
 		public DateTime CheckInDate { get; set; }
-		public DateTime CheckOutDate { get; set; }
-		public int NumOfAdults { get; set; }
-		public int NumOfChildrens { get; set; }
-		public int NumOfNights { get; set; }
+        [RequiredEx]
+        public DateTime CheckOutDate { get; set; }
 
-		public int RateId { get; set; }
-		public int BranchId { get; set; }
-		public int ReservationSourceId { get; set; }
+        [RequiredEx]
+        public int NumOfNights { get; set; }
+
+        [RequiredEx]
+        public int RateId { get; set; }
+        [RequiredEx]
+        public int BranchId { get; set; }
+        [RequiredEx]
+        public int ReservationSourceId { get; set; }
 		public int? CompanyId { get; set; }
 
 		public List<RoomTypeToBookDTO> roomTypeToBookDTOs { get; set; } = new List<RoomTypeToBookDTO>();
@@ -24,6 +31,9 @@ namespace HotelApp.Application.DTOs.Reservation
 	public class RoomTypeToBookDTO
 	{
 		public int Id { get; set; }
-		public int NumOfRooms { get; set; }
+        [RequiredEx]
+        public int NumOfRooms { get; set; }
+		public int NumOfAdults { get; set; }
+		public int NumOfChildren { get; set; }
 	}
 }

@@ -52,7 +52,9 @@ namespace HotelApp.Application
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-			return services;
+
+
+            return services;
         }
     }
 }

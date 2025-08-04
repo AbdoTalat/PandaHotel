@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotelApp.Helper.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,16 +12,12 @@ namespace HotelApp.Application.DTOs.Guests
     {
         public int Id { get; set; }
 
-        [Required]
-        public string FirstName { get; set; }
-        public string? MiddleName { get; set; }
+        [RequiredEx]
+        public string FullName { get; set; }
 
-        [Required]
-        public string LastName { get; set; }
-		
-		public bool IsPrimary { get; set; }
+        public bool IsPrimary { get; set; }
 
-        [Required]
+        [RequiredEx]
         public DateOnly DateOfBirth { get; set; }
         public string Address { get; set; }
         public string Phone { get; set; }

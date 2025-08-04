@@ -1,7 +1,7 @@
 ﻿@model AddGuestDTO
 
  <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="panel panel-flat">
             <div class="panel-body">
 
@@ -28,33 +28,37 @@
                             </label>
                         </div>
                     </div>
-
                     <div class="row">
-                        <div class="col-md-4">
+                        
+                        
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label>First name</label>
-                                <input asp-for="FirstName" id="FirstName" required class="form-control" placeholder="First Name">
-                                <span class="text-danger validation-error-label" asp-validation-for="FirstName"></span>
+                                <label for="GuestFullName">Guest Name</label>
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            Mr. <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Mr.</a></li>
+                                            <li><a href="#">Mrs.</a></li>
+                                            <li><a href="#">Ms.</a></li>
+                                            <li><a href="#">Dr.</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <input asp-for="FullName" id="FullName" class="form-control" required placeholder="Full Name" />
+
+                                    <span class="input-group-addon"><i class="icon-vcard"></i></span>
+
+                                </div>                                   
+                                <span class="text-danger validation-error-label" asp-validation-for="FullName"></span>
 
                             </div>
-                        </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Middle name</label>
-                                <input type="text" asp-for="MiddleName" id="MiddleName" class="form-control" placeholder="Middle Name">
-                                <span class="text-danger validation-error-label" asp-validation-for="MiddleName"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Last name</label>
-                                <input type="text" asp-for="LastName" id="LastName" class="form-control" placeholder="Last Name">
-                                <span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
-                            </div>
                         </div>
                     </div>
+                   
 
                     <div class="row">
                         <div class="col-md-6">
@@ -127,7 +131,7 @@
         </div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
         <!-- Primary Guest Panel -->
         <div class="panel panel-flat">
             <div class="panel-heading">

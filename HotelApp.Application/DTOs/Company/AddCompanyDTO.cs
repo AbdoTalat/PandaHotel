@@ -13,8 +13,12 @@ namespace HotelApp.Application.DTOs.Company
 		public string Phone { get; set; }
 		public string Address { get; set; }
 
+		[EmailAddress]
+		public string Email { get; set; }
+
 		[MaxLength(100, ErrorMessage = "Max Length is 100")]
 		public string? Notes { get; set; }
+		public bool IsActive { get; set; }
 		public int BranchId { get; set; }
 
 	}

@@ -29,8 +29,6 @@ namespace HotelApp.Infrastructure
 			IQueryable<T> query = _dbSet.AsNoTracking()
 				.BranchFilter(SkipBranchFilter);
 
-            var a = query;
-
 			if (predicate != null)
 				query = query.Where(predicate);
 
@@ -40,8 +38,6 @@ namespace HotelApp.Infrastructure
         {
             IQueryable<T> query = _dbSet.AsNoTracking()
 				.BranchFilter(SkipBranchFilter);
-
-            var s = query;
 
 			if (predicate != null)
             {

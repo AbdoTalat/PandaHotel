@@ -14,16 +14,9 @@ namespace HotelApp.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Guest> builder)
 		{
-			builder.Property(b => b.FirstName)
+			builder.Property(b => b.FullName)
 				.IsRequired()
-				.HasMaxLength(20);
-
-			builder.Property(b => b.MiddleName)
-				.HasMaxLength(50);
-
-			builder.Property(b => b.LastName)
-				.IsRequired()
-				.HasMaxLength(20);
+				.HasMaxLength(60);
 
 			builder.Property(b => b.Email)
 				.IsRequired()

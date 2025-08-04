@@ -15,7 +15,6 @@ namespace HotelApp.Domain
 
 
 
-
         Task AddNewAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
 

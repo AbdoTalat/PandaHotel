@@ -17,5 +17,8 @@ namespace HotelApp.Domain.Entities
 		public RoomType? RoomType { get; set; }
 
 		public int Quantity { get; set; }
+
+		public int NumOfAdults { get; set; }
+		public int NumOfChildren { get; set; }
 	}
 }

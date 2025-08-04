@@ -29,7 +29,8 @@ namespace HotelApp.Application.Services.GuestService
 		}
 		public async Task<GetGuestByIdDTO?> GetGuestByIdAsync(int Id)
 		{
-			var guest = await _unitOfWork.Repository<Guest>().GetByIdAsDtoAsync<GetGuestByIdDTO>(Id);
+			var guest = await _unitOfWork.Repository<Guest>()
+				.GetByIdAsDtoAsync<GetGuestByIdDTO>(Id);
 			return guest;
         }
 		public async Task<EditGuestDTO?> GetGuestToEditByIdAsync(int Id)

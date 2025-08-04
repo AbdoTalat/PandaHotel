@@ -11,5 +11,7 @@ namespace HotelApp.Application.DTOs.RoomTypes
         public int Id { get; set; }
         public string Name { get; set; }
         public int NumOfAvailableRooms { get; set; }
+        public int MaxNumOfAdults { get; set; }
+        public int MaxNumOfChildrens { get; set; }
     }
 }

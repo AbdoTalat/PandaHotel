@@ -1,6 +1,7 @@
 ﻿using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.Services.RoomTypeService;
 using HotelApp.Domain.Entities;
+using HotelApp.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace HotelApp.UI.Controllers
         }
         [HttpGet]
         [Authorize(Policy = "RoomType.View")]
-        public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index()
         {
             var roomTypes = await _roomTypeService.GetAllRoomTypesAsync();
             return View(roomTypes);

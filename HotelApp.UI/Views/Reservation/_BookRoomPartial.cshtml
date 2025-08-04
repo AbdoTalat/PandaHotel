@@ -4,15 +4,12 @@
 }
 
 <div class="row">
-    
     <form id="bookRoomForm">
         <input type="hidden" asp-for="BranchId" value="@ViewBag.BranchId" />
-        @* <div asp-validation-summary="All" class="text-danger"></div> *@
         <fieldset>
-
             <div class="row">
                 <!-- Left Section -->
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <legend class="text-semibold"><i class="icon-reading position-left"></i> Reservation Info</legend>
 
                     <div class="row">
@@ -44,127 +41,30 @@
                         </div>
                     </div>
 
-
-
-                    <div id="modal_large" class="modal fade in" style="display: none; padding-right: 15px;">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal">×</button>
-                                    <h5 class="modal-title">Company</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Check-in - Check-out <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                                    <input type="text" class="form-control daterange-time" id="StayRange" placeholder="Select check-in and check-out" value="" />
+                                    <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
+                                    <span asp-validation-for="CheckOutDate" class="text-danger validation-error-label"></span>
                                 </div>
-
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>Serach company </label>
-                                                <select id="companyNameSelect" class="form-control select" data-placeholder="Search by company name...">
-                                                    <option></option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <form id="companyForm">
-                                        <input type="hidden" id="companyId"  value="0" />
-                                        <input type="hidden" id="companyBranchId" value="0" />
-                                        
-                                        <div class="panel panel-flat border-left-sm border-left-teal ">
-                                            <div class="panel-body">
-                                                <div class="content">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="CompanyName">Name <span class="text-danger">*</span></label>
-                                                                <input type="text" id="CompanyName" name="CompanyName" class="form-control" required />
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="CompanyPhone">Phone <span class="text-danger">*</span></label>
-                                                                <input type="text" id="CompanyPhone" name="CompanyPhone" class="form-control" required />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="CompanyAddress">Address</label>
-                                                                <input type="text" id="CompanyAddress" name="CompanyAddress" class="form-control" />
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="CompanyNotes">Notes</label>
-                                                                <textarea id="CompanyNotes" name="CompanyNotes" class="form-control" rows="2"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-center">
-                                            <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-                                            <button type="button" class="btn bg-teal-400" id="saveCompanySelection">Save</button>
-
-                                        </div>
-                                    </form>
-                                    </div>
+                            </div>
+                            <input type="hidden" asp-for="CheckInDate" id="CheckInDate" />
+                            <input type="hidden" asp-for="CheckOutDate" id="CheckOutDate" />
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Number of Nights</label>
+                                <input type="text" class="form-control" asp-for="NumOfNights" id="NumOfNights" readonly />
                             </div>
                         </div>
                     </div>
 
-
-
-
-
-
-
-
-
-
-
-                    <!-- Check-in & Check-out Dates -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Check In Date<span class="text-danger">*</span></label>
-                                <input  asp-for="CheckInDate" class="form-control" />
-                                @* <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn bg-teal-400 btn-icon" id="CheckInDateButton"><i class="icon-calendar3"></i></button>
-                                    </span>
-                                    <input type="text" asp-for="CheckInDate" class="form-control" id="CheckInDate" placeholder="Select a date" readonly="">
-                                </div> *@
-                                <span class="text-danger validation-error-label" asp-validation-for="CheckInDate"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Check Out Date<span class="text-danger">*</span></label>
-                                <input  asp-for="CheckOutDate" class="form-control" />
-                               @*  <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn bg-teal-400 btn-icon" id="CheckOutDateButton"><i class="icon-calendar3"></i></button>
-                                    </span>
-                                    <input type="text" asp-for="CheckOutDate" class="form-control" id="CheckOutDate" placeholder="Select a date" readonly="">
-                                </div> *@
-                                <span class="text-danger validation-error-label" asp-validation-for="CheckOutDate"></span>
-
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>No. Of Nights<span class="text-danger">*</span></label>
-                                <input id="NumOfNights"  asp-for="NumOfNights" name="NumOfNights" class="form-control" readonly />
-                                <span class="text-danger validation-error-label"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Adults & Children -->
-                    <div class="row">
+@*                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Adults<span class="text-danger">*</span></label>
@@ -206,68 +106,161 @@
                             </div>
                         </div>
                     </div>
-
+ *@
                     <legend class="text-semibold"><i class="icon-reading position-left"></i> Rooms Selection</legend>
                    
-
-                    <!-- Room Types Selection -->
                     <div class="form-group">
                         <button type="button" style="width:100px" id="singleBtn" class="btn text-teal-800 border-teal btn-flat" onclick="setToSingleMode()">Single</button>
                         <button type="button" style="width:100px" id="groupBtn" class="btn bg-teal" onclick="setToGroupMode()">Group</button>
                     </div>
 
-                    <table class="table table-borderless" id="roomTable">
-                        <thead style="background-color:#F5F5F5">
-                            <tr>
+                    <table class="table table-bordered" id="roomTable">
+                        <thead>
+                            <tr class="active">
                                 <th>Room Type</th>
                                 <th>No. of Rooms</th>
-                                <th>Action</th>
+                                <th>Adults</th>
+                                <th>Children</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
 
-                    <div id="addRoomWrapper">
+                   
+                    <div id="addRoomWrapper" style="margin-top:10px">
                         <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
                     </div>
 
-                    <!-- Choose Rate -->
-                    <div class="form-group" style="margin-top:30px">
-                        <label>Rate<span class="text-danger">*</span></label>
-                        <a data-popup="popover" data-content="Select check-in/out dates and room type to see rates" data-trigger="hover">
-                            <i class="icon-info22" style="color#00796B"></i>
-                        </a>
-                        <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
-                            <option></option>
-                        </select>
-                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
-                    </div>
-                </div>
 
-                <!-- Right Section -->
-                <div class="col-md-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h6 class="panel-title">Rate Details <a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-                            <div class="heading-elements">
-                                <ul class="icons-list">
-                                    <li><a data-action="collapse"></a></li>
-                                    <li><a data-action="reload"></a></li>
-                                </ul>
+                    <div class="row" style="margin-top:30px">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label">Rate <span class="text-danger">*</span></label>
+
+                                <div class="input-group">
+                                    <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
+                                        <option></option>
+                                    </select>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal_default">
+                                            <i class="icon-spinner9"></i> Rate Details
+                                        </button>                             
+
+                                    </div>
+                                </div>
+                                <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
                             </div>
                         </div>
-                        <div class="panel-body">
-                            <div id="rateDetails" class="col-md-12"></div>
-                        </div>
+                    </div>
                 </div>
-            </div>
-                    
-
             </div>
         </fieldset>
     </form>
 </div>
+
+<div id="modal_default" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h5 class="modal-title">Rate Details</h5>
+            </div>
+
+            <div class="modal-body">
+                <div class="panel">
+                    
+                    <div class="panel-body">
+                        <div id="rateDetails" class="col-md-12"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="modal_large" class="modal fade in" style="display: none; padding-right: 15px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h5 class="modal-title">Company</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Serach company </label>
+                            <select id="companyNameSelect" class="form-control select" data-placeholder="Search by company name...">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form id="companyForm">
+                    <input type="hidden" id="companyId" value="0" />
+                    <input type="hidden" id="companyBranchId" value="0" />
+
+                    <div class="panel panel-flat border-left-sm border-left-teal ">
+                        <div class="panel-body">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="CompanyName">Name <span class="text-danger">*</span></label>
+                                            <input type="text" id="CompanyName" name="CompanyName" class="form-control" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="CompanyPhone">Phone <span class="text-danger">*</span></label>
+                                            <input type="text" id="CompanyPhone" name="CompanyPhone" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="CompanyAddress">Address</label>
+                                            <input type="text" id="CompanyAddress" name="CompanyAddress" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="CompanyEmail">Email</label>
+                                            <input type="text" id="CompanyEmail" name="CompanyEmail" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="CompanyNotes">Notes</label>
+                                            <textarea id="CompanyNotes" name="CompanyNotes" class="form-control" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn bg-teal-400" id="saveCompanySelection">Save</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(document).ready(function () {
@@ -314,6 +307,7 @@
                         $('#CompanyPhone').val(company.phone);
                         $('#CompanyAddress').val(company.address);
                         $('#CompanyNotes').val(company.notes);
+                        $('#CompanyEmail').val(company.email);
                         $('#companyBranchId').val(company.branchId);
 
                         // Clear the Select2 after selecting a company
@@ -336,6 +330,7 @@
                 Phone: $('#CompanyPhone').val(),
                 Address: $('#CompanyAddress').val(),
                 Notes: $('#CompanyNotes').val(),
+                Email: $('#CompanyEmail').val(),
                 BranchId: $('#companyBranchId').val()
                 };
 
@@ -355,7 +350,7 @@
                         $('#CompanyPhone').val('');
                         $('#CompanyAddress').val('');
                         $('#CompanyNotes').val('');
-                        
+                        $('#CompanyEmail').val('');
 
                         $('#modal_large').modal('hide');
                     } else {
@@ -372,64 +367,52 @@
 </script>
 
 <script>
-    let isGroupMode = false; // Default mode is Single
+    let isGroupMode = false;
 
     function setToSingleMode() {
         isGroupMode = false;
-
         $('#addRoomWrapper').hide();
 
-        $('#singleBtn')
-            .addClass('text-teal-800 border-teal btn-flat')
-            .removeClass('bg-teal');
-
-        $('#groupBtn')
-            .removeClass('text-teal-800 border-teal btn-flat')
-            .addClass('bg-teal');
+        $('#singleBtn').addClass('text-teal-800 border-teal btn-flat').removeClass('bg-teal');
+        $('#groupBtn').removeClass('text-teal-800 border-teal btn-flat').addClass('bg-teal');
 
         const rows = $('#roomTable tbody tr');
-        if (rows.length > 1) {
-            rows.slice(1).remove();
-        }
+        if (rows.length > 1) rows.slice(1).remove();
     }
 
     function setToGroupMode() {
         isGroupMode = true;
-
         $('#addRoomWrapper').show();
 
-        $('#groupBtn')
-            .addClass('text-teal-800 border-teal btn-flat')
-            .removeClass('bg-teal');
-
-        $('#singleBtn')
-            .removeClass('text-teal-800 border-teal btn-flat')
-            .addClass('bg-teal');
+        $('#groupBtn').addClass('text-teal-800 border-teal btn-flat').removeClass('bg-teal');
+        $('#singleBtn').removeClass('text-teal-800 border-teal btn-flat').addClass('bg-teal');
     }
 
-    // Custom display of Room Type options with colored count
     function formatRoomOption(data) {
-    if (!data.id) return data.text;
+        if (!data.id) return data.text;
 
-    const $option = $(data.element);
-    const name = $option.data('name') || data.text;
-    const count = $option.data('count');
+        const $option = $(data.element);
+        const name = $option.data('name') || data.text;
+        const count = $option.data('count');
+        const isDisabled = $option.prop('disabled');
 
-    return $(`
-        <div class="d-flex justify-content-between align-items-center w-100">
-            <span class="text-start">${name}</span>
-            <span class="label bg-primary ">${count}</span>
-        </div>
-    `);
-}
-
+        return $(`
+            <div class="d-flex justify-content-between align-items-center w-100 ${isDisabled ? 'text-muted' : ''}">
+                <span>${name}</span>
+                <span class="label ${isDisabled ? 'bg-danger' : 'bg-primary'}">${count}</span>
+            </div>
+        `);
+    }
 
     function formatRoomSelection(data) {
         return data.text;
     }
 
     function initializeSelect2(container) {
-        $(container).find('.room-type-select').select2({
+
+        const roomTypeSelect = $(container).find('.room-type-select');
+
+        roomTypeSelect.select2({
             width: '100%',
             placeholder: function () {
                 return $(this).data('placeholder');
@@ -438,34 +421,74 @@
             templateSelection: formatRoomSelection
         });
 
+        // Prevent selecting unavailable RoomTypes
+        roomTypeSelect.on('select2:selecting', function (e) {
+            const count = $(e.params.args.data.element).data('count');
+            if (count === 0 || count === "0") {
+                e.preventDefault(); // Block selection
+                toastr.warning("This room type is not available.");
+            }
+        });
+
         $(container).find('select:not(.room-type-select)').select2({
             width: '100%',
             placeholder: function () {
                 return $(this).data('placeholder');
             }
         });
+
+        // Rest of your change logic stays here
+        roomTypeSelect.on('change', function () {
+            const selectedId = $(this).val();
+            const roomOption = $(this).find(`option[value="${selectedId}"]`);
+
+            const maxRooms = parseInt(roomOption.data('count') || 1);
+            const maxAdults = parseInt(roomOption.data('max-adults') || 0);
+            const maxChildren = parseInt(roomOption.data('max-children') || 0);
+
+            const $row = $(this).closest('tr');
+
+            const roomSelect = $row.find('.num-rooms-select');
+            roomSelect.empty().append('<option></option>');
+            for (let i = 1; i <= maxRooms; i++) {
+                roomSelect.append(`<option value="${i}">${i}</option>`);
+            }
+
+            const adultSelect = $row.find('.num-adults-select');
+            adultSelect.empty().append('<option></option>');
+            for (let i = 0; i <= maxAdults; i++) {
+                adultSelect.append(`<option value="${i}">${i}</option>`);
+            }
+
+            const childSelect = $row.find('.num-children-select');
+            childSelect.empty().append('<option></option>');
+            for (let i = 0; i <= maxChildren; i++) {
+                childSelect.append(`<option value="${i}">${i}</option>`);
+            }
+        });
     }
 
     function addRoomRow() {
         const tbody = document.querySelector('#roomTable tbody');
-
-        // 🟢 Step 1: Get already selected RoomType IDs
         const selectedIds = Array.from(document.querySelectorAll('.room-type-select'))
-            .map(select => select.value)
-            .filter(val => val !== "");
+            .map(select => select.value).filter(val => val !== "");
 
-        // 🟢 Step 2: Build options excluding already selected
         let optionsHtml = `<option></option>`;
     @foreach (var item in ViewBag.RoomTypes)
     {
         <text>
-                    if (!selectedIds.includes("@item.Id")) {
-                optionsHtml += `<option value="@item.Id" data-name="@item.Name" data-count="@item.NumOfAvailableRooms">@item.Name</option>`;
+                    if (!(isGroupMode && selectedIds.includes("@item.Id"))) {
+                optionsHtml += `<option value="@item.Id"
+                            data-name="@item.Name"
+                            data-count="@item.NumOfAvailableRooms"
+                            data-max-adults="@item.MaxNumOfAdults"
+                            data-max-children="@item.MaxNumOfChildrens">
+                @item.Name (@item.NumOfAvailableRooms available)
+                        </option>`;
             }
         </text>
     }
 
-        // 🟢 Step 3: Create new row with filtered options
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
             <td style="padding: 4px;">
@@ -474,21 +497,16 @@
                 </select>
             </td>
             <td style="padding: 4px;">
-                <select class="form-control select" data-placeholder="Num Of Rooms">
-                    <option></option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
+                <select class="form-control select num-rooms-select" data-placeholder="Num Of Rooms"></select>
+            </td>
+            <td style="padding: 4px;">
+                <select class="form-control select num-adults-select" data-placeholder="Adults"></select>
+            </td>
+            <td style="padding: 4px;">
+                <select class="form-control select num-children-select" data-placeholder="Children"></select>
             </td>
             <td style="padding: 4px; vertical-align: middle;">
-                <div style="display: flex; align-items: center;">
-                    <button type="button" class="btn btn-sm btn-danger remove-room-btn" onclick="removeRoomRow(this)">
-                        &minus;
-                    </button>
-                </div>
+                <button type="button" class="btn btn-sm btn-danger remove-room-btn" onclick="removeRoomRow(this)">−</button>
             </td>
         `;
 
@@ -497,90 +515,106 @@
         updateRemoveButtons();
     }
 
-
     function removeRoomRow(button) {
         const row = button.closest('tr');
         row.remove();
         updateRemoveButtons();
-        refreshAllRoomTypeOptions(); // 🟢 Refresh disabled options
+        refreshAllRoomTypeOptions();
     }
 
     function updateRemoveButtons() {
         const rows = document.querySelectorAll('#roomTable tbody tr');
         const removeButtons = document.querySelectorAll('.remove-room-btn');
-
-        if (rows.length === 1) {
-            removeButtons.forEach(btn => btn.style.display = 'none');
-        } else {
-            removeButtons.forEach(btn => btn.style.display = 'inline-block');
-        }
+        removeButtons.forEach(btn => btn.style.display = rows.length === 1 ? 'none' : 'inline-block');
     }
-
 
     function refreshAllRoomTypeOptions() {
         const allSelects = $('.room-type-select');
-        const selectedValues = allSelects.map(function () {
-            return $(this).val();
-        }).get().filter(v => v);
+        const selectedValues = allSelects.map(function () { return $(this).val(); }).get().filter(v => v);
 
         allSelects.each(function () {
             const currentVal = $(this).val();
-            const $select = $(this);
-
-            $select.find('option').each(function () {
+            $(this).find('option').each(function () {
                 const optionVal = $(this).val();
-                if (optionVal === "" || optionVal === currentVal) {
+                if (!optionVal || optionVal === currentVal) {
                     $(this).prop('disabled', false);
-                } else if (selectedValues.includes(optionVal)) {
-                    $(this).prop('disabled', true);
                 } else {
-                    $(this).prop('disabled', false);
+                    $(this).prop('disabled', selectedValues.includes(optionVal));
                 }
             });
         });
     }
 
-
     document.addEventListener('DOMContentLoaded', function () {
-        setToSingleMode(); // Default to Single
-        addRoomRow();      // Add one initial row
+        setToSingleMode();
+        addRoomRow();
         updateRemoveButtons();
     });
 </script>
 
 <script>
-    $("#CheckInDate, #CheckOutDate").change(function () {
-        let checkIn = new Date($("#CheckInDate").val());
-        let checkOut = new Date($("#CheckOutDate").val());
+    $(function () {
 
-        if (checkIn >= checkOut) {
-            Swal.fire({
-                position: 'top',
-                icon: 'error',
-                title: 'Error!',
-                text: 'Check-out date must be after check-in date.',
-                showConfirmButton: true
-            });
-            $("#CheckOutDate").val("");
+        // 🔁 Clear all date-related fields
+        function clearDates() {
+            $('#CheckInDate').val('');
+            $('#CheckOutDate').val('');
+            $('#NumOfNights').val('');
+            $('#StayRange').val('');
         }
-        else {
-            const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-            $("#NumOfNights").val(nights);
-        }
+
+        // 🧹 Clear on page load
+        clearDates();
+
+        // ✅ Handle date selection
+        $('.daterange-time').on('apply.daterangepicker', function (ev, picker) {
+            const checkIn = picker.startDate;
+            const checkOut = picker.endDate;
+
+            if (checkIn >= checkOut) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Dates',
+                    text: 'Check-out must be after check-in.',
+                    position: 'top',
+                    showConfirmButton: true
+                });
+
+                clearDates();
+                return;
+            }
+
+            // Set hidden values
+            $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm'));
+            $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm'));
+
+            // Calculate number of nights
+            const durationHours = checkOut.diff(checkIn, 'hours', true);
+            const nights = durationHours < 24 ? 0 : Math.floor(durationHours / 24);
+            $('#NumOfNights').val(nights);
+
+            // Set visible input
+            $(this).val(checkIn.format('YYYY-MM-DD HH:mm') + ' - ' + checkOut.format('YYYY-MM-DD HH:mm'));
+        });
+
+        // ❌ Handle cancel event
+        $('.daterange-time').on('cancel.daterangepicker', function () {
+            clearDates();
+        });
     });
-
 </script>
 
 <script>
     $(document).ready(function () {
-        $('#rateDetails').hide();
-
-        // 🔁 Listen for room type changes in any row (even dynamically added)
+        // 🔁 Still used for rate dropdown population
         $(document).on('change', '#roomTable select.room-type-select', function () {
             updateSelectedRoomTypesAndLoadRates();
         });
 
-        // ✅ Gather selected RoomType IDs from all rows and load rates
+        $('#CheckInDate, #CheckOutDate').change(function () {
+            updateSelectedRoomTypesAndLoadRates();
+        });
+
         function updateSelectedRoomTypesAndLoadRates() {
             const roomTypeIds = [];
 
@@ -594,7 +628,6 @@
             loadRatesDropdown(roomTypeIds);
         }
 
-        // ✅ Load rates from server and populate the Rate dropdown
         function loadRatesDropdown(selectedRoomTypes) {
             const checkInVal = $("#CheckInDate").val();
             const checkOutVal = $("#CheckOutDate").val();
@@ -628,18 +661,11 @@
             });
         }
 
-        // ✅ Load rate details when user selects a rate
         function loadRateDetails() {
             const selectedRateId = $('#rateSelect').val();
 
             if (!selectedRateId) {
-                Swal.fire({
-                    position: 'top',
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Please select a rate first.',
-                    showConfirmButton: true
-                });
+                $('#rateDetails').html('<p class="text-danger">Please select a rate first.</p>').show();
                 return;
             }
 
@@ -653,13 +679,15 @@
                         $.each(response, function (index, rateDetail) {
                             rateHtml += `
                                 <h4>${rateDetail.typeName}</h4>
-                                <li><strong>Hourly Price:</strong> $${rateDetail.hourlyPrice}</li>
-                                <li><strong>Daily Price:</strong> $${rateDetail.dailyPrice}</li>
-                                <li><strong>Extra Daily Price:</strong> $${rateDetail.extraDailyPrice}</li>
-                                <li><strong>Weekly Price:</strong> $${rateDetail.weeklyPrice}</li>
-                                <li><strong>Monthly Price:</strong> $${rateDetail.monthlyPrice}</li>
+                                <ul>
+                                    <li><strong>Hourly Price:</strong> $${rateDetail.hourlyPrice}</li>
+                                    <li><strong>Daily Price:</strong> $${rateDetail.dailyPrice}</li>
+                                    <li><strong>Extra Daily Price:</strong> $${rateDetail.extraDailyPrice}</li>
+                                    <li><strong>Weekly Price:</strong> $${rateDetail.weeklyPrice}</li>
+                                    <li><strong>Monthly Price:</strong> $${rateDetail.monthlyPrice}</li>
+                                </ul>
                                 <hr>
-                            `;
+                            `;                           ;
                         });
 
                         $('#rateDetails').html(rateHtml).show();
@@ -674,15 +702,15 @@
             });
         }
 
-        // 🔁 If you have a reload button
-        $('.heading-elements [data-action="reload"]').click(function (e) {
-            e.preventDefault();
+        // 🚀 Load details when modal opens
+        $('#modal_default').on('show.bs.modal', function () {
             loadRateDetails();
         });
 
-        // 🔁 Optionally: auto-load rates when check-in/out changes
-        $('#CheckInDate, #CheckOutDate').change(function () {
-            updateSelectedRoomTypesAndLoadRates();
+        // 🌀 Reload logic inside modal (optional)
+        $('#modal_default [data-action="reload"]').click(function (e) {
+            e.preventDefault();
+            loadRateDetails();
         });
     });
 </script>
@@ -691,31 +719,36 @@
     $("#bookRoomForm").on("submit", function (e) {
     e.preventDefault();
 
-    const formData = {
-        CheckInDate: $("#CheckInDate").val(),
-        CheckOutDate: $("#CheckOutDate").val(),
-        NumOfNights: $("#NumOfNights").val(),
-        NumOfAdults: $("#NumOfAdults").val(),
-        NumOfChildrens: $("#NumOfChildrens").val(),
-        ReservationSourceId: $("#ReservationSourceId").val(),
-        RateId: $("#rateSelect").val(),
-        BranchId: $("input[name='BranchId']").val(),
-        companyId: $("#CompanyId").val(),
-        roomTypeToBookDTOs: []
-    };
+        const companyIdVal = $("#CompanyId").val();
+        const formData = {
+            CheckInDate: $("#CheckInDate").val(),
+            CheckOutDate: $("#CheckOutDate").val(),
+            NumOfNights: $("#NumOfNights").val(),
+            //NumOfAdults: $("#NumOfAdults").val(),
+            //NumOfChildrens: $("#NumOfChildrens").val(),
+            ReservationSourceId: $("#ReservationSourceId").val(),
+            RateId: $("#rateSelect").val(),
+            BranchId: $("input[name='BranchId']").val(),
+            companyId: companyIdVal ? parseInt(companyIdVal) : null,
+            roomTypeToBookDTOs: []
+        };
 
-    // ✅ Extract selected room types from the new dynamic table rows
-    $("#roomTable tbody tr").each(function () {
-        const roomTypeId = $(this).find("select").eq(0).val();
-        const numOfRooms = $(this).find("select").eq(1).val();
+        // ✅ Extract selected room types from the dynamic table
+        $("#roomTable tbody tr").each(function () {
+            const roomTypeId = $(this).find("select").eq(0).val();
+            const numOfRooms = $(this).find(".num-rooms-select").val();
+            const numAdults = $(this).find(".num-adults-select").val();
+            const numChildren = $(this).find(".num-children-select").val();
 
-        if (roomTypeId && numOfRooms > 0) {
-            formData.roomTypeToBookDTOs.push({
-                Id: roomTypeId,
-                NumOfRooms: parseInt(numOfRooms)
-            });
-        }
-    });
+            if (roomTypeId && numOfRooms > 0) {
+                formData.roomTypeToBookDTOs.push({
+                    Id: parseInt(roomTypeId),
+                    NumOfRooms: parseInt(numOfRooms),
+                    NumOfAdults: parseInt(numAdults || 0),
+                    NumOfChildren: parseInt(numChildren || 0)
+                });
+            }
+        });
 
     $.ajax({
         url: '/Reservation/SaveRoomToBook',
@@ -741,7 +774,7 @@
 
                 $(document).trigger("roomBookingSuccess");
             } else {
-                Swal.fire("Error", response.message, "error");
+                //Swal.fire("Error", response.message, "error");
                 $("#bookRoomContainer").html(response);
             }
         },
@@ -751,31 +784,5 @@
     });
 });
 
-</script>
-
-<script>
-    $(document).ready(function () {
-        $.ajax({
-            url: '/Company/GetCompaniesDropDown',
-            method: 'GET',
-            success: function (data) {
-                var $select = $('#companySelect');
-                $select.empty();
-
-                // Set default "no company" option with empty string ("") as value
-                $select.append('<option value="">-- No Company --</option>');
-
-                $.each(data, function (index, item) {
-                    $select.append($('<option>', {
-                        value: item.id,
-                        text: item.displayText
-                    }));
-                });
-            },
-            error: function () {
-                alert("Failed to load companies.");
-            }
-        });
-    });
 </script>
 
