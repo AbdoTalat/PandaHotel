@@ -74,14 +74,14 @@ namespace HotelApp.Application.Services.UserService
 				return ServiceResponse<EditUserDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
 			}
 		}
-		public async Task<ServiceResponse<User>> AddUserAsync(AddUserDTO userDTO)
+		public async Task<ServiceResponse<AddUserDTO>> AddUserAsync(AddUserDTO userDTO)
 		{
 			var newUser = new User
 			{
 				FirstName = userDTO.FirstName,
 				LastName = userDTO.LastName,
-				UserName = userDTO.userName,
-				Email = userDTO.email,
+				UserName = userDTO.UserName,
+				Email = userDTO.Email,
 				DefaultBranchId = userDTO.DefaultBranchId,
 				isActive = userDTO.IsActive,
 				CreatedById = GetCurrentUserId(),
@@ -90,42 +90,35 @@ namespace HotelApp.Application.Services.UserService
 
 			try
 			{
-				var createResult = await _userManager.CreateAsync(newUser, userDTO.password);
+				var createResult = await _userManager.CreateAsync(newUser, userDTO.Password);
 				if (!createResult.Succeeded)
 				{
 					var errors = createResult.Errors.Select(e => e.Description).ToList();
-					return ServiceResponse<User>.ResponseFailure(string.Join(", ", errors));
+					return ServiceResponse<AddUserDTO>.ResponseFailure(string.Join(", ", errors));
 				}
 
-				if (userDTO.RoleId > 0)
+				var roleResult = await _userManager.AddToRolesAsync(newUser, userDTO.SelectedRoles);
+				if (!roleResult.Succeeded)
 				{
-					var role = await _roleManager.FindByIdAsync(userDTO.RoleId.ToString());
-					if (role == null)
-					{
-						return ServiceResponse<User>.ResponseFailure($"Role with ID {userDTO.RoleId} not found.");
-					}
-
-					var roleResult = await _userManager.AddToRoleAsync(newUser, role.Name);
-					if (!roleResult.Succeeded)
-					{
-						var roleErrors = roleResult.Errors.Select(e => e.Description).ToList();
-						return ServiceResponse<User>.ResponseFailure(string.Join(", ", roleErrors));
-					}
+					var roleErrors = roleResult.Errors.Select(e => e.Description).ToList();
+					return ServiceResponse<AddUserDTO>.ResponseFailure(string.Join(", ", roleErrors));
 				}
-				var newUserBranch = new UserBranch
+				
+				var newUserBranches = userDTO.SelectedBranchIds.Select(branchId => new UserBranch
 				{
 					UserId = newUser.Id,
-					BranchId = newUser.DefaultBranchId,
+					BranchId = branchId,
 					AssignedAt = DateTime.UtcNow
-				};
-				await _unitOfWork.Repository<UserBranch>().AddNewAsync(newUserBranch);
+				}).ToList();
+
+				await _unitOfWork.Repository<UserBranch>().AddRangeAsync(newUserBranches);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<User>.ResponseSuccess($"New user '{newUser.UserName}' created successfully.");
+				return ServiceResponse<AddUserDTO>.ResponseSuccess($"New user '{newUser.UserName}' created successfully.");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<User>.ResponseFailure($"An exception occurred: {ex.InnerException.Message}");
+				return ServiceResponse<AddUserDTO>.ResponseFailure($"An exception occurred: {ex.InnerException.Message}");
 			}
 		}
 

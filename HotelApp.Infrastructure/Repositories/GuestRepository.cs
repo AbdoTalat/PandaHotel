@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -34,5 +35,49 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return guest;
 		}
-	}
+
+        public async Task<List<GetSearchedGuestsDTO>> SearchGuestsAsync(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 4)
+                return new List<GetSearchedGuestsDTO>();
+
+            term = term.Trim();
+
+            var query = _context.Guests.AsQueryable();
+
+            bool isEmail = term.Contains("@") && term.Contains(".");
+            bool isPhone = term.All(char.IsDigit) || term.StartsWith("+");
+
+            if (isEmail)
+            {
+                query = query.Where(g => g.Email.StartsWith(term));
+            }
+            else if (isPhone)
+            {
+                query = query.Where(g => g.Phone.StartsWith(term));
+            }
+            else
+            {
+                query = query.Where(g => g.FullName.StartsWith(term));
+            }
+
+            var results = await query
+                .OrderBy(g => g.FullName)
+                .Take(15)
+                .Select(g => new GetSearchedGuestsDTO
+                {
+                    Id = g.Id,
+                    DisplayText = isEmail
+                        ? g.Email
+                        : isPhone
+                            ? g.Phone
+                            : g.FullName
+                })
+                .ToListAsync();
+
+            return results;
+        }
+
+
+    }
 }

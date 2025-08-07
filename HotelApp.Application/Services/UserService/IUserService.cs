@@ -13,7 +13,7 @@ namespace HotelApp.Application.Services.UserService
 	{
 		Task<IEnumerable<UsersDTO>> GetAllUsersAsync();
 		Task<User?> GetUserbyId(int Id);
-		Task<ServiceResponse<User>> AddUserAsync(AddUserDTO userDTO);
+		Task<ServiceResponse<AddUserDTO>> AddUserAsync(AddUserDTO userDTO);
 		Task<ServiceResponse<EditUserDTO>> GetUserToEditByIdAsync(int Id);
 		Task<ServiceResponse<EditUserDTO>> EditUserAsync(EditUserDTO model);
 		Task<ServiceResponse<User>> DeleteUserAsync(int Id);

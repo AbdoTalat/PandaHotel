@@ -14,5 +14,6 @@ namespace HotelApp.Application.DTOs.RoomTypes
         public int MaxNumOfAdults { get; set; }
         public int MaxNumOfChildrens { get; set; }
         public int BranchId { get; set; }
+        public bool IsActive { get; set; }
     }
 }

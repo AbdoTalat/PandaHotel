@@ -22,6 +22,10 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<EditGuestDTO, Guest>();
 			CreateMap<Guest, EditGuestDTO>();
+
+			CreateMap<Guest, ReservationGuestDTO>()
+				.ForMember(dest => dest.GuestId, opt => opt.MapFrom(src => src.Id))
+				.ForMember(dest => dest.IsPrimary, opt => opt.Ignore());
 		}
 	}
 }

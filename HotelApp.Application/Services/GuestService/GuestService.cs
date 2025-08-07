@@ -100,10 +100,58 @@ namespace HotelApp.Application.Services.GuestService
 				return ServiceResponse<Guest>.ResponseFailure($"Error Occurred: {ex.InnerException.Message}");
 			}
 		}
-		public async Task<IEnumerable<GetSearchedGuestsDTO>> SerachGuestsByEmailAsync(string email)
+
+		public async Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(AddGuestDTO guestDTO)
 		{
-			var guest = await _guestRepository.SerachGuestsByEmailAsync(email);
-			return guest;
+			try
+			{
+				var guest = _mapper.Map<Guest>(guestDTO);
+
+				if (guest.Id == 0)
+				{
+					var IsGuestExists = await _unitOfWork.Repository<Guest>()
+					.IsExistsAsync(g =>
+					   g.FullName.Contains(guestDTO.FullName)
+					|| g.Email.Contains(guestDTO.Email) 
+					|| g.Phone.Contains(guestDTO.Phone));
+
+					if (IsGuestExists)
+					{
+						return ServiceResponse<ReservationGuestDTO>.ResponseFailure("This guest already exists.");
+					}
+					await _unitOfWork.Repository<Guest>().AddNewAsync(guest);
+				}
+				else
+				{
+					_unitOfWork.Repository<Guest>().Update(guest);
+				}
+				await _unitOfWork.CommitAsync();
+
+				var addedGuest = await _unitOfWork.Repository<Guest>()
+					.GetByIdAsDtoAsync<ReservationGuestDTO>(guest.Id);
+
+				if (addedGuest == null)
+				{
+					return ServiceResponse<ReservationGuestDTO>.ResponseFailure("guest was not added");
+				}
+
+				addedGuest.IsPrimary = guestDTO.IsPrimary;
+
+				return ServiceResponse<ReservationGuestDTO>.ResponseSuccess(Data: addedGuest);
+			}
+			catch (Exception ex)
+			{
+				return ServiceResponse<ReservationGuestDTO>.ResponseFailure(ex.Message);
+			}
+
 		}
-	}
+
+
+		public async Task<IEnumerable<GetSearchedGuestsDTO>> SearchGuestsAsync(string term)
+		{
+			var guetss = await _guestRepository.SearchGuestsAsync(term);
+
+			return guetss;
+		}
+    }
 }

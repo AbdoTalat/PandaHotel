@@ -86,16 +86,15 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<State> States { get; set; }
 		public DbSet<ReservationRoomType> ReservationRoomTypes { get; set; }
 		public DbSet<SystemSetting> SystemSettings { get; set; }
-		public DbSet<Company> Companies { get; set; }	
-		#endregion
+		public DbSet<Company> Companies { get; set; }
+        #endregion
 
 
-		
-		protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
 
-			builder.Entity<RoomStatus>().HasData(
+            builder.Entity<RoomStatus>().HasData(
 				new RoomStatus { Id = 1, Name = "Available", Description = "Room is ready to be booked", BranchId = 2, Color = "#20BF7E" },
 				new RoomStatus { Id = 2, Name = "Reserved", Description = "Room is reserved by a guest", BranchId = 2, Color = "#20BF7E" },
 				new RoomStatus { Id = 3, Name = "Occupied", Description = "Room is currently occupied", BranchId = 2, Color = "#20BF7E" },

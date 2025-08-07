@@ -25,8 +25,8 @@ namespace HotelApp.Domain
 		void Delete(T entity);
         void DeleteRange(IEnumerable<T> entities);
 
-        Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate);
-        Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
+        Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
+		Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
         Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false) where TDto : class;
 
     }

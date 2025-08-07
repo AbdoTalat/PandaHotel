@@ -103,18 +103,25 @@ namespace HotelApp.UI.Controllers
 			var guestsDataJson = HttpContext.Session.GetString("ReservationGuests");
 
 			var roomData = JsonConvert.DeserializeObject<BookRoomDTO>(roomDataJson);
-			var guestsData = JsonConvert.DeserializeObject<List<AddGuestDTO>>(guestsDataJson);
+			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO?>>(guestsDataJson);
 
 			var reservationDTO = new AddReservationDTO
 			{
-				addGuestDTOs = guestsData,
+				GuestsDTOs = guestsData,
 				bookRoomDTO = roomData,
 				confirmReservationDTO = confirmReservationDTO
 			};
 
 			var result = await _reservationService.AddReservation(reservationDTO, userId);
+            if (result.Success)
+            {
+                HttpContext.Session.Remove("BookRoomData");
+                HttpContext.Session.Remove("ReservationGuests");
 
-			return Json(new {success = result.Success, message = result.Message});
+                return Json(new { success = result.Success, message = result.Message });
+            }
+
+            return Json(new {success = result.Success, message = result.Message});
 		}
 
 	

@@ -18,7 +18,7 @@ namespace HotelApp.UI.Controllers
         }
         [HttpGet]
         [Authorize(Policy = "RoomType.View")]
-		public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var roomTypes = await _roomTypeService.GetAllRoomTypesAsync();
             return View(roomTypes);

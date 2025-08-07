@@ -85,7 +85,7 @@ namespace HotelApp.Infrastructure
 
             return await query.FirstOrDefaultAsync();
         }
-        public async Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null,bool skipBranchFilter = false)where TDto : class
+        public async Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false) where TDto : class
         {
             IQueryable<T> query = _dbSet.AsNoTracking()
                 .BranchFilter(skipBranchFilter);
@@ -115,9 +115,13 @@ namespace HotelApp.Infrastructure
 		#endregion
 
 		#region Other Methods
-		public async Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate)
-            =>await _dbSet.AnyAsync(predicate);
-        
+		public async Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false) 
+        {
+			IQueryable<T> query = _dbSet.AsNoTracking()
+				.BranchFilter(skipBranchFilter);
+
+            return await query.AnyAsync(predicate);
+		}        
 		#endregion
 
 	}

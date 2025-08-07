@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using HotelApp.Helper.Validation;
+using Microsoft.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,34 +12,36 @@ namespace HotelApp.Application.DTOs.Users
     public class AddUserDTO
     {
         [MinLength(3)]
-        [Required(ErrorMessage = "Please your first name")]
+        [RequiredEx]
         public string FirstName { get; set; }
 
         [MinLength(3)]
-        [Required]
+        [RequiredEx]
         public string LastName { get; set; }
-        [Required]
-        [MinLength(3, ErrorMessage = "User Name must be at least 3 characters")]
-        public string userName { get; set; }
+        [RequiredEx]
+        [MinLength(3)]
+        public string UserName { get; set; }
 
         [Required]
         [EmailAddress]
-        public string email { get; set; }
+        public string Email { get; set; }
 
-        [Required]
+        [RequiredEx]
         [DataType(DataType.Password)]
-        public string password { get; set; }
+        public string Password { get; set; }
 
-        [Required]
+        [RequiredEx]
         [DataType(DataType.Password)]
-        [Compare("password")]
-        public string confirmPassword { get; set; }
+        [Compare("Password")]
+        public string ConfirmPassword { get; set; }
         public int DefaultBranchId { get; set; }
         public bool IsActive { get; set; }
 
-        public int? RoleId { get; set; }
-        public List<string> AvailableRoles { get; set; } = new List<string>();
+		public List<string> SelectedRoles { get; set; } = new List<string>();		
+        public List<string> AllRoles { get; set; } = new();
 
-        public List<string?>? SelectedRoles { get; set; }
-    }
+		public List<int> SelectedBranchIds { get; set; } = new List<int>();
+		public IEnumerable<DropDownDTO<string>> AllBranches { get; set; } = Enumerable.Empty<DropDownDTO<string>>();
+
+	}
 }

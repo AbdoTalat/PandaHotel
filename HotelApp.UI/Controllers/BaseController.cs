@@ -10,7 +10,7 @@ namespace HotelApp.UI.Controllers
 	{		
         //protected int? BranchId => HttpContext?.Session?.GetInt32("DefaultBranchId");
 
-		protected int BranchId => int.TryParse(User.FindFirstValue("DefaultBranch"), out var Id) ? Id : 0;
+		protected int BranchId => int.TryParse(User.FindFirstValue("DefaultBranchId"), out var Id) ? Id : 0;
 
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{

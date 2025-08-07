@@ -14,5 +14,7 @@ namespace HotelApp.Application.DTOs.RoomTypes
 		public decimal PricePerNight { get; set; }
         public int MaxNumOfAdults { get; set; }
         public int MaxNumOfChildrens { get; set; }
-    }
+		public bool IsActive { get; set; }
+
+	}
 }

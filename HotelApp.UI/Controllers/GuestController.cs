@@ -92,26 +92,66 @@ namespace HotelApp.UI.Controllers
             return Json(guest);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> SearchGuestByEmail(string email)
-        {
-            var guests = await _guestService.SerachGuestsByEmailAsync(email);
 
-            return Json(guests);
+        [HttpGet]
+        public async Task<IActionResult> SearchGuests(string term)
+        {
+            var guests = await _guestService.SearchGuestsAsync(term);
+
+            return Json(guests.Select(g => new {
+                id = g.Id,
+                text = g.DisplayText
+            }));
         }
+
 
         [HttpGet]
         public IActionResult LoadGuestForm()
         {
             return PartialView("_ManageGuestsPartial");
         }
-        [HttpPost]
-		public IActionResult AddGuestsToReservation([FromBody] List<AddGuestDTO> guests)
+
+
+
+		[HttpPost]
+		public async Task<IActionResult> AddOrEditGuest([FromBody] AddGuestDTO dto)
 		{
+			if (dto == null)
+			{
+				return BadRequest(new { success = false, message = "Invalid guest data." });
+			}
+
+			if(dto.BranchId == 0 || dto.BranchId == null)
+			{
+				dto.BranchId = BranchId;
+			}
+			var result = await _guestService.AddOrEditGuestsAsync(dto);
+			if (result.Success)
+			{
+				return Json(new
+				{
+					success = result.Success,
+					guestId = result.Data.GuestId,
+					isPrimary = result.Data.IsPrimary
+				});
+			}
+			return Json(new {success = result.Success, message = result.Message});
+		}
+
+
+		[HttpPost]
+		public IActionResult AddGuestsToReservation([FromBody] List<ReservationGuestDTO> guests)
+		{
+			if (guests == null || !guests.Any())
+			{
+				return Json(new { success = false, message = "Guest list is empty." });
+			}
+
 			if (!guests.Any(g => g.IsPrimary))
 			{
 				return Json(new { success = false, message = "One primary guest is required." });
 			}
+
 			if (guests.Count(g => g.IsPrimary) != 1)
 			{
 				return Json(new { success = false, message = "Exactly one primary guest must be selected." });
@@ -122,10 +162,11 @@ namespace HotelApp.UI.Controllers
 				HttpContext.Session.SetString("ReservationGuests", JsonConvert.SerializeObject(guests));
 				return Json(new { success = true, message = "Guests saved successfully." });
 			}
-			catch(Exception) 
+			catch (Exception)
 			{
 				return Json(new { success = false, message = "An error occurred while saving guests." });
 			}
 		}
+
 	}
 }

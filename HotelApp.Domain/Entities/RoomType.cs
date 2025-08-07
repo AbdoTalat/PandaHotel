@@ -16,9 +16,8 @@ namespace HotelApp.Domain.Entities
         public decimal PricePerNight { get; set; }
         public int MaxNumOfAdults { get; set; }
         public int MaxNumOfChildrens { get; set; }
-        public bool IsActive { get; set; } = false;
-
-        public int BranchId { get; set; }
+        public bool IsActive { get; set; }
+		public int BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();

@@ -3,6 +3,7 @@ using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Common;
 using HotelApp.Infrastructure.Repositories;
 
+
 //using HotelApp.UI.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +31,9 @@ namespace HotelApp.UI.DependencyInjectionExtentions
 						policy.Requirements.Add(new PermissionRequirement(permission)));
 				}
 			});
-			return services;
+
+
+            return services;
 		}
 	}
 }

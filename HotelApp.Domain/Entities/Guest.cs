@@ -12,13 +12,13 @@ namespace HotelApp.Domain.Entities
     {
         public int Id { get; set; }
         public string FullName { get; set; }
-        public DateOnly DateOfBirth { get; set; }
-        public string Address { get; set; }
-        public string Phone { get; set; }
-        public string Email { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
 
-        public string TypeOfProof { get; set; }
-        public string ProofNumber { get; set; }
+        public string? TypeOfProof { get; set; }
+        public string? ProofNumber { get; set; }
 
         public int BranchId { get; set; }
         public Branch? Branch { get; set; }

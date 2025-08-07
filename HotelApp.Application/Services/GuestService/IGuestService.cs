@@ -16,6 +16,7 @@ namespace HotelApp.Application.Services.GuestService
         Task<ServiceResponse<AddGuestDTO>> AddGuestAsync(AddGuestDTO guestDTO);
 		Task<ServiceResponse<EditGuestDTO>> EditGuestAsync(EditGuestDTO guestDTO, int Id);
 		Task<ServiceResponse<Guest>> DeleteGuestAsync(int Id);
-		Task<IEnumerable<GetSearchedGuestsDTO>> SerachGuestsByEmailAsync(string email);
+		Task<IEnumerable<GetSearchedGuestsDTO>> SearchGuestsAsync(string term);
+		Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(AddGuestDTO guestDTO);
 	}
 }

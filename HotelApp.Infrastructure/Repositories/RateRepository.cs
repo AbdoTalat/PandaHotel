@@ -35,6 +35,7 @@ namespace HotelApp.Infrastructure.Repositories
         public async Task<EditRateDTO> GetRateToEditByIdAsync(int Id)
         {
             var rateDto = await _context.Rates
+                .BranchFilter()
                 .Where(r => r.Id == Id)
                 .Select(r => new EditRateDTO
                 {
@@ -68,6 +69,7 @@ namespace HotelApp.Infrastructure.Repositories
                 .ToListAsync();
 
             var roomTypes = await _context.RoomTypes
+                .BranchFilter()
                 .Select(rt => new { rt.Id, rt.Name })
                 .ToListAsync();
 
@@ -95,33 +97,46 @@ namespace HotelApp.Infrastructure.Repositories
 
 		public async Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model)
 		{
-			var roomTypeCount = model.RoomTypeIds.Count();
-
+			int requiredRoomTypeCount = model.RoomTypeIds.Count;
 
 			var rates = await _context.Rates
-	            .BranchFilter() 
-	            .Where(rate =>
-		            rate.IsActive &&
-		            rate.EffectiveDate <= model.CheckInDate &&
-		            rate.EndDate >= model.CheckOutDate)
-	            .Select(rate => new
-	            {
-		            Rate = rate,
-		            RoomTypeRates = rate.RoomTypeRates
-			            .Where(rtr => model.RoomTypeIds.Contains(rtr.RoomTypeId))
-	            })
-	            .Where(x => x.RoomTypeRates
-		            .Select(rtr => rtr.RoomTypeId)
-		            .Distinct()
-		            .Count() == roomTypeCount)
-	            .Select(x => new GetRatesForReservationResponseDTO
-	            {
-		            Id = x.Rate.Id,
-		            Name = x.Rate.Code
-	            })
-	            .Distinct()
-	            .ToListAsync();
-
+				.AsNoTracking()
+				.BranchFilter()
+				.Where(rate =>
+					rate.IsActive &&
+					rate.EffectiveDate <= model.CheckInDate &&
+					rate.EndDate >= model.CheckOutDate)
+				.Select(rate => new
+				{
+					RateId = rate.Id,
+					RateCode = rate.Code,
+					RoomTypeRates = rate.RoomTypeRates
+						.Where(rtr => model.RoomTypeIds.Contains(rtr.RoomTypeId))
+						.Select(rtr => new
+						{
+							rtr.RoomTypeId,
+							rtr.DailyPrice,
+							RoomTypeName = rtr.RoomType.Name
+						})
+				})
+				.Where(x =>
+					x.RoomTypeRates
+						.Select(r => r.RoomTypeId)
+						.Distinct()
+						.Count() == requiredRoomTypeCount)
+				.Select(x => new GetRatesForReservationResponseDTO
+				{
+					Id = x.RateId,
+					Name = x.RateCode,
+					roomTypeRateForReservations = x.RoomTypeRates
+						.Select(rtr => new RoomTypeRateForReservationDTO
+						{
+							TypeName = rtr.RoomTypeName,
+							DailyPrice = rtr.DailyPrice
+						})
+						.ToList()
+				})
+				.ToListAsync();
 
 			return rates;
 		}

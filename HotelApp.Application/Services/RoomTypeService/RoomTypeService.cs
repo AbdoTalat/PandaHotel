@@ -64,7 +64,8 @@ namespace HotelApp.Application.Services.RoomTypeService
 		{
 			try
 			{
-				var isTypeNameExist = await _unitOfWork.Repository<RoomType>().IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
+				var isTypeNameExist = await _unitOfWork.Repository<RoomType>()
+					.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
 				if (isTypeNameExist)
 				{
 					return ServiceResponse<AddRoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");

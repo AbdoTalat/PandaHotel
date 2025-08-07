@@ -77,23 +77,13 @@ namespace HotelApp.Application.Services.ReservationService
 				await _unitOfWork.Repository<ReservationRoomType>().AddRangeAsync(reservationRoomTypes);
 				await _unitOfWork.CommitAsync();
 
-				// Add/Update Guests
-				var guests = _mapper.Map<List<Guest>>(reservationDTO.addGuestDTOs);
-				foreach (var guest in guests)
-				{
-					if (guest.Id == 0)
-						await _unitOfWork.Repository<Guest>().AddNewAsync(guest);
-					else
-						_unitOfWork.Repository<Guest>().Update(guest);
-				}
-				await _unitOfWork.CommitAsync();
 
 				// Link Guests to Reservation
-				var guestReservations = guests.Select((guest, index) => new GuestReservation
+				var guestReservations = reservationDTO.GuestsDTOs.Select((guest, index) => new GuestReservation
 				{
-					GuestId = guest.Id,
+					GuestId = guest.GuestId,
 					ReservationId = reservation.Id,
-					IsPrimaryGuest = reservationDTO.addGuestDTOs[index].IsPrimary
+					IsPrimaryGuest = reservationDTO.GuestsDTOs[index].IsPrimary
 				}).ToList();
 
 				await _unitOfWork.Repository<GuestReservation>().AddRangeAsync(guestReservations);

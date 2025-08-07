@@ -51,7 +51,7 @@ namespace HotelApp.Infrastructure
 
 			if (user.DefaultBranchId != 0)
 			{
-				identity.AddClaim(new Claim("DefaultBranch", user.DefaultBranchId.ToString()));
+				identity.AddClaim(new Claim("DefaultBranchId", user.DefaultBranchId.ToString()));
 
 				var defaultBranchData = await _context.Branches
 					.Where(b => b.Id == user.DefaultBranchId)

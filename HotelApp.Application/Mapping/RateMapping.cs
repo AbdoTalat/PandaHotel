@@ -27,6 +27,7 @@ namespace HotelApp.Application.Mapping
 
             CreateMap<RoomTypeRate, GetRateDetailsForReservationDTO>()
                 .ForMember(dest => dest.typeName, opt => opt.MapFrom(src => src.RoomType.Name ?? "N/A"));
-		}
+		
+        }
     }
 }

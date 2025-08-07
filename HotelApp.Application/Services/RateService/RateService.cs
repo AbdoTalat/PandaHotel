@@ -41,16 +41,15 @@ namespace HotelApp.Application.Services.RateService
 
 		public async Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model)
 		{
-			var roomTypeCount = model.RoomTypeIds.Count();
 			var rates = await _rateRepository.GetRatesForReservationAsync(model);
 
 			return rates;
 		}
 
-        public async Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId)
+        public async Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId, int BranchId)
 		{
 			var rateDetails = await _unitOfWork.Repository<RoomTypeRate>()
-				.GetAllAsDtoAsync<GetRateDetailsForReservationDTO>(rtr => rtr.RateId == rateId);
+				.GetAllAsDtoAsync<GetRateDetailsForReservationDTO>(rtr => rtr.RateId == rateId && rtr.RoomType.BranchId == BranchId);
 
 			return rateDetails;
         }

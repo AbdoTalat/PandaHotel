@@ -1,4 +1,7 @@
 ﻿@model AddGuestDTO
+@{
+	int BranchId = ViewBag.BranchId;
+}
 
  <div class="row">
     <div class="col-md-8">
@@ -9,7 +12,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Serach guest </label>
-                            <select id="emailSelect" class="form-control select" data-placeholder="Search by guest email...">
+							<select id="guestSearchSelect" class="form-control select" data-placeholder="Search guest by name, email, or phone...">
                                 <option></option>
                             </select>
                         </div>
@@ -18,6 +21,7 @@
 
                 <form id="guestForm">
                     <input type="hidden" id="guestId" value="0" />
+					<input type="hidden" id="BranchId" value="0" />
 
                     <div class="row">
                         <div class="col-md-6">
@@ -28,9 +32,8 @@
                             </label>
                         </div>
                     </div>
+
                     <div class="row">
-                        
-                        
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="GuestFullName">Guest Name</label>
@@ -59,7 +62,6 @@
                         </div>
                     </div>
                    
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -120,9 +122,12 @@
 
                     <div class="row">
                         <div class="text-right">
-                            <button type="button" id="addGuestButton" class="btn bg-teal-400 btn-lg">
+							<button type="button" class="btn btn-default btn-md" id="clearGuestForm">Clear</button>
+
+                            <button type="button" id="addGuestButton" class="btn bg-teal-400 btn-md">
                                 <i class="icon-plus-circle2"></i> Add
                             </button>
+
                         </div>
                     </div>
                 </form> 
@@ -177,4 +182,309 @@
     </div>
 
 </div>
+
+<script>
+	$(document).ready(function () {
+
+		// Initialize Select2 for Smart Guest Search
+		$('#guestSearchSelect').select2({
+			placeholder: "Search guest by name, email, or phone",
+			minimumInputLength: 4, // ✅ Enforce 4 characters before search
+			ajax: {
+				url: '/Guest/SearchGuests', // ✅ Unified endpoint
+				dataType: 'json',
+				delay: 250,
+				data: function (params) {
+					return {
+						term: params.term
+					};
+				},
+				processResults: function (data) {
+					return {
+						results: data.map(function (guest) {
+							return {
+								id: guest.id,
+								text: guest.text // e.g. guest.FullName OR guest.Email OR guest.Phone
+							};
+						})
+					};
+				},
+				cache: true
+			}
+		});
+
+		// Handle guest selection from Select2
+		$('#guestSearchSelect').on('select2:select', function (e) {
+			var guestId = e.params.data.id;
+
+			if (guestId) {
+				$.ajax({
+					url: '/Guest/GetGuestJson/' + guestId,
+					type: 'GET',
+					success: function (guest) {
+						console.log("Guest Data", guest);
+
+						$('#guestId').val(guest.id);
+						$('#FullName').val(guest.fullName);
+						$('#Email').val(guest.email);
+						$('#Phone').val(guest.phone);
+						$('#Address').val(guest.address);
+						$('#TypeOfProof').val(guest.typeOfProof).trigger('change');
+						$('#ProofNumber').val(guest.proofNumber);
+						$('#BranchId').val(guest.branchId);
+
+						// Format and set DateOfBirth
+						if (guest.dateOfBirth) {
+							$('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
+						} else {
+							$('#DateOfBirth').val('');
+						}
+
+						// Clear Select2 input after selection
+						$('#guestSearchSelect').val(null).trigger('change');
+					},
+					error: function () {
+						alert('❌ Failed to fetch guest data.');
+					}
+				});
+			}
+		});
+
+	});
+</script>
+
+<script>
+	let guestList = [];                // For full guest data to show in UI
+	let reservationGuestList = [];     // For saving GuestId + IsPrimary only
+	let guestCounter = 0;
+
+	$('#addGuestButton').click(function () {
+		const form = $('#guestForm');
+		const isPrimary = $('#isPrimary').is(':checked');
+
+		let isValid = true;
+		let errorMessages = [];
+
+		const fullName = $('#FullName').val().trim();
+		if (!fullName) {
+			isValid = false;
+			errorMessages.push("Full Name is required.");
+		}
+
+		if (isPrimary) {
+			const dateOfBirth = $('#DateOfBirth').val() || null;
+			const address = $('#Address').val().trim();
+			const phone = $('#Phone').val().trim();
+			const email = $('#Email').val().trim();
+			const typeOfProof = $('#TypeOfProof').val().trim();
+			const proofNumber = $('#ProofNumber').val().trim();
+
+			if (!dateOfBirth) {
+				isValid = false;
+				errorMessages.push("Date of Birth is required for a primary guest.");
+			}
+			if (!address) {
+				isValid = false;
+				errorMessages.push("Address is required for a primary guest.");
+			}
+			if (!phone) {
+				isValid = false;
+				errorMessages.push("Phone is required for a primary guest.");
+			}
+			if (!email) {
+				isValid = false;
+				errorMessages.push("Email is required for a primary guest.");
+			}
+			if (!typeOfProof) {
+				isValid = false;
+				errorMessages.push("Type of Proof is required for a primary guest.");
+			}
+			if (!proofNumber) {
+				isValid = false;
+				errorMessages.push("Proof Number is required for a primary guest.");
+			}
+		}
+
+		if (!isValid) {
+			alert(errorMessages.join('\n'));
+			return;
+		}
+
+		// Continue with AJAX only if validation passed
+		const guestDto = {
+			id: $('#guestId').val() || 0,
+			isPrimary: isPrimary,
+			fullName: fullName,
+			email: $('#Email').val(),
+			phone: $('#Phone').val(),
+			typeOfProof: $('#TypeOfProof').val(),
+			proofNumber: $('#ProofNumber').val(),
+			dateOfBirth: $('#DateOfBirth').val(),
+			address: $('#Address').val(),
+			branchId: $('#BranchId').val()
+		};
+
+		$.ajax({
+			url: '/Guest/AddOrEditGuest',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(guestDto),
+			success: function (response) {
+				if (response.success) {
+					const guestId = response.guestId;
+
+					if (isPrimary) {
+						reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
+					}
+
+					reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
+
+					reservationGuestList.push({
+						guestId: guestId,
+						isPrimary: isPrimary
+					});
+
+					guestList = guestList.filter(g => g.id !== guestId);
+					guestList.push({ ...guestDto, id: guestId });
+
+					updateGuestTable();
+					renderGuestList();
+
+					form[0].reset();
+					$('#guestId').val(0);
+					$('#isPrimary').prop('checked', false);
+					form.validate().resetForm();
+
+					toastr.success("Guest added successfully.");
+				} else {
+					Swal.fire("Error", response.message, "error");
+				}
+			},
+			error: function () {
+				Swal.fire("Error", "Failed to save guest. Please try again.", "error");
+			}
+		});
+	});
+
+	function updateGuestTable() {
+		const tbody = $('#normalGuestTable tbody');
+		tbody.empty();
+
+		const normalGuests = guestList.filter(g => !g.isPrimary);
+		guestCounter = normalGuests.length;
+		$('#guestCount').text(guestCounter);
+
+		normalGuests.forEach(guest => {
+			tbody.append(`
+					<tr data-guest-id="${guest.id}">
+						<td>${guest.fullName}</td>
+						<td>${guest.email}</td>
+						<td>${guest.phone}</td>
+						<td>
+							<a type="button" class="text-teal-600 editGuestBtn"><i class="icon-pencil7"></i></a>
+							<a type="button" class="text-danger deleteGuestBtn"><i class="icon-trash"></i></a>
+						</td>
+					</tr>
+				`);
+		});
+
+		const primary = guestList.find(g => g.isPrimary);
+		if (primary) {
+			$('#primaryGuestContainer').html(`
+					<div class="row">
+						<div class="col-md-2">
+							<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+						</div>
+						<div class="col-md-10">
+							<h5 class="text-primary">${primary.fullName}</h5>
+							<p>Email: ${primary.email}</p>
+							<p>Phone: ${primary.phone}</p>
+						</div>
+					</div>
+				`);
+		} else {
+			$('#primaryGuestContainer').html(`<p class="text-muted">No primary guest selected.</p>`);
+		}
+	}
+
+	function renderGuestList() {
+		const container = $('#guestDisplayList');
+		container.empty();
+
+		$('#guestCountLabel').text(`${guestList.length} guest${guestList.length !== 1 ? 's' : ''}`);
+		$('#guestCount').text(guestList.filter(g => !g.isPrimary).length);
+
+		guestList.forEach(guest => {
+			const isPrimary = guest.isPrimary;
+			const badge = isPrimary ? `<span class="label label-primary">Primary Guest</span>` : '';
+
+			container.append(`
+					<li class="media">
+						<a href="#" class="media-left">
+							<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+						</a>
+						<div class="media-body">
+							<a href="#" class="media-heading text-default">
+								${guest.fullName} ${badge}
+							</a>
+							<span class="text-size-small text-muted display-block">
+								<span class="status-mark ${isPrimary ? 'border-primary' : 'border-success'} position-left"></span>
+								${guest.email}
+							</span>
+						</div>
+						<div class="media-right media-middle">
+							<ul class="icons-list text-nowrap">
+								<li><a href="#" class="editGuestBtn" data-id="${guest.id}"><i class="icon-pencil7"></i></a></li>
+								<li><a href="#" class="deleteGuestBtn" data-id="${guest.id}"><i class="icon-trash"></i></a></li>
+							</ul>
+						</div>
+					</li>
+				`);
+		});
+	}
+
+	// Edit guest
+	$(document).on('click', '.editGuestBtn', function () {
+		var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
+		var guest = guestList.find(g => g.id == guestId);
+		if (!guest) return;
+
+		$('#guestId').val(guest.id);
+		$('#isPrimary').prop('checked', guest.isPrimary);
+		$('#FullName').val(guest.fullName);
+		$('#Email').val(guest.email);
+		$('#Phone').val(guest.phone);
+		$('#TypeOfProof').val(guest.typeOfProof);
+		$('#ProofNumber').val(guest.proofNumber);
+		$('#DateOfBirth').val(guest.dateOfBirth);
+		$('#Address').val(guest.address);
+	});
+
+	// Delete guest
+	$(document).on('click', '.deleteGuestBtn', function () {
+		var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
+
+		guestList = guestList.filter(g => g.id != guestId);
+		reservationGuestList = reservationGuestList.filter(g => g.guestId != guestId);
+
+		updateGuestTable(); // remove from AddGuest tab
+		renderGuestList();  // remove from Confirm tab
+	});
+
+	// Clear guest form manually
+	$('#clearGuestForm').click(function () {
+		$('#guestForm')[0].reset(); // Reset native form
+
+		// Clear select2 fields
+		$('#TypeOfProof').val(null).trigger('change');
+
+		// Reset hidden and checkbox fields
+		$('#guestId').val('');
+		$('#isPrimary').prop('checked', false);
+
+		// Clear client-side validation
+		$('#guestForm').validate().resetForm();
+	});
+</script>
+
 

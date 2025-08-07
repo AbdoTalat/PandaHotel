@@ -154,29 +154,37 @@
 			"#isCancelled"
 		];
 
-		// Disable all except the first
-		checkboxes.forEach((selector, index) => {
-			if (index !== 0) {
-				$(selector).prop("disabled", true);
+		// Initial state
+		$(checkboxes[0]).prop("checked", true).prop("disabled", false); // isConfirmed checked & enabled
+		$(checkboxes[1]).prop("disabled", false); // isPending enabled only
+		$(checkboxes[2]).prop("disabled", false); // isStarted enabled only
+		$(checkboxes[6]).prop("disabled", false); // isCancelled enabled only
+
+		// Disable others
+		for (let i = 3; i < checkboxes.length; i++) {
+			if (![1, 2, 6].includes(i)) {
+				$(checkboxes[i]).prop("disabled", true);
 			}
-		});
+		}
 
 		// Handle enabling/disabling chain
 		checkboxes.forEach((selector, index) => {
 			$(selector).change(function () {
-				// If checked, enable next
+				// Enable next if current is checked
 				if ($(this).is(":checked")) {
 					if (checkboxes[index + 1]) {
 						$(checkboxes[index + 1]).prop("disabled", false);
 					}
 				} else {
-					// Uncheck and disable all following checkboxes
+					// Uncheck and disable all next ones (if not in always-enabled list)
 					for (let i = index + 1; i < checkboxes.length; i++) {
-						$(checkboxes[i]).prop("checked", false).prop("disabled", true);
+						if (![1, 2, 6].includes(i)) {
+							$(checkboxes[i]).prop("checked", false).prop("disabled", true);
+						}
 					}
 				}
 
-				// Show/hide cancellation reason
+				// Cancellation reason toggle
 				if ($("#isCancelled").is(":checked")) {
 					$("#cancelReasonGroup").slideDown();
 				} else {

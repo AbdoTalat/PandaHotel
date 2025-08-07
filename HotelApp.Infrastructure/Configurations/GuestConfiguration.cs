@@ -19,23 +19,18 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasMaxLength(60);
 
 			builder.Property(b => b.Email)
-				.IsRequired()
-				.HasMaxLength(20);
+				.HasMaxLength(50);
 
 			builder.Property(b => b.Address)
-				.IsRequired()
-				.HasMaxLength(20);
+				.HasMaxLength(50);
 
 			builder.Property(b => b.Phone)
-				.IsRequired()
 				.HasMaxLength(20);
 
 			builder.Property(b => b.TypeOfProof)
-				.IsRequired()
 				.HasMaxLength(20);
 
 			builder.Property(b => b.ProofNumber)
-				.IsRequired()
 				.HasMaxLength(20);
 
 			builder.HasOne(g => g.Branch)

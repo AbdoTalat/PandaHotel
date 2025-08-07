@@ -9,7 +9,7 @@ namespace HotelApp.Application.DTOs.Reservation
 {
 	public class AddReservationDTO
 	{
-		public List<AddGuestDTO?>? addGuestDTOs { get; set; }
+		public List<ReservationGuestDTO?>? GuestsDTOs { get; set; }
 		public BookRoomDTO? bookRoomDTO { get; set; }
 		public ConfirmReservationDTO confirmReservationDTO { get; set; }
 	}

@@ -113,7 +113,7 @@ namespace HotelApp.UI.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetRateDetailsForReservation(int rateId)
 		{
-			var rateDetails = await _rateService.GetRateDetailsForReservation(rateId);
+			var rateDetails = await _rateService.GetRateDetailsForReservation(rateId, BranchId);
 
 			return Json(rateDetails);
 		}

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Guests
 {
-	public class GetSearchedGuestsDTO
+	public class ReservationGuestDTO
 	{
-		public int Id { get; set; }
-		public string DisplayText { get; set; }
+		public int GuestId { get; set; }
+		public bool IsPrimary { get; set; }
 	}
 }

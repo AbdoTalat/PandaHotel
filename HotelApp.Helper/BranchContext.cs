@@ -22,7 +22,7 @@ namespace HotelApp.Helper
 			get
 			{
 				var claimValue = _httpContextAccessor?.HttpContext?.User?
-					.Claims.FirstOrDefault(c => c.Type == "DefaultBranch")?.Value;
+					.Claims.FirstOrDefault(c => c.Type == "DefaultBranchId")?.Value;
 
 				return int.TryParse(claimValue, out var branchId) ? branchId : null;
 			}

@@ -78,35 +78,38 @@ namespace HotelApp.UI.Controllers
 
         [HttpGet]
         [Authorize(Policy = "User.Add")]
-        public IActionResult AddNewUser()
+        public async Task<IActionResult> AddUser()
         {
-            return PartialView("_AddNewUser");
+            AddUserDTO dto = new AddUserDTO();
+			dto.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+			dto.AllBranches = await _branchService.GetBranchsDropDownAsync();
+			return View(dto);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "User.Add")]
-        public async Task<IActionResult> AddNewUser(AddUserDTO userDTO)
+        public async Task<IActionResult> AddUser(AddUserDTO model)
         {
             if (!ModelState.IsValid)
             {
-                return PartialView("_AddNewUser", userDTO);
-            }
+				model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+				model.AllBranches = await _branchService.GetBranchsDropDownAsync();
+				return View(model);
+			}
 
-            var result = await _userService.AddUserAsync(userDTO);
+            var result = await _userService.AddUserAsync(model);
 
             if (result.Success)
             {
-                TempData["Created"] = result.Message;
-                return Json(new { success = true, message = result.Message });
+                TempData["Success"] = "User updated successfully.";
+                return RedirectToAction("GetUsers");
             }
 
-            foreach (var error in result.Message.Split(", "))
-            {
-                ModelState.AddModelError("", error);
-            }
-            return PartialView("_AddNewUser", userDTO);
-        }
+			model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+			model.AllBranches = await _branchService.GetBranchsDropDownAsync();
+			return View(result);
+		}
 
         [HttpGet]
         public async Task<IActionResult> EditUser(int id)
@@ -134,54 +137,10 @@ namespace HotelApp.UI.Controllers
                 TempData["Success"] = "User updated successfully.";
                 return RedirectToAction("GetUsers");
             }
-            return View(result);
+			model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+			model.AllBranches = await _branchService.GetBranchsDropDownAsync();
+			return View(result);
         }
-
-        //[HttpGet]
-        //[Authorize(Policy = "User.Edit")]
-        //public async Task<IActionResult> EditUser(int Id)
-        //{
-        //    var result = await _userService.GetUserToEditByIdAsync(Id);
-        //    if (result.Success)
-        //    {
-        //        var userBranches = await _unitOfWork.Repository<UserBranch>().GetAllAsync(ub => ub.UserId == Id, SkipBranchFilter:true);
-        //        result.Data.AssignedBranches = userBranches.Select(ub => ub.BranchId).ToList();
-        //        return View(result.Data);
-        //    }
-        //    return Json(new { success = result.Success, message = result.Message });
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize(Policy = "User.Edit")]
-        //public async Task<IActionResult> EditUser(EditUserDTO userDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var userWithRoles = await _userService.GetUserToEditByIdAsync(userDTO.Id);
-        //        userDTO.AvailableRoles = userWithRoles.Data.AvailableRoles; 
-        //        return View(userDTO);
-        //    }
-
-        //    var result = await _userService.EditUserAsync(userDTO);
-
-        //    if (!result.Success)
-        //    {
-        //        var userWithRoles = await _userService.GetUserToEditByIdAsync(userDTO.Id);
-        //        userDTO.AvailableRoles = userWithRoles.Data.AvailableRoles;
-
-        //        return View(userDTO);
-        //    }
-
-        //    TempData["UserUpdated"] = result.Message;
-
-        //    var userBranchess = await _branchService.GetBranchesByUserId(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-        //    HttpContext.Session.SetString("UserBranches", JsonConvert.SerializeObject(userBranchess));
-
-        //    return RedirectToAction("GetUsers");
-        //}
-
-
 
 
         [HttpDelete]
@@ -201,18 +160,8 @@ namespace HotelApp.UI.Controllers
 
             var result = await _userService.UpdateDefaultBranchId(BranchId, userId);
 
-            //if (result.Success)
-            //{
-            //	HttpContext.Session.SetInt32("DefaultBranchId", BranchId);
-
-            //	var branchData = await _branchService.GetBranchByIdAsync(user.DefaultBranchId);
-            //	HttpContext.Session.SetString("BranchData", JsonConvert.SerializeObject(branchData));
-            //	return Ok();
-            //}
-
             if (result.Success)
             {
-                // 👇 Refresh claims to reflect new DefaultBranch
                 await _signInManager.RefreshSignInAsync(user);
 
                 return Ok(new { success = true });

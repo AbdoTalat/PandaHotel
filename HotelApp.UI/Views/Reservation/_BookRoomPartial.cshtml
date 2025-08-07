@@ -64,49 +64,7 @@
                         </div>
                     </div>
 
-@*                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Adults<span class="text-danger">*</span></label>
-                                    <select asp-for="NumOfAdults" class="form-control select" required data-placeholder="Num of adults">
-                                        <option></option>
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                </select>
-                                <span asp-validation-for="NumOfAdults" class="text-danger validation-error-label"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Children<span class="text-danger">*</span></label>
-                                    <select asp-for="NumOfChildrens" class="form-control select" required data-placeholder="Num of childrens">
-                                        <option></option>
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                    </select>                            
-                                    <span asp-validation-for="NumOfChildrens" class="text-danger validation-error-label"></span>
-                            </div>
-                        </div>
-                    </div>
- *@
+
                     <legend class="text-semibold"><i class="icon-reading position-left"></i> Rooms Selection</legend>
                    
                     <div class="form-group">
@@ -125,10 +83,10 @@
                             </tr>
                         </thead>
                         <tbody>
+
                         </tbody>
                     </table>
 
-                   
                     <div id="addRoomWrapper" style="margin-top:10px">
                         <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
                     </div>
@@ -260,7 +218,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     $(document).ready(function () {
@@ -397,11 +354,11 @@
         const isDisabled = $option.prop('disabled');
 
         return $(`
-            <div class="d-flex justify-content-between align-items-center w-100 ${isDisabled ? 'text-muted' : ''}">
-                <span>${name}</span>
-                <span class="label ${isDisabled ? 'bg-danger' : 'bg-primary'}">${count}</span>
-            </div>
-        `);
+                <div class="d-flex justify-content-between align-items-center w-100 ${isDisabled ? 'text-muted' : ''}">
+                    <span>${name}</span>
+                    <span class="label ${isDisabled ? 'bg-danger' : 'bg-primary'}">${count}</span>
+                </div>
+            `);
     }
 
     function formatRoomSelection(data) {
@@ -409,7 +366,6 @@
     }
 
     function initializeSelect2(container) {
-
         const roomTypeSelect = $(container).find('.room-type-select');
 
         roomTypeSelect.select2({
@@ -425,7 +381,7 @@
         roomTypeSelect.on('select2:selecting', function (e) {
             const count = $(e.params.args.data.element).data('count');
             if (count === 0 || count === "0") {
-                e.preventDefault(); // Block selection
+                e.preventDefault();
                 toastr.warning("This room type is not available.");
             }
         });
@@ -437,7 +393,6 @@
             }
         });
 
-        // Rest of your change logic stays here
         roomTypeSelect.on('change', function () {
             const selectedId = $(this).val();
             const roomOption = $(this).find(`option[value="${selectedId}"]`);
@@ -448,27 +403,51 @@
 
             const $row = $(this).closest('tr');
 
+            // Num of rooms
             const roomSelect = $row.find('.num-rooms-select');
             roomSelect.empty().append('<option></option>');
             for (let i = 1; i <= maxRooms; i++) {
                 roomSelect.append(`<option value="${i}">${i}</option>`);
             }
+            if (maxRooms >= 1) {
+                roomSelect.val('1').trigger('change'); // 👈 Set default to 1
+            }
 
+            // Adults
             const adultSelect = $row.find('.num-adults-select');
             adultSelect.empty().append('<option></option>');
             for (let i = 0; i <= maxAdults; i++) {
                 adultSelect.append(`<option value="${i}">${i}</option>`);
             }
+            if (maxAdults >= 1) {
+                adultSelect.val('1').trigger('change');
+            }
 
+            // Children
             const childSelect = $row.find('.num-children-select');
             childSelect.empty().append('<option></option>');
             for (let i = 0; i <= maxChildren; i++) {
                 childSelect.append(`<option value="${i}">${i}</option>`);
             }
+            childSelect.val('0').trigger('change');
         });
     }
 
     function addRoomRow() {
+        const lastRow = $('#roomTable tbody tr').last();
+
+        if (lastRow.length > 0) {
+            const roomType = lastRow.find('.room-type-select').val();
+            const numRooms = lastRow.find('.num-rooms-select').val();
+            const numAdults = lastRow.find('.num-adults-select').val();
+            const numChildren = lastRow.find('.num-children-select').val();
+
+            if (!roomType || !numRooms || !numAdults || !numChildren) {
+                toastr.warning("Please fill all fields in the last row before adding a new room.");
+                return;
+            }
+        }
+
         const tbody = document.querySelector('#roomTable tbody');
         const selectedIds = Array.from(document.querySelectorAll('.room-type-select'))
             .map(select => select.value).filter(val => val !== "");
@@ -489,30 +468,31 @@
         </text>
     }
 
-        const newRow = document.createElement('tr');
+            const newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td style="padding: 4px;">
-                <select class="form-control select room-type-select" data-placeholder="Room Type">
-                    ${optionsHtml}
-                </select>
-            </td>
-            <td style="padding: 4px;">
-                <select class="form-control select num-rooms-select" data-placeholder="Num Of Rooms"></select>
-            </td>
-            <td style="padding: 4px;">
-                <select class="form-control select num-adults-select" data-placeholder="Adults"></select>
-            </td>
-            <td style="padding: 4px;">
-                <select class="form-control select num-children-select" data-placeholder="Children"></select>
-            </td>
-            <td style="padding: 4px; vertical-align: middle;">
-                <button type="button" class="btn btn-sm btn-danger remove-room-btn" onclick="removeRoomRow(this)">−</button>
-            </td>
-        `;
+                <td style="padding: 4px;">
+                    <select class="form-control select room-type-select" data-placeholder="Room Type">
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td style="padding: 4px;">
+                    <select class="form-control select num-rooms-select" data-placeholder="Num Of Rooms"></select>
+                </td>
+                <td style="padding: 4px;">
+                    <select class="form-control select num-adults-select" data-placeholder="Adults"></select>
+                </td>
+                <td style="padding: 4px;">
+                    <select class="form-control select num-children-select" data-placeholder="Children"></select>
+                </td>
+                <td style="padding: 4px; vertical-align: middle;">
+                    <button type="button" class="btn btn-sm btn-danger remove-room-btn" onclick="removeRoomRow(this)">−</button>
+                </td>
+            `;
 
         tbody.appendChild(newRow);
         initializeSelect2(newRow);
         updateRemoveButtons();
+        toggleRoomSelectsBasedOnDates(); // Apply enable/disable state to new selects
     }
 
     function removeRoomRow(button) {
@@ -545,10 +525,27 @@
         });
     }
 
+    function toggleRoomSelectsBasedOnDates() {
+        const hasDates = $('#CheckInDate').val() && $('#CheckOutDate').val();
+
+        $('#roomTable select').prop('disabled', !hasDates);
+        $('#roomTable .select').each(function () {
+            if (!hasDates) {
+                $(this).val(null).trigger('change'); // Reset select2
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         setToSingleMode();
         addRoomRow();
         updateRemoveButtons();
+        toggleRoomSelectsBasedOnDates(); // Initial check on page load
+    });
+
+    // Re-evaluate on date change
+    $('#CheckInDate, #CheckOutDate').on('change', function () {
+        toggleRoomSelectsBasedOnDates();
     });
 </script>
 
@@ -557,8 +554,8 @@
 
         // 🔁 Clear all date-related fields
         function clearDates() {
-            $('#CheckInDate').val('');
-            $('#CheckOutDate').val('');
+            $('#CheckInDate').val('').trigger('change');
+            $('#CheckOutDate').val('').trigger('change');
             $('#NumOfNights').val('');
             $('#StayRange').val('');
         }
@@ -584,9 +581,9 @@
                 return;
             }
 
-            // Set hidden values
-            $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm'));
-            $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm'));
+            // Set hidden values and trigger change
+            $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm')).trigger('change');
+            $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm')).trigger('change');
 
             // Calculate number of nights
             const durationHours = checkOut.diff(checkIn, 'hours', true);
@@ -631,9 +628,10 @@
         function loadRatesDropdown(selectedRoomTypes) {
             const checkInVal = $("#CheckInDate").val();
             const checkOutVal = $("#CheckOutDate").val();
+            const rateSelect = $('#rateSelect');
 
             if (!checkInVal || !checkOutVal || selectedRoomTypes.length === 0) {
-                $('#rateSelect').empty().append('<option value="">Select Rate</option>');
+                rateSelect.empty().append('<option value="">Select Rate</option>');
                 $('#rateDetails').html('').hide();
                 return;
             }
@@ -648,17 +646,48 @@
                     CheckOutDate: new Date(checkOutVal)
                 }),
                 success: function (response) {
-                    const rateSelect = $('#rateSelect');
-                    rateSelect.empty().append('<option value="">Select Rate</option>');
+                    rateSelect.empty();
+
+                    rateSelect.append(new Option('Select Rate', '', false, false));
 
                     $.each(response, function (index, item) {
-                        rateSelect.append(`<option value="${item.id}">${item.name} - ($${item.price})</option>`);
+                        // Build display text for room types
+                        const roomTypeInfo = item.roomTypeRateForReservations
+                            .map(rt => `${rt.typeName}($${rt.dailyPrice})`)
+                            .join(' - ');
+
+                        const optionText = `${item.name}|||${roomTypeInfo}`; // Use delimiter to split later
+
+                        const option = new Option(optionText, item.id, false, false);
+                        rateSelect.append(option);
+                    });
+
+                    // Initialize or reinitialize Select2 with template
+                    rateSelect.select2({
+                        width: '100%',
+                        templateResult: formatRateOption,
+                        templateSelection: formatRateOption
                     });
                 },
                 error: function (xhr) {
                     console.error('❌ Failed to load rates:', xhr.responseText);
                 }
             });
+        }
+
+        // Custom rendering for dropdown items
+        function formatRateOption(option) {
+            if (!option.id) 
+                return option.text;
+
+            const [rateName, roomTypes] = option.text.split('|||');
+
+            return $(`
+            <div>
+                <span style="color:#007bff; font-weight:bold;">${rateName}</span>
+                <span> - ${roomTypes}</span>
+            </div>
+        `);
         }
 
         function loadRateDetails() {
@@ -724,8 +753,6 @@
             CheckInDate: $("#CheckInDate").val(),
             CheckOutDate: $("#CheckOutDate").val(),
             NumOfNights: $("#NumOfNights").val(),
-            //NumOfAdults: $("#NumOfAdults").val(),
-            //NumOfChildrens: $("#NumOfChildrens").val(),
             ReservationSourceId: $("#ReservationSourceId").val(),
             RateId: $("#rateSelect").val(),
             BranchId: $("input[name='BranchId']").val(),

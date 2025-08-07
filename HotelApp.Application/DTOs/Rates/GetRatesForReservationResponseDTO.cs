@@ -10,6 +10,11 @@ namespace HotelApp.Application.DTOs.Rates
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
-		public decimal price { get; set; }
+		public List<RoomTypeRateForReservationDTO> roomTypeRateForReservations { get; set; } = new List<RoomTypeRateForReservationDTO>();
+	}
+	public class RoomTypeRateForReservationDTO
+	{
+		public string TypeName { get; set; }
+		public decimal DailyPrice { get; set; }
 	}
 }

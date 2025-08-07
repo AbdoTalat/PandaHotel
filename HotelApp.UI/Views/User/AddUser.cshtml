@@ -1,6 +1,6 @@
-﻿@model EditUserDTO
+﻿@model AddUserDTO
 @{
-	TempData["Title"] = "Edit User";
+	TempData["Title"] = "Add User";
 }
 
 <!-- Page header -->
@@ -50,13 +50,11 @@
 
 <div class="content">
 	<div class="row">
-		<form id="editUserForm" class="form-basic" asp-action="EditUser" asp-controller="User" asp-route-userId="@Model.Id" method="post">
-            <div asp-validation-summary="All"></div>
-
+		<form id="addUserForm" class="form-basic" asp-action="AddUser" asp-controller="User" method="post">
 			<div class="col-md-12">
 				<div class="panel panel-flat border-left-lg border-left-teal">
 					<div class="panel-heading" style="height:70px">
-                        <h6 class="panel-title ">
+						<h6 class="panel-title ">
 							<a class="collapsed" data-toggle="collapse" data-parent="#accordion-control-right"
 							   href="#editUser" aria-expanded="false">
 								<legend class="text-semibold "><i class="icon-reading position-left"></i> Edit User</legend>
@@ -65,58 +63,78 @@
 						</h6>
 					</div>
 					<div id="editUser" class="panel-collapse collapse in">
-						<div class="panel-body" >
+						<div class="panel-body">
 							<fieldset class="step" id="step1">
 								<div class="row">
 									<div class="col-md-6">
-										<label class="form-label">First Name <span class="text-danger">*</span></label>
+										<label>First Name<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+												<input asp-for="FirstName" class="form-control" placeholder="First Name">
+											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="FirstName"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<label>Last Name<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+												<input asp-for="LastName" class="form-control" placeholder="Last Name">
+											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="row">
+									<div class="col-md-6">
+										<label>User Name<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group input-group">
+												<span class="input-group-addon"><i class="icon-user"></i></span>
+												<input asp-for="UserName" class="form-control" placeholder="User Name">
+											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="UserName"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<label>E-mail Address<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group input-group">
+												<span class="input-group-addon"><i class="fa-solid fa-envelope"></i></span>
+												<input asp-for="Email" class="form-control" placeholder="your@email.com">
+											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="Email"></span>
+										</div>
+									</div>
+
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<label class="form-label">Password <span class="text-danger">*</span></label>
 										<div class="form-group">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="icon-user"></i></span>
-												<input asp-for="FirstName" class="form-control" placeholder="First Name">
-												<span class="validation-badge" asp-validation-for="FirstName"></span>
+												<input asp-for="Password" class="form-control" placeholder="Password">
+												<span class="validation-badge" asp-validation-for="Password"></span>
 											</div>
 										</div>
 									</div>
-
-
-
-										<div class="col-md-6">
-											<label>Last Name</label>
-											<div class="form-group">
-												<div class="input-group input-group">
+									<div class="col-md-6">
+										<label>Confirm Password<span class="text-danger">*</span></label>
+										<div class="form-group">
+											<div class="input-group input-group">
 												<span class="input-group-addon"><i class="icon-user"></i></span>
-													<input asp-for="LastName" class="form-control" placeholder="Last Name">
-												</div>
-											<span class="text-danger validation-error-label" asp-validation-for="LastName"></span>
+												<input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password">
 											</div>
+											<span class="text-danger validation-error-label" asp-validation-for="ConfirmPassword"></span>
 										</div>
-
 									</div>
 
-								<div class="row">
-										<div class="col-md-6">
-											<label>User Name</label>
-											<div class="form-group">
-												<div class="input-group input-group">
-												<span class="input-group-addon"><i class="icon-user"></i></span>
-													<input asp-for="UserName" class="form-control" placeholder="User Name">
-												</div>
-											<span class="text-danger validation-error-label" asp-validation-for="UserName"></span>
-											</div>
-										</div>
-										<div class="col-md-6">
-											<label>E-mail Address</label>
-											<div class="form-group">
-												<div class="input-group input-group">
-													<span class="input-group-addon"><i class="fa-solid fa-envelope"></i></span>
-													<input asp-for="Email" class="form-control" placeholder="your@email.com">
-												</div>
-											<span class="text-danger validation-error-label" asp-validation-for="Email"></span>
-											</div>
-										</div>
-
-									</div>
+								</div>
 
 								<div class="row">
 									<div class="col-md-6">
@@ -154,7 +172,7 @@
 					</div>
 				</div>
 			</div>
-           
+
 			<div class="col-md-6">
 				<div class="panel panel-flat border-left-lg border-left-teal">
 					<div class="panel-heading" style="height:70px">
@@ -195,6 +213,7 @@
 												</label>
 											</div>
 										}
+
 									</div>
 								</div>
 							</div>
@@ -203,6 +222,7 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="col-md-6">
 				<div class="panel panel-flat border-left-lg border-left-teal">
 					<div class="panel-heading" style="height:70px">
@@ -224,7 +244,7 @@
 											<div class="col-md-6">
 												<label class="checkbox-container">
 													<input type="checkbox" name="SelectedRoles"
-														class="checkbox-input roomTypeCheckbox" value="@role"
+														   class="checkbox-input roomTypeCheckbox" value="@role"
 													@(Model.SelectedRoles.Contains(role) ? "checked" : "")>
 													<div class="checkbox-custom"></div>
 													<a class="text-default">@role</a>
@@ -240,21 +260,23 @@
 				</div>
 			</div>
 
-			<div class="text-center">
-				<a class="btn btn-default btn-lg" asp-action="GetUsers" asp-controller="User"> Cancel</a>
-				<button type="submit" class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius"><i class="icon-checkmark4"></i> Save</button>
+			<div class="col-md-12">
+                <div class="text-center">
+                    <a class="btn btn-default btn-lg" asp-action="GetUsers" asp-controller="User"> Cancel</a>
+                    <button type="submit" class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius"><i class="icon-plus2"></i> Add</button>
+                </div>
 			</div>
-    </form>
+			
+		</form>
+
+	</div>
 
 </div>
 
-</div>
 
 
 
-
-@section Scripts{
-
+@section Scripts {
 	<script>
 		$(function () {
 			const checkboxSelector = 'input[name="SelectedBranchIds"]';
