@@ -2,7 +2,7 @@
 
 namespace HotelApp.Domain.Entities
 {
-    public class Room : BaseEntity, IBranchEntity
+    public class Room : BaseEntity, IHasBranch
 	{
         public int Id { get; set; }
         public string RoomNumber { get; set; }
@@ -25,7 +25,6 @@ namespace HotelApp.Domain.Entities
         public int FloorId { get; set; }
         public Floor? Floor { get; set; }
 
-        //public ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
         public ICollection<RoomOption> RoomOptions { get; set; } = new HashSet<RoomOption>();
 
     }

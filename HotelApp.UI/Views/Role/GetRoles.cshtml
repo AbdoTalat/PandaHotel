@@ -54,7 +54,7 @@
             <h5 class="panel-title">Roles</h5>
 
 			<div class="heading-elements" style=" margin-right:0px">
-				@if ((await AuthorizationService.AuthorizeAsync(User, "Role.Add")).Succeeded)
+				@if (User.HasClaim("permission", "Role.Add"))
 				{
 				<button data-title="Add New Role" data-url="/Role/AddRole" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
 					<i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -108,7 +108,7 @@
 							<td><span class="label label-rounded label-danger">Not Active</span></td>
 						}
 							<td>
-							@if ((await AuthorizationService.AuthorizeAsync(User, "Role.Edit")).Succeeded)
+							@if (User.HasClaim("permission", "Role.Edit"))
 							{
 								<a data-title="Edit Role Permissions"
 								data-popup="popover" 
@@ -123,11 +123,11 @@
 							}    
 							@if (item.IsBasic == false)
                             {
-								@if ((await AuthorizationService.AuthorizeAsync(User, "Role.Edit")).Succeeded)
+								@if (User.HasClaim("permission", "Role.Edit"))
 								{
 								<a data-title="Edit Role" data-url="/Role/EditRole/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
 								}
-								@if ((await AuthorizationService.AuthorizeAsync(User, "Role.Delete")).Succeeded && !item.IsActive)
+								@if (User.HasClaim("permission", "Role.Delete") && !item.IsActive)
 								{
 								<a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
 								}

@@ -15,6 +15,7 @@ namespace HotelApp.Application.Services.RoomService
 		Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id);
 		Task<GetRoomByIdDTO?> GetRoomByIdAsync(int Id);
 		Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO room);
+		Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto);
 		Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO room);
 		Task<ServiceResponse<Room>> DeleteRoomAsync(int Id);
 		Task<ServiceResponse<string>> CheckRoomAvailabilityAsync(int roomTypeId, int numberOfRooms);

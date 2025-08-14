@@ -2,7 +2,7 @@
 
 namespace HotelApp.Domain.Entities
 {
-    public class RoomStatus : BaseEntity, IBranchEntity
+    public class RoomStatus : BaseEntity, IHasBranch
 	{
         public int Id { get; set; }
         public string Name { get; set; }

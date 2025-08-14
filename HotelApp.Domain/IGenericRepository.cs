@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace HotelApp.Domain
@@ -20,12 +21,23 @@ namespace HotelApp.Domain
 
 		void Update(T entity);
         void UpdateRange(IEnumerable<T> entities);
+		//		Task BulkUpdateAsync(
+		//	Expression<Func<T, bool>> predicate,
+		//	Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties
+		//);
+		 Task BulkUpdateAsync(
+	Expression<Func<T, bool>> predicate,
+	Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
+	bool skipBranchFilter = false,
+	bool skipAuditFields = false);
 
 
 		void Delete(T entity);
         void DeleteRange(IEnumerable<T> entities);
+        Task DeleteByIdAsync(int id);
 
-        Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
+
+		Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
 		Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
         Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false) where TDto : class;
 

@@ -58,7 +58,7 @@
         <div class="panel-heading">
             <h5 class="panel-title">Options</h5>
             <div class="heading-elements" style=" margin-right:0px">
-                @if ((await AuthorizationService.AuthorizeAsync(User, "Option.Add")).Succeeded)
+                @if (User.HasClaim("permission", "Option.Add"))
                 {
                     <button data-title="Add New Option" data-url="/Option/AddOption" type="button" class="btn bg-teal-400 btn-md btnOpenModal">
                         <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -108,11 +108,11 @@
                             {
                                 <a class="text-primary-700"><i class="glyphicon glyphicon-new-window" style="font-size:20px; margin-right:8px"></i></a>
                             } *@
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Option.Edit")).Succeeded)
+                            @if (User.HasClaim("permission", "Option.Edit"))
                             {
                                 <a data-title="Edit Option" data-url="/Option/EditOption/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Option.Delete")).Succeeded)
+                            @if (User.HasClaim("permission", "Option.Delete"))
                             {
                                 <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
                             }

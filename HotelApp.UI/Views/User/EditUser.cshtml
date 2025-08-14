@@ -180,15 +180,13 @@
 													<input type="checkbox"
 														   name="SelectedBranchIds"
 														   class="checkbox-input roomTypeCheckbox"
-														   value="@branch.Id"
-													@(isChecked ? "checked" : "")
-													@(isDefault ? "disabled" : "") />
+														   value="@branch.Id" />
 
-													@if (isDefault)
+													@* @if (isDefault)
 													{
 														<!-- Hidden input to ensure default branch still posted -->
 														<input type="hidden" name="SelectedBranchIds" value="@branch.Id" />
-													}
+													} *@
 
 													<div class="checkbox-custom"></div>
 													<a class="text-default">@branch.DisplayText</a>
@@ -256,45 +254,57 @@
 @section Scripts{
 
 	<script>
-		$(function () {
-			const checkboxSelector = 'input[name="SelectedBranchIds"]';
-			const hiddenInputName = 'SelectedBranchIds';
-			let previousDefaultBranchId = $('#DefaultBranchId').val();
+		document.addEventListener('DOMContentLoaded', function () {
+			// Inject server values
+			var defaultBranchId = '@(Model.DefaultBranchId == null ? "" : Model.DefaultBranchId.ToString())';
 
-			function syncDefaultBranchSelection() {
-				const newDefaultBranchId = $('#DefaultBranchId').val();
+			// Serialize previously selected branches to JS (strings to match checkbox value attributes)
+			var selectedBranchIds = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+			(Model.SelectedBranchIds ?? new List<int>()).Select(x => x.ToString()).ToList()
+			));
 
-				$(checkboxSelector).each(function () {
-					const $checkbox = $(this);
-					const val = $checkbox.val();
+			// 1) Pre-check all previously saved branches
+			(selectedBranchIds || []).forEach(function (id) {
+				document.querySelectorAll('input[name="SelectedBranchIds"][value="' + id + '"]')
+					.forEach(cb => cb.checked = true);
+			});
 
-					// Handle the new default branch
-					if (val === newDefaultBranchId) {
-						$checkbox.prop('checked', true).prop('disabled', true);
-
-						// Ensure a hidden input exists to submit this value
-						if ($checkbox.closest('label').find(`input[type="hidden"][value="${val}"]`).length === 0) {
-							$checkbox.closest('label').append(`<input type="hidden" name="${hiddenInputName}" value="${val}" />`);
-						}
-					}
-					// Handle the old default branch (now no longer default)
-					else if (val === previousDefaultBranchId) {
-						$checkbox.prop('disabled', false).prop('checked', false);
-						$checkbox.closest('label').find(`input[type="hidden"][value="${val}"]`).remove();
-					}
-				});
-
-				// Update the reference
-				previousDefaultBranchId = newDefaultBranchId;
+			// 2) Make sure the default branch is checked and the dropdown reflects it
+			if (defaultBranchId) {
+				var defaultSelect = document.getElementById('DefaultBranchId');
+				if (defaultSelect) {
+					defaultSelect.value = defaultBranchId;
+					// If you're using Select2 or similar, uncomment the next line:
+					// $(defaultSelect).trigger('change.select2');
+					defaultSelect.dispatchEvent(new Event('change'));
+				}
+				document.querySelectorAll('input[name="SelectedBranchIds"][value="' + defaultBranchId + '"]')
+					.forEach(cb => cb.checked = true);
 			}
 
-			// Trigger on page load
-			syncDefaultBranchSelection();
+			// 3) When default changes, check the same branch in the list and update guarding logic
+			document.getElementById('DefaultBranchId')?.addEventListener('change', function (e) {
+				var id = e.target.value;
+				if (!id) return;
+				defaultBranchId = id; // update current default we're guarding
+				var cb = document.querySelector('input[name="SelectedBranchIds"][value="' + id + '"]');
+				if (cb) cb.checked = true;
+			});
 
-			// Watch for changes to the default branch dropdown
-			$('#DefaultBranchId').on('change', syncDefaultBranchSelection);
+			// 4) Prevent unchecking the current default from the checkbox list
+			document.addEventListener('change', function (e) {
+				var el = e.target;
+				if (el && el.matches('input[name="SelectedBranchIds"]')) {
+					if (defaultBranchId && el.value === defaultBranchId && !el.checked) {
+						// Re-check it; it's the default
+						el.checked = true;
+					}
+				}
+			});
 		});
 	</script>
+
+
 
 	@await Html.PartialAsync("_ValidationScriptsPartial")
 }

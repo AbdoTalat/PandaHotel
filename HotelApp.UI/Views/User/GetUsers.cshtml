@@ -57,7 +57,7 @@
             <h5 class="panel-title">Users</h5>
 
 			<div class="heading-elements" >
-				@if ((await AuthorizationService.AuthorizeAsync(User, "User.Add")).Succeeded)
+				@if (User.HasClaim("permission", "User.Add"))
 				{
 					<a asp-action="AddUser" asp-controller="User" type="button" class="btn bg-teal-400 btn-lg">
 						<i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -128,7 +128,7 @@
 
 						<td class="text-center">
 
-							@if ((await AuthorizationService.AuthorizeAsync(User, "User.Edit")).Succeeded)
+							@if (User.HasClaim("permission", "User.Edit"))
 								{
 									<a asp-action="EditUser" asp-controller="User" asp-route-Id="@item.Id" class="text-teal-600">
 										<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
@@ -136,7 +136,7 @@
 								}
 								@if (User.IsInRole("Admin"))
 								{
-									@if ((await AuthorizationService.AuthorizeAsync(User, "User.Delete")).Succeeded && !item.IsActive)
+								@if (User.HasClaim("permission", "User.Delete") && !item.IsActive)
 									{
 										<a data-id="@item.Id" class="text-danger-600 btn-delete">
 											<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>

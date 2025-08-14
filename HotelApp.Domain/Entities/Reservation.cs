@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Domain.Entities
 {
-    public class Reservation : BaseEntity, IBranchEntity
+    public class Reservation : BaseEntity, IHasBranch
 	{
         public int Id { get; set; }
         public DateTime CheckInDate { get; set; }

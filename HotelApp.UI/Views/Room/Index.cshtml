@@ -1,12 +1,11 @@
-﻿
-@model IEnumerable<GetAllRoomsDTO>
+﻿ @model IEnumerable<GetAllRoomsDTO>
 @{
 	int rowNumber = 1;
 	TempData["Title"] = "Rooms";
 
-	var canView = (await AuthorizationService.AuthorizeAsync(User, "Room.View")).Succeeded;
-	var canEdit = (await AuthorizationService.AuthorizeAsync(User, "Room.Edit")).Succeeded;
-	var canDelete = (await AuthorizationService.AuthorizeAsync(User, "Room.Delete")).Succeeded;
+	var canView = User.HasClaim("permission", "Room.View");
+	var canEdit = User.HasClaim("permission", "Room.Edit");
+	var canDelete = User.HasClaim("permission", "Room.Delete");
 
 }
 
@@ -116,7 +115,7 @@
 			<h5 class="panel-title">Rooms </h5>
 			
 			<div class="heading-elements">
-				@if ((await AuthorizationService.AuthorizeAsync(User, "Room.Add")).Succeeded)
+				@if (User.HasClaim("Permission","Room.Add"))
 				{
 
 					<a asp-action="AddRoom" asp-controller="Room" type="button" class="btn bg-teal-400 btn-lg">
@@ -190,7 +189,6 @@
 			</div>
 		</div>
 
-
 		<table class="table datatable-button-html5-basic dataTable" id="MyTable">
 			<thead>
 				<tr class="border-double">
@@ -200,6 +198,7 @@
 					<th>Room Type</th>
 					<th>Max Adults</th>
 					<th>Max Children</th>
+					<th>Is Active</th>
 					<th>Status</th>
 					<th>Actions</th>
 				</tr>
@@ -214,21 +213,32 @@
 						<td class="room-type">@item.TypeName</td>
 						<td>@item.MaxNumOfAdults</td>
 						<td>@item.MaxNumOfChildren</td>
+						@if (item.IsActive)
+						{
+							<td><span class="label label-flat border-success text-success-600">Active</span>
+
+							</td>
+						}
+						else
+						{
+							<td><span class="label label-flat border-danger text-danger-600">Not Active</span></td>
+						}
+						
 						<td><span class="label label-rounded" style="background-color:@item.RoomStatusColor">@item.RoomStatusName</span></td>
 						<td>
-							@if (canView)
+							@if (User.HasClaim("permission", "Room.View"))
 							{
 								<a data-title="Room Details" data-url="/Room/GetRoomDetails/@item.Id" class="btnEditOpenModal">
 									<i class="icon-info22" style="font-size:20px; margin-right:8px"></i>
 								</a>
 							}
-							@if (canEdit)
+							@if (User.HasClaim("permission", "Room.Edit"))
 							{
-								<a data-title="Edit Room" data-url="/Room/EditRoom/@item.Id" class="text-teal-600 btnEditOpenModal">
+								<a asp-action="EditRoom" asp-controller="Room" asp-route-Id="@item.Id" class="text-teal-600 btnEditOpenModal">
 									<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
 								</a>
 							}
-							@if (canDelete && !item.IsActive)
+							@if (User.HasClaim("permission", "Room.Delete") && !item.IsActive)
 							{
 								<a data-id="@item.Id" class="text-danger-600 btn-delete">
 									<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
@@ -248,7 +258,8 @@
 
 @section Scripts {
 
-	 <script>
+
+	<script>
 		$(document).ready(function () {
 			const swalWithBootstrapButtons = Swal.mixin({
 				customClass: {
@@ -348,6 +359,10 @@
 
 							// Populate rows
 							$.each(roomsToShow, function (index, item) {
+								let isActiveLabel = item.isActive
+									? '<span class="label label-flat border-success text-success-600">Active</span>'
+									: '<span class="label label-flat border-danger text-danger-600">Not Active</span>';
+
 								let statusLabel = getStatusBadge(item);
 								let actionButtons = getActionButtons(item);
 
@@ -358,6 +373,7 @@
 									item.typeName,
 									item.maxNumOfAdults,
 									item.maxNumOfChildren,
+									isActiveLabel,
 									statusLabel,
 									actionButtons
 								]);
@@ -401,10 +417,15 @@
 
 			// Action buttons
 			function getActionButtons(item) {
-				return (item.canViewRoom ? `<a data-title="Room Details" data-url="/Room/GetRoomDetails/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
-					(item.canEditRoom ? `<a data-title="Edit Room" data-url="/Room/EditRoom/${item.id}" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
-					(item.canDeleteRoom ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
+				let canView = @canView.ToString().ToLower();   // Razor → JS boolean
+				let canEdit = @canEdit.ToString().ToLower();
+				let canDelete = @canDelete.ToString().ToLower();
+
+				return (canView ? `<a data-title="Room Details" data-url="/Room/GetRoomDetails/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+					(canEdit ? `<a data-title="Edit Room" data-url="/Room/EditRoom/${item.id}" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+					(canDelete && !item.isActive ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
 			}
+
 
 			// Optional: Load on page load
 			// loadRooms();

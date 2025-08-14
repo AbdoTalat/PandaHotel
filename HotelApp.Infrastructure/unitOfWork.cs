@@ -12,13 +12,15 @@ namespace HotelApp.Infrastructure
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
 
         public unitOfWork(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig)
+            IConfigurationProvider mapperConfig, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapperConfig = mapperConfig;
+			_httpContextAccessor = httpContextAccessor;
 		}
 
 		public IGenericRepository<T> Repository<T>() where T : class
@@ -26,7 +28,7 @@ namespace HotelApp.Infrastructure
 			if (_repositories.ContainsKey(typeof(T)))
 				return (IGenericRepository<T>)_repositories[typeof(T)];
 
-			var repo = new GenericRepository<T>(_context, _mapperConfig);
+			var repo = new GenericRepository<T>(_context, _mapperConfig, _httpContextAccessor);
 			_repositories[typeof(T)] = repo;
 			return repo;
 		}

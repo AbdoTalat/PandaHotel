@@ -28,18 +28,18 @@ namespace HotelApp.Infrastructure.Repositories
 		public GetRoomsReview GetRoomsReview()
         {
 			var available = _context.Rooms
+				.BranchFilter()
 		        .Where(r =>  r.RoomStatusId == (int)RoomStatusEnum.Available)
-                .BranchFilter()
 		        .Count();
 
 			var Occupied = _context.Rooms
+			   .BranchFilter()
 			   .Where(r => r.RoomStatusId == (int)RoomStatusEnum.Occupied)
-               .BranchFilter()
 			   .Count();
 
 			var Maintainance = _context.Rooms
+			   .BranchFilter()
 			   .Where(r => r.RoomStatusId == (int)RoomStatusEnum.Maintenance)
-               .BranchFilter()
 			   .Count();
 
             var result = new GetRoomsReview
@@ -77,8 +77,8 @@ namespace HotelApp.Infrastructure.Repositories
 			int available = statusCounts.FirstOrDefault(s => s.Status == "Available")?.Count ?? 0;
 			int occupied = statusCounts.FirstOrDefault(s => s.Status == "Occupied")?.Count ?? 0;
 			int maintenance = statusCounts.FirstOrDefault(s => s.Status == "Maintenance")?.Count ?? 0;
+			
 
-			// ✅ 3. Return DTO
 			return new RoomReportDTO
 			{
 				roomsDetails = roomDetails,
@@ -86,6 +86,9 @@ namespace HotelApp.Infrastructure.Repositories
 				NumOfOccupied = occupied,
 				NumOfMaintainable = maintenance
 			};
+
+
+			
 		}
 	}
 }

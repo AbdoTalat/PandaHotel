@@ -55,7 +55,7 @@
 			<h5 class="panel-title">Room Statuses</h5>
 
 			<div class="heading-elements">
-				@if ((await AuthorizationService.AuthorizeAsync(User, "RoomStatus.Add")).Succeeded)
+				@if (User.HasClaim("permission", "RoomStatus.Add"))
 				{
 					<button data-title="Add New Room Status" data-url="/RoomStatus/AddRoomStatus" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
 						<i class="icon-plus-circle2" style="font-size:21px; margin-right:0px; margin-top:3px"></i>
@@ -98,7 +98,6 @@
 						<td>@item.Description</td>
 						<td>
 							<div style="background-color:@item.Color; width: 30px; height: 30px; border-radius: 4px; display: inline-block; border: 1px solid #ccc;" title="@item.Color"></div>
-							<span class="ml-2">@item.Color</span>
 						</td>
 						@if (item.IsActive)
 						{
@@ -109,11 +108,11 @@
 							<td><span class="label label-rounded label-danger">Not Active</span></td>
 						}
 						<td>
-							@if ((await AuthorizationService.AuthorizeAsync(User, "RoomStatus.Edit")).Succeeded)
+							@if (User.HasClaim("permission", "RoomStatus.Edit"))
 							{
 								<a data-title="Edit Room Status" data-url="/RoomStatus/EditRoomStatus/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
 							}
-							@if ((await AuthorizationService.AuthorizeAsync(User, "RoomStatus.Delete")).Succeeded)
+							@if (User.HasClaim("permission", "RoomStatus.Delete"))
 							{
 								@if (!item.IsActive)
 								{
@@ -138,13 +137,12 @@
 			const swalWithBootstrapButtons = Swal.mixin({
 				customClass: {
 					confirmButton: 'btn btn-danger',
-					cancelButton: 'btn bg-teal-400 custom-cancel-btn'
+					cancelButton: 'btn btn-default custom-cancel-btn'
 				},
 				buttonsStyling: false
 			});
 
-			// Use event delegation to handle dynamically created elements
-			$('#MyTable tbody').on('click', '.btn-delete', function () {
+			$(".btn-delete").click(function () {
 				let button = $(this);  // Reference to the clicked button
 				let itemId = button.data("id");
 				let row = button.closest("tr");
@@ -162,16 +160,15 @@
 				}).then((result) => {
 					if (result.isConfirmed) {
 						$.ajax({
-							url: '/RoomType/DeleteRoomType/' + itemId,
+							url: '/RoomStatus/DeleteRoomStatus/' + itemId,
 							type: 'DELETE',
 							success: function (response) {
-								if (response.success) {
+								if (response.success == true) {
 									swalWithBootstrapButtons.fire({
 										position: "top",
 										title: "Deleted!",
 										text: response.message,
 										icon: "success",
-										//toast: true,
 										customClass: {
 											confirmButton: 'btn btn-success'
 										}
@@ -180,12 +177,21 @@
 											$(this).remove(); // Remove the row from DOM
 										});
 									});
-								} else {
+								}
+								else if (response.success == false) {
 									swalWithBootstrapButtons.fire({
 										position: "top",
-										title: "Warning!",
+										title: "warning!",
 										text: response.message,
 										icon: "warning"
+									});
+								}
+								else {
+									swalWithBootstrapButtons.fire({
+										position: "top",
+										title: "Error!",
+										text: response.message,
+										icon: "error"
 									});
 								}
 							},

@@ -12,7 +12,6 @@
 }
 
 @{
-	//var defaultBranchId = User.FindFirstValue("DefaultBranch");
 	var defaultBranchJson = User.FindFirstValue("DefaultBranchData");
 
 	var defaultBranch = string.IsNullOrEmpty(defaultBranchJson)
@@ -25,23 +24,6 @@
 	var userBranches = string.IsNullOrEmpty(userBranchesJson)
 		? new List<UserBranchesDataDTO>()
 		: JsonConvert.DeserializeObject<List<UserBranchesDataDTO>>(userBranchesJson);
-}
-
-@{
-	bool canViewUsers = (await AuthorizationService.AuthorizeAsync(User, "User.View")).Succeeded;
-	bool canViewRoles = (await AuthorizationService.AuthorizeAsync(User, "Role.View")).Succeeded;
-	bool canViewRooms = (await AuthorizationService.AuthorizeAsync(User, "Room.View")).Succeeded;
-	bool canViewRoomTypes = (await AuthorizationService.AuthorizeAsync(User, "RoomType.View")).Succeeded;
-	bool canViewRoomStatus = (await AuthorizationService.AuthorizeAsync(User, "RoomStatus.View")).Succeeded;
-	bool canViewGuests = (await AuthorizationService.AuthorizeAsync(User, "Guest.View")).Succeeded;
-	bool canViewReservations = (await AuthorizationService.AuthorizeAsync(User, "Reservation.View")).Succeeded;
-	bool canViewBranches = (await AuthorizationService.AuthorizeAsync(User, "Branch.View")).Succeeded;
-	bool canViewFloors = (await AuthorizationService.AuthorizeAsync(User, "Floor.View")).Succeeded;
-	bool canViewOptions = (await AuthorizationService.AuthorizeAsync(User, "Option.View")).Succeeded;
-	bool canViewRates = (await AuthorizationService.AuthorizeAsync(User, "Rate.View")).Succeeded;
-	bool canViewSystemSettings = (await AuthorizationService.AuthorizeAsync(User, "SystemSetting.Edit")).Succeeded;
-	bool canViewReports = (await AuthorizationService.AuthorizeAsync(User, "Report.View")).Succeeded;
-	bool canViewCompanies = (await AuthorizationService.AuthorizeAsync(User, "Company.View")).Succeeded;
 }
 
 <!DOCTYPE html>
@@ -377,7 +359,7 @@
 									<script>
 										$(document).ready(function () {
 											$(".branch-item").click(function (e) {
-												e.preventDefault(); // Prevent page jump
+												e.preventDefault(); // Prevent default link action
 												var branchId = $(this).data("branch-id");
 
 												if (branchId) {
@@ -387,7 +369,7 @@
 														contentType: 'application/json',
 														data: JSON.stringify(branchId),
 														success: function () {
-															location.reload(); // Reload to apply changes
+															window.location.href = '/Home/Index'; // Always go to Dashboard
 														},
 														error: function (xhr, status, error) {
 															console.error("Error changing branch:", error);
@@ -466,18 +448,18 @@
 
 								
 
-								@if (canViewUsers || canViewRoles)
+								@if (User.HasClaim("permission", "User.View") || User.HasClaim("permission", "Role.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Admin") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-users4"></i> <span>Administration</span></a>
 										<ul>
-											@if (canViewUsers)
+											@if (User.HasClaim("permission", "User.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active" : "")">
 													<a asp-action="GetUsers" asp-controller="User"><i class="icon-users2"></i> Users</a>
 												</li>
 											}
-											@if (canViewRoles)
+											@if (User.HasClaim("permission", "Role.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Role" && ViewContext.RouteData.Values["action"]?.ToString() == "GetRoles" ? "active" : "")">
 													<a asp-action="GetRoles" asp-controller="Role"><i class="icon-cog52"></i> Roles</a>
@@ -487,24 +469,24 @@
 									</li>
 								}
 
-								@if (canViewRooms || canViewRoomTypes || canViewRoomStatus)
+								@if (User.HasClaim("permission", "Room.View") || User.HasClaim("permission", "RoomType.View") || User.HasClaim("permission", "RoomStatus.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Room") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-library2"></i> <span>Rooms Management</span></a>
 										<ul>
-											@if (canViewRooms)
+											@if (User.HasClaim("permission", "Room.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Room" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Room"><i class="icon-bed2"></i> Rooms</a>
 												</li>
 											}
-											@if (canViewRoomTypes)
+											@if (User.HasClaim("permission", "RoomType.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "RoomType" ? "active" : "")">
 													<a asp-action="Index" asp-controller="RoomType"><i class="glyphicon glyphicon-tags"></i> Room Types</a>
 												</li>
 											}
-											@if (canViewRoomStatus)
+											@if (User.HasClaim("permission", "RoomStatus.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "RoomStatus" ? "active" : "")">
 													<a asp-action="Index" asp-controller="RoomStatus"><i class="icon-loop"></i> Room Status</a>
@@ -514,14 +496,14 @@
 									</li>
 								}
 
-								@if (canViewGuests)
+								@if (User.HasClaim("permission", "Guest.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Guest" ? "active" : "")">
 										<a asp-action="Index" asp-controller="Guest"><i class="icon-man-woman"></i> <span>Guests</span></a>
 									</li>
 								}
 
-								@if (canViewReservations)
+								@if (User.HasClaim("permission", "Reservation.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Reservation") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-file-spreadsheet2"></i> <span>Reservation Management</span></a>
@@ -536,47 +518,47 @@
 									</li>
 								}
 
-								@if (canViewBranches || canViewFloors || canViewOptions || canViewRates || canViewSystemSettings || canViewCompanies)
+								@if (User.HasClaim("permission", "Branch.View") || User.HasClaim("permission", "Floor.View") || User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") || User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Branch") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-hammer-wrench"></i> <span>System Settings</span></a>
 										<ul>
-											@if (canViewSystemSettings)
+											@if (User.HasClaim("permission", "SystemSetting.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "SystemSetting" ? "active" : "")">
 													<a asp-action="Edit" asp-controller="SystemSetting"><i class="icon-cog52"></i> Master System Settings</a>
 												</li>
 											}
-											@if (canViewBranches)
+											@if (User.HasClaim("permission", "Branch.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Branch" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Branch"><i class="icon-location4"></i> Branches</a>
 												</li>
 											}
-											@if (canViewFloors)
+											@if (User.HasClaim("permission", "Floor.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Floor" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Floor"><i class="icon-package"></i> Floors</a>
 												</li>
 											}
-											@if (canViewCompanies)
+											@if (User.HasClaim("permission", "Company.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Company" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Company"><i class="icon-city"></i> Companies</a>
 												</li>
 											}
-											@if (canViewOptions || canViewRates)
+											@if (User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Option") == true ? "active navigation-open" : "")">
 													<a href="#" class="has-ul"><i class="icon-stats-growth"></i>Rates</a>
 													<ul>
-														@if (canViewOptions)
+														@if (User.HasClaim("permission", "Option.View"))
 														{
 															<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Option" ? "active" : "")">
 																<a asp-action="Index" asp-controller="Option"><i class="icon-primitive-dot"></i> Options</a>
 															</li>
 														}
-														@if (canViewRates)
+														@if (User.HasClaim("permission", "Rate.View"))
 														{
 															<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Rate" ? "active" : "")">
 																<a asp-action="Index" asp-controller="Rate"><i class="icon-primitive-dot"></i> Room Type Rates</a>
@@ -589,13 +571,13 @@
 									</li>
 								}
 
-								@if (canViewReports)
+								@if (User.HasClaim("permission", "Report.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Report") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-magazine"></i> <span>Reports</span></a>
 										<ul>
 
-											@if (canViewReports)
+											@if (User.HasClaim("permission", "Report.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Report"><i class="icon-list3"></i> Room Reports</a>

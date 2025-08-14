@@ -7,6 +7,9 @@ using AutoMapper.QueryableExtensions;
 using AutoMapper;
 using HotelApp.Helper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Query;
+using HotelApp.Domain.Common;
+using System.Security.Claims;
 
 namespace HotelApp.Infrastructure
 {
@@ -14,13 +17,18 @@ namespace HotelApp.Infrastructure
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly DbSet<T> _dbSet;
-        public GenericRepository(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig)
+
+		private readonly int _currentUserId;
+		public GenericRepository(ApplicationDbContext context,
+            IConfigurationProvider mapperConfig, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapperConfig = mapperConfig;
+			_httpContextAccessor = httpContextAccessor;
 			_dbSet = _context.Set<T>();
+			_currentUserId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
 		#region Get Methods
@@ -108,10 +116,41 @@ namespace HotelApp.Infrastructure
             => _dbSet.Update(entity);
         public void UpdateRange(IEnumerable<T> entities)
             => _dbSet.UpdateRange(entities);
+
+		public async Task BulkUpdateAsync(
+			Expression<Func<T, bool>> predicate,
+			Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
+			bool skipBranchFilter = false,
+			bool skipAuditFields = false)
+		{
+			IQueryable<T> query = _dbSet.BranchFilter(skipBranchFilter);
+
+			if (predicate != null)
+				query = query.Where(predicate);
+
+			if (!skipAuditFields)
+			{
+				setProperties = CombineSetProperties(setProperties, s =>
+					s.SetProperty(e => EF.Property<int>(e, "LastModifiedById"), _currentUserId)
+					 .SetProperty(e => EF.Property<DateTime>(e, "LastModifiedDate"), DateTime.UtcNow)
+				);
+			}
+
+			await query.ExecuteUpdateAsync(setProperties);
+		}
+
 		public void Delete(T entity)
             => _dbSet.Remove(entity);
         public void DeleteRange(IEnumerable<T> entities)
             => _dbSet.RemoveRange(entities);
+
+		public async Task DeleteByIdAsync(int id)
+		{
+			await _dbSet
+                .BranchFilter()
+				.Where(e => EF.Property<int>(e, "Id") == id)
+				.ExecuteDeleteAsync();
+		}
 		#endregion
 
 		#region Other Methods
@@ -121,7 +160,25 @@ namespace HotelApp.Infrastructure
 				.BranchFilter(skipBranchFilter);
 
             return await query.AnyAsync(predicate);
-		}        
+		}
+		#endregion
+
+
+		#region Helper Methods
+		private static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> CombineSetProperties(
+			Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> first,
+			Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> second)
+		{
+			var param = Expression.Parameter(typeof(SetPropertyCalls<T>), "p");
+
+			// Invoke first(p)
+			var firstBody = Expression.Invoke(first, param);
+
+			// Invoke second(first(p))
+			var secondBody = Expression.Invoke(second, firstBody);
+
+			return Expression.Lambda<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>(secondBody, param);
+		}
 		#endregion
 
 	}

@@ -66,6 +66,15 @@ namespace HotelApp.UI.Controllers
 			return Json(new { success = result.Success, message = result.Message });
 		}
 
+		[HttpDelete]	
+		[Authorize(Policy = "RoomStatus.Delete")]
+		public async Task<IActionResult> DeleteRoomStatus(int Id)
+		{
+			var result = await _roomStatusService.DeleteRoomStatusByIdAsync(Id);
+
+			return Json(new {success = result.Success, message = result.Message});
+		}
+
 		public async Task<IActionResult> GetRoomStatusJson()
 		{
 			var roomStatus = await _roomStatusService.GetRoomStatusDropDownAsync();

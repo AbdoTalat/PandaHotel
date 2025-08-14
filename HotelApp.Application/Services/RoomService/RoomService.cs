@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HotelApp.Application.DTOs.RoleBased;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
+using BenchmarkDotNet.Running;
 
 namespace HotelApp.Application.Services.RoomService
 {
@@ -35,17 +36,16 @@ namespace HotelApp.Application.Services.RoomService
             
             return rooms;
         }
-		
 		public GetRoomsReview GetRoomsReview()
 		{
             var result = _roomRepository.GetRoomsReview();
 
             return result;
         }
-
 		public async Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id)
         {
-            var room = await _unitOfWork.Repository<Room>().GetByIdAsDtoAsync<EditRoomDTO>(Id);
+            var room = await _unitOfWork.Repository<Room>()
+                .GetByIdAsDtoAsync<EditRoomDTO>(Id);
             
             return room;
         }
@@ -55,20 +55,18 @@ namespace HotelApp.Application.Services.RoomService
             return room;
         }
 
-		public async Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO roomDTO)
+        public async Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO roomDTO)
         {
             try
             {
-                bool IsRoomNumberUnique = await _unitOfWork.Repository<Room>().IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower() && r.BranchId == roomDTO.BranchId);
+                bool IsRoomNumberUnique = await _unitOfWork.Repository<Room>()
+                    .IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower() && r.BranchId == roomDTO.BranchId);
                 if (IsRoomNumberUnique)
                 {
                     return ServiceResponse<AddRoomDTO>.ResponseFailure("Cannot enter duplicate room number.");
                 }
-
                 var mappedRoom = _mapper.Map<Room>(roomDTO);
-				await _unitOfWork.Repository<Room>().AddNewAsync(mappedRoom);
-                //await _unitOfWork.CommitAsync();
-
+                await _unitOfWork.Repository<Room>().AddNewAsync(mappedRoom);
 
                 if (roomDTO.SelectedOptions != null)
                 {
@@ -79,31 +77,91 @@ namespace HotelApp.Application.Services.RoomService
                     });
 
                     await _unitOfWork.Repository<RoomOption>().AddRangeAsync(roomOptions);
-                    
+
                 }
                 await _unitOfWork.CommitAsync();
 
                 var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(roomDTO.RoomTypeId);
                 if (roomType == null)
                 {
-					return ServiceResponse<AddRoomDTO>.ResponseFailure("Room Type not found");
-				}
-				if (!roomType.IsActive)
-				{
-					roomType.IsActive = true;
+                    return ServiceResponse<AddRoomDTO>.ResponseFailure("Room Type not found");
+                }
+                if (!roomType.IsActive)
+                {
+                    roomType.IsActive = true;
                     _unitOfWork.Repository<RoomType>().Update(roomType);
-                    
+
                     await _unitOfWork.CommitAsync();
-				}
-				return ServiceResponse<AddRoomDTO>.ResponseSuccess("New Room Created Successfully.");
+                }
+                return ServiceResponse<AddRoomDTO>.ResponseSuccess("New Room Created Successfully.");
             }
             catch (Exception ex)
             {
-				return ServiceResponse<AddRoomDTO>.ResponseFailure( $"Error occurred while saving the room. Please contact the site owner");
-			}
+                return ServiceResponse<AddRoomDTO>.ResponseFailure($"Error occurred while saving the room. Please contact the site owner");
+            }
         }
+		public async Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto)
+		{
+			try
+			{
+				var roomsToAdd = new List<Room>();
 
-        public async Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO room)
+				for (int i = dto.RoomNumberFrom; i <= dto.RoomNumberTo; i++)
+				{
+					var roomNumber = string.IsNullOrEmpty(dto.RoomNumberText)
+				        ? i.ToString()
+				        : $"{dto.RoomNumberText}{i}";
+
+					bool isRoomNumberExist = await _unitOfWork.Repository<Room>()
+						.IsExistsAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower() && r.BranchId == dto.BranchId);
+
+					if (isRoomNumberExist)
+					{
+						continue;
+					}
+
+					var room = new Room
+					{
+						RoomNumber = string.IsNullOrEmpty(dto.RoomNumberText) 
+                        ? i.ToString()
+                        : $"{dto.RoomNumberText}{i}",
+						BranchId = dto.BranchId,
+						Description = dto.Description,
+						FloorId = dto.FloorId,
+						RoomStatusId = dto.RoomStatusId,
+						IsActive = dto.IsActive,
+						IsAffectedByRoomType = dto.IsAffectedByRoomType,
+						PricePerNight = dto.PricePerNight,
+						MaxNumOfAdults = dto.MaxNumOfAdults,
+						MaxNumOfChildrens = dto.MaxNumOfChildrens,
+						RoomTypeId = dto.RoomTypeId,
+                        RoomOptions = dto.SelectedOptions?.Select(optionId => new RoomOption
+                        {
+                            OptionId = optionId
+                        }).ToList()
+                    };
+					
+
+					roomsToAdd.Add(room);
+				}
+
+				if (roomsToAdd.Count > 0)
+				{
+					await _unitOfWork.Repository<Room>().AddRangeAsync(roomsToAdd);
+					await _unitOfWork.CommitAsync();
+					return ServiceResponse<AddRoomDTO>.ResponseSuccess( $"{roomsToAdd.Count} room(s) added successfully.");
+				}
+
+				return ServiceResponse<AddRoomDTO>.ResponseFailure("No rooms were added. All specified room numbers already exist.");
+			}
+			catch (Exception ex)
+			{
+				return ServiceResponse<AddRoomDTO>.ResponseFailure(ex.Message);
+			}
+		}
+
+
+		public async Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO room)
         {
             var oldRoom = await _unitOfWork.Repository<Room>().GetByIdAsync(room.Id);
             if (oldRoom == null)

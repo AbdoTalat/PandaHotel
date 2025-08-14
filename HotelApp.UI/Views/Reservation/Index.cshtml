@@ -57,7 +57,7 @@
 	<div class="panel panel-flat ">
 		<div class="panel-heading">
 			<h5 class="panel-title">Reservations</h5>
-			@if ((await AuthorizationService.AuthorizeAsync(User, "Reservation.Add")).Succeeded)
+			@if (User.HasClaim("permission", "Reservation.Add"))
             {
 			<div class="heading-elements" style=" margin-right:0px">
 				<a asp-action="AddReservation" asp-controller="Reservation" type="button" class="btn bg-teal-400 btn-lg">
@@ -104,15 +104,15 @@
 						<td>@item.Status</td>
 						<td>@item.CreatedBy</td>
 						<td>
-							@if ((await AuthorizationService.AuthorizeAsync(User, "Reservation.View")).Succeeded)
+							@if (User.HasClaim("permission", "Reservation.View"))
 							{
 								<a><i class="icon-info22" style="font-size:20px; margin-right:8px"></i>  </a>
 							}
-							@if ((await AuthorizationService.AuthorizeAsync(User, "Reservation.Edit")).Succeeded)
+							@if (User.HasClaim("permission", "Reservation.Edit"))
 							{
 								<a data-title="Edit Resrvation" data-url="" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
 							}
-							@if ((await AuthorizationService.AuthorizeAsync(User, "Reservation.Delete")).Succeeded)
+							@if (User.HasClaim("permission", "Reservation.Delete"))
 							{
 								<a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
 							}

@@ -8,7 +8,7 @@ using HotelApp.Domain.Common;
 
 namespace HotelApp.Domain.Entities
 {
-    public class Guest : BaseEntity, IBranchEntity
+    public class Guest : BaseEntity, IHasBranch
     {
         public int Id { get; set; }
         public string FullName { get; set; }

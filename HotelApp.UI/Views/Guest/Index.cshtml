@@ -54,7 +54,7 @@
         <div class="panel-heading">
             <h5 class="panel-title">Guests</h5>
             <div class="heading-elements" style=" margin-right:0px">
-                @if ((await AuthorizationService.AuthorizeAsync(User, "Guest.Add")).Succeeded)
+                @if (User.HasClaim("permission", "Guest.Add"))
                 {
                 <button data-title="Add New Guest" data-url="/Guest/AddGuest" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
                     <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -97,15 +97,15 @@
                         <td>@item.Phone</td>
                         <td>@item.Address</td>
                         <td>
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Reservation.Add")).Succeeded)
+                            @if (User.HasClaim("permission", "Reservation.Add"))
                             {
                             <a class="text-primary-700"><i class="glyphicon glyphicon-new-window" style="font-size:20px; margin-right:8px"></i></a>
                             }
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Guest.Edit")).Succeeded)
+                            @if (User.HasClaim("permission", "Guest.Edit"))
                             {
                             <a data-title="Edit Guest" data-url="/Guest/EditGuest/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Guest.Delete")).Succeeded)
+                            @if (User.HasClaim("permission", "Guest.Delete"))
                             {
                             <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
                             }

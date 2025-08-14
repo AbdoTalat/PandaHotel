@@ -4,6 +4,7 @@ using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 		private readonly IRoomTypeRepository _roomTypeRepository;
 
 		public RoomTypeService(IUnitOfWork unitOfWork, IMapper mapper, IRoomRepository roomRepository,
-			IRoomTypeRepository roomTypeRepository)
+			IRoomTypeRepository roomTypeRepository, IHttpContextAccessor httpContextAccessor)
         {
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
@@ -102,22 +103,17 @@ namespace HotelApp.Application.Services.RoomTypeService
 				_unitOfWork.Repository<RoomType>().Update(oldRoomType);
 				await _unitOfWork.CommitAsync();
 
-				var roomsToUpdate = await _unitOfWork.Repository<Room>().GetAllAsync(r => r.RoomTypeId == roomTypeDTO.Id);
 
-				if (roomsToUpdate.Any())
-				{
-					foreach (var room in roomsToUpdate)
-					{
-						if (room.IsAffectedByRoomType)
-						{
-							room.PricePerNight = roomTypeDTO.PricePerNight;
-							room.MaxNumOfAdults = roomTypeDTO.MaxNumOfAdults;
-							room.MaxNumOfChildrens = roomTypeDTO.MaxNumOfChildrens;
-						}
-						_unitOfWork.Repository<Room>().Update(room);
-					}
-					await _unitOfWork.CommitAsync(skipAuditFields: true);
-				}
+				await _unitOfWork.Repository<Room>().BulkUpdateAsync(
+					 r => r.RoomTypeId == roomTypeDTO.Id && r.IsAffectedByRoomType,
+					 setters => setters
+						 .SetProperty(r => r.PricePerNight, roomTypeDTO.PricePerNight)
+						 .SetProperty(r => r.MaxNumOfAdults, roomTypeDTO.MaxNumOfAdults)
+						 .SetProperty(r => r.MaxNumOfChildrens, roomTypeDTO.MaxNumOfChildrens),
+					 skipAuditFields:true
+				 );
+
+
 
 				return ServiceResponse<EditRoomTypeDTO>.ResponseSuccess($"{oldRoomType.Name} Room type updated successfully.");
 			}

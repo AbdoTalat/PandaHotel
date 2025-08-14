@@ -57,7 +57,7 @@
 			<h5 class="panel-title">Room Types</h5>
 			
 			<div class="heading-elements">
-				@if ((await AuthorizationService.AuthorizeAsync(User, "RoomType.Add")).Succeeded)
+				@if (User.HasClaim("permission", "RoomType.Add"))
 				{
 					<button data-title="Add New Room Type" data-url="/RoomType/AddRoomType" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
 						<i class="icon-plus-circle2" style="font-size:21px; margin-right:0px; margin-top:3px"></i>
@@ -112,11 +112,11 @@
 							{
 								<a data-title="Room Type Details" data-url="" class="btnEditOpenModal">  <i class="icon-info22" style="font-size:20px; margin-right:8px"></i>  </a>
 							} *@
-							@if ((await AuthorizationService.AuthorizeAsync(User, "RoomType.Edit")).Succeeded)
+							@if (User.HasClaim("permission", "RoomType.Edit"))
 							{
 								<a data-title="Edit Room Type" data-url="/RoomType/EditRoomType/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
 							}
-							@if ((await AuthorizationService.AuthorizeAsync(User, "RoomType.Delete")).Succeeded)
+							@if (User.HasClaim("permission", "RoomType.Delete"))
 							{
 								@if (!item.IsActive)
 								{

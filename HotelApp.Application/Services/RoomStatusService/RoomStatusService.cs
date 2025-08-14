@@ -67,7 +67,8 @@ namespace HotelApp.Application.Services.RoomStatusService
         }
 		public async Task<ServiceResponse<EditRoomStatusDTO>> EditRoomStatusAsync(EditRoomStatusDTO roomStatusDTO)
         {
-            var OldRoomStatus = await _unitOfWork.Repository<RoomStatus>().GetByIdAsync(roomStatusDTO.Id);
+            var OldRoomStatus = await _unitOfWork.Repository<RoomStatus>()
+                .GetByIdAsync(roomStatusDTO.Id);
             if(OldRoomStatus == null)
             {
                 return ServiceResponse<EditRoomStatusDTO>.ResponseFailure("Room Status not found.");
@@ -87,5 +88,25 @@ namespace HotelApp.Application.Services.RoomStatusService
 				return ServiceResponse<EditRoomStatusDTO>.ResponseFailure(ex.Message);
 			}
         }
+
+        public async Task<ServiceResponse<object>> DeleteRoomStatusByIdAsync(int Id)
+        {
+            var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+                .IsExistsAsync(rs => rs.Id == Id);
+            if (!roomStatus)
+            {
+                return ServiceResponse<object>.ResponseFailure("not found.");
+            }
+            try
+            {
+                await _unitOfWork.Repository<RoomStatus>().DeleteByIdAsync(Id);
+
+                return ServiceResponse<object>.ResponseSuccess("Room status deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+				return ServiceResponse<object>.ResponseFailure(ex.Message);
+			}
+		}
 	}
 }

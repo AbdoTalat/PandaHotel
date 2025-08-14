@@ -1,8 +1,4 @@
-﻿@model AddRoomDTO
-@{
-	TempData["Title"] = "Add Room";
-	int BranchId = ViewBag.BranchId;
-}
+﻿@model EditRoomDTO
 
 <div class="page-header page-header-default">
 	<div class="page-header-content">
@@ -48,10 +44,10 @@
 </div>
 
 
- <div class="content">
-	 <div class="row">
-        <form asp-action="AddRoom" asp-controller="Room" method="post">
-            <input type="hidden" asp-for="BranchId" value="@BranchId" />
+<div class="content">
+	<div class="row">
+		<form asp-action="EditRoom" asp-controller="Room" asp-route-Id="@Model.Id" method="post">
+			<input type="hidden" asp-for="Id" value="@Model.Id" />
 			<div class="col-md-12">
 				<div class="panel panel-flat border-left-md border-left-teal">
 					<div class="panel-heading">
@@ -63,78 +59,32 @@
 					</div>
 
 					<div class="panel-body">
-
-
 						<fieldset class="step">
 
 							<div class="row">
 								<div class="col-md-12">
 									<legend class="text-semibold"> Room Fileds</legend>
 								</div>
-
-								<div class="col-md-12">
-									<div class="form-group">
-										<div class="radio">
-											<label>
-												<input type="radio" asp-for="AddManyRooms" id="singleRoomRadio" value="false" checked="checked">
-												Single Room
-											</label>
-										</div>
-										<div class="radio">
-											<label>
-												<input type="radio" asp-for="AddManyRooms" id="multipleRoomRadio" value="true">
-												Multiple Rooms
-											</label>
-										</div>
-										
-									</div>
-								</div>
 							</div>
 
 							<div class="row">
-                                <div id="singleRoomDiv" class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Room number <span class="text-danger">*</span></label>
+								<div id="singleRoomDiv" class="col-md-6">
+									<div class="form-group">
+										<label>Room number <span class="text-danger">*</span></label>
 										<input asp-for="RoomNumber" id="RoomNumber" class="form-control" placeholder="Room Number" required>
-                                        <span asp-validation-for="RoomNumber" class="text-danger validation-error-label"></span>
-                                    </div>
-                                </div>
-
-								<div id="manyRoomsDiv" class="col-md-6" style="display: none;">
-									<div class="row">
-										<div class="col-md-4">
-											<div class="form-group">
-												<label>Room Number Text</label>
-												<input asp-for="RoomNumberText" class="form-control" placeholder="e.g. A">
-												<span asp-validation-for="RoomNumberText" class="text-danger validation-error-label"></span>
-											</div>
-										</div>
-										<div class="col-md-4">
-											<div class="form-group">
-												<label>From</label>
-												<input asp-for="RoomNumberFrom" type="number" class="form-control" placeholder="1">
-												<span asp-validation-for="RoomNumberFrom" class="text-danger validation-error-label"></span>
-											</div>
-										</div>
-										<div class="col-md-4">
-											<div class="form-group">
-												<label>To</label>
-												<input asp-for="RoomNumberTo" type="number" class="form-control" placeholder="10">
-												<span asp-validation-for="RoomNumberTo" class="text-danger validation-error-label"></span>
-											</div>
-										</div>
+										<span asp-validation-for="RoomNumber" class="text-danger validation-error-label"></span>
 									</div>
 								</div>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Floor<span class="text-danger">*</span></label>
-                                        <select asp-for="FloorId" id="floorSelect" name="FloorId" class="form-control select" required data-placeholder="Select Floor">
-                                            <option></option>
-                                        </select>
-                                        <span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
-                                    </div>
-                                </div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Floor<span class="text-danger">*</span></label>
+										<select asp-for="FloorId" id="floorSelect" name="FloorId" class="form-control select" required data-placeholder="Select Floor">
+											<option></option>
+										</select>
+										<span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
+									</div>
+								</div>
 							</div>
 
 							<div class="row">
@@ -177,8 +127,8 @@
 										<label>
 											Max Childrens<span class="text-danger">*</span>
 
-											<a  data-popup="popover" data-content="Max num of childrens in the room" data-trigger="hover">
-                                                <i class="icon-info22"></i>
+											<a data-popup="popover" data-content="Max num of childrens in the room" data-trigger="hover">
+												<i class="icon-info22"></i>
 											</a>
 										</label>
 										<input asp-for="MaxNumOfChildrens" class="form-control" id="maxNumOfChildren" placeholder="Max Childrens" />
@@ -230,8 +180,8 @@
 													<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
 														<input type="checkbox" asp-for="IsAffectedByRoomType" class="switchery">
 														Is Affected by Room Type
-														<a data-popup="popover" data-content="When checked, this room’s settings follow its room type.Uncheck to manage independently."       
-														data-trigger="hover">
+														<a data-popup="popover" data-content="When checked, this room’s settings follow its room type.Uncheck to manage independently."
+														   data-trigger="hover">
 															<i class="icon-info22"></i>
 														</a>
 													</label>
@@ -255,15 +205,18 @@
 
 												@foreach (var item in ViewBag.Options)
 												{
+													var isChecked = Model.AssignOptions != null && Model.AssignOptions.Contains(item.Id) ? "checked" : "";
+
 													<div class="col-md-4">
 														<div class="checkbox">
 															<label class="checkbox-inline checkbox-left">
-																<input type="checkbox" name="SelectedOptions" value="@item.Id" class="styled">
+																<input type="checkbox" name="SelectedOptions" value="@item.Id" class="styled" @isChecked>
 																@item.Name
 															</label>
 														</div>
 													</div>
 												}
+
 											</div>
 										</div>
 									</div>
@@ -276,13 +229,13 @@
 
 				</div>
 			</div>
-		
+
 			<div class="text-center">
-            <a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Room"> Cancel</a>
-            <button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-plus2"></i> Add</button>
-        </div>
-        </form>
-	</div> 
+				<a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Room"> Cancel</a>
+				<button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-plus2"></i> Add</button>
+			</div>
+		</form>
+	</div>
 </div>
 
 
@@ -291,19 +244,21 @@
 
 @section Scripts {
 
-    @if (TempData["Error"] != null)
-    {
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: '@TempData["Error"]'
-            });
-        </script>
-    }
+	@if (TempData["Error"] != null)
+	{
+		<script>
+			Swal.fire({
+				icon: 'error',
+				title: 'Error',
+				text: '@TempData["Error"]'
+			});
+		</script>
+	}
 
 	<script>
 		$(document).ready(function () {
+			var selectedRoomTypeId = '@Model.RoomTypeId'; // Current room type from model
+
 			$.ajax({
 				url: '/RoomType/GetRoomTypesJson',
 				type: 'GET',
@@ -314,7 +269,8 @@
 					select.append('<option value="">Select Room Type</option>');
 
 					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.typeName + '</option>');
+						var isSelected = item.id == selectedRoomTypeId ? ' selected' : '';
+						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.typeName + '</option>');
 					});
 				},
 				error: function () {
@@ -324,6 +280,8 @@
 		});
 
 		$(document).ready(function () {
+			var selectedFloorId = '@Model.FloorId'; // Inject the existing floor ID from the model
+
 			$.ajax({
 				url: '/Floor/GetFloorsJson',
 				type: 'GET',
@@ -334,16 +292,19 @@
 					select.append('<option value="">Select Floor</option>');
 
 					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.number + '</option>');
+						var isSelected = item.id == selectedFloorId ? ' selected' : '';
+						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.number + '</option>');
 					});
 				},
 				error: function () {
-					console.error('Failed to load room types.');
+					console.error('Failed to load floors.');
 				}
 			});
 		});
 
 		$(document).ready(function () {
+			var selectedStatusId = '@Model.RoomStatusId'; // Current status from model
+
 			$.ajax({
 				url: '/RoomStatus/GetRoomStatusJson',
 				type: 'GET',
@@ -354,15 +315,15 @@
 					select.append('<option value="">Select Status</option>');
 
 					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.name + '</option>');
+						var isSelected = item.id == selectedStatusId ? ' selected' : '';
+						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.name + '</option>');
 					});
 				},
 				error: function () {
-					console.error('Failed to load room types.');
+					console.error('Failed to load statuses.');
 				}
 			});
 		});
-
 
 	</script>
 
@@ -373,7 +334,7 @@
 
 				if (roomTypeId) {
 					// Show loading indicator (optional)
-					$('#roomPrice, #maxNumOfAdults, #maxNumOfChildren').val('Loading...');
+					//$('#roomPrice, #maxNumOfAdults, #maxNumOfChildren').val('Loading...');
 
 					$.get('/RoomType/GetRoomTypeData', { roomTypeId: roomTypeId }, function (response) {
 						if (response.success) {
@@ -401,34 +362,31 @@
 		});
 	</script>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			const singleRoomRadio = document.getElementById("singleRoomRadio");
-			const multipleRoomRadio = document.getElementById("multipleRoomRadio");
-			const singleRoomDiv = document.getElementById("singleRoomDiv");
-			const manyRoomsDiv = document.getElementById("manyRoomsDiv");
-			const roomNumberInput = document.getElementById("RoomNumber");
-
-			function toggleRoomUI() {
-				if (multipleRoomRadio.checked) {
-					singleRoomDiv.style.display = "none";
-					manyRoomsDiv.style.display = "flex";
-					roomNumberInput.removeAttribute("required");
-				} else {
-					singleRoomDiv.style.display = "block";
-					manyRoomsDiv.style.display = "none";
-					roomNumberInput.setAttribute("required", "required");
-				}
-			}
-
-			// Initialize on load
-			toggleRoomUI();
-
-			// Listen for changes
-			singleRoomRadio.addEventListener("change", toggleRoomUI);
-			multipleRoomRadio.addEventListener("change", toggleRoomUI);
-		});
-	</script>
+    <script>
+        $(document).ready(function () {
+            $('#roomTypeSelect').change(function () {
+                var roomTypeId = $(this).val();
+                if (roomTypeId) {
+                    $.get('/RoomType/GetRoomTypeData', { roomTypeId: roomTypeId }, function (response) {
+                        if (response.success) {
+                            $('#roomPrice').val(response.price);
+                            $('#maxNumOfAdults').val(response.maxAdults);
+                            $('#maxNumOfChildren').val(response.maxChildren);
+                        } else {
+                            alert(response.message);
+                            $('#roomPrice').val('');
+                            $('#maxNumOfAdults').val('');
+                            $('#maxNumOfChildren').val('');
+                        }
+                    });
+                } else {
+                    $('#roomPrice').val('');
+                    $('#maxNumOfAdults').val('');
+                    $('#maxNumOfChildren').val('');
+                }
+            });
+        });
+    </script>
 
 
 	@await Html.PartialAsync("_ValidationScriptsPartial")

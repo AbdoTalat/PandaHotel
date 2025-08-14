@@ -7,48 +7,54 @@ using static HotelApp.UI.Controllers.AccountController;
 
 namespace HotelApp.UI.DependencyInjectionExtentions
 {
-    public static class AuthenticationAndSessionExtension
-    {
-        public static IServiceCollection AddAuthenticationAndSessionDI(this IServiceCollection services)
-        {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                   options.AccessDeniedPath = "/Home/NoPermission";
-                });
+	public static class AuthenticationAndSessionExtension
+	{
+		public static IServiceCollection AddAuthenticationAndSessionDI(this IServiceCollection services)
+		{
+			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie(options =>
+				{
+					options.AccessDeniedPath = "/Home/NoPermission";
+				});
 
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            });
+			services.AddControllers().AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+			});
 
-            services.AddDistributedMemoryCache(); // Required for session
+			services.AddDistributedMemoryCache();
 
-            services.Configure<SecurityStampValidatorOptions>(options =>
-            {
-                options.ValidationInterval = TimeSpan.FromHours(1); // prevent reloading user/claims on every request
-            });
+			// Claims refresh every 1 hour
+			services.Configure<SecurityStampValidatorOptions>(options =>
+			{
+				options.ValidationInterval = TimeSpan.FromHours(1);
+			});
 
-            services.AddDistributedMemoryCache();
-            
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromHours(1); 
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
+			services.AddSession(options =>
+			{
+				options.IdleTimeout = TimeSpan.FromHours(1);
+				options.Cookie.HttpOnly = true;
+				options.Cookie.IsEssential = true;
+			});
 
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                options.SlidingExpiration = true; 
-                options.LoginPath = "/Account/Login";
-            });
+			services.ConfigureApplicationCookie(options =>
+			{
+				options.LoginPath = "/Account/Login";
+				options.AccessDeniedPath = "/Account/AccessDenied";
+
+				// Absolute expiration for RememberMe
+				options.ExpireTimeSpan = TimeSpan.FromDays(30);
+				options.SlidingExpiration = true;
+
+				// Security
+				options.Cookie.HttpOnly = true;
+				options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Only over HTTPS
+			});
 
 			services.AddScoped<IUserClaimsPrincipalFactory<User>, CustomClaimsPrincipalFactory>();
 
-
 			return services;
-        }
-    }
+		}
+	}
+
 }

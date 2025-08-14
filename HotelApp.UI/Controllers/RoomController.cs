@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Application.Services.OptionService;
 using Microsoft.EntityFrameworkCore;
+using HotelApp.Application;
+using BenchmarkDotNet.Attributes;
+using HotelApp.Domain.Entities;
 //using HotelApp.UI.Helper;
 
 namespace HotelApp.UI.Controllers
@@ -58,45 +61,20 @@ namespace HotelApp.UI.Controllers
 
 			var result = rooms.Select(item => new
 			{
-				Id = item.Id,
-				RoomNumber = item.RoomNumber,
-				Floor = item.Floor,
-				TypeName = item.TypeName,
-				MaxNumOfAdults = item.MaxNumOfAdults,
-				MaxNumOfChildren = item.MaxNumOfChildren,
-				PricePerNight = item.PricePerNight,
-                roomStatus = item.RoomStatusName,     
-                roomStatusColor = item.RoomStatusColor,
-                CanViewRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.View").Result.Succeeded),
-				CanEditRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.Edit").Result.Succeeded),
-				CanDeleteRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.Delete").Result.Succeeded && !item.IsActive)
-			});
+				id = item.Id,
+				roomNumber = item.RoomNumber,
+				floor = item.Floor,
+				typeName = item.TypeName,
+				maxNumOfAdults = item.MaxNumOfAdults,
+				maxNumOfChildren = item.MaxNumOfChildren,
+				roomStatus = item.RoomStatusName,
+				isActive = item.IsActive,
+				roomStatusColor = item.RoomStatusColor
+			}).ToList();
 
 			return Json(new { success = true, data = result });
 		}
 
-		public async Task<IActionResult> GetRoomsForRefresh()
-		{
-			var rooms = await _roomService.GetAllRoomsAsync();
-
-			var result = rooms.Select(item => new
-			{
-				Id = item.Id,
-				RoomNumber = item.RoomNumber,
-				Floor = item.Floor,
-				TypeName = item.TypeName,
-				MaxNumOfAdults = item.MaxNumOfAdults,
-				MaxNumOfChildren = item.MaxNumOfChildren,
-				PricePerNight = item.PricePerNight,
-                roomStatus = item.RoomStatusName,            
-                roomStatusColor = item.RoomStatusColor,
-                CanViewRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.View").Result.Succeeded),
-				CanEditRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.Edit").Result.Succeeded),
-				CanDeleteRoom = (User != null) && (_authorizationService.AuthorizeAsync(User, "Room.Delete").Result.Succeeded && !item.IsActive)
-			});
-
-			return Json(new { success = true, data = result });
-		}
 
 
 		[HttpGet]
@@ -110,16 +88,21 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = ("Room.Add"))]
-        public async Task<IActionResult> AddRoom(AddRoomDTO model)
+		public async Task<IActionResult> AddRoom(AddRoomDTO model)
         {
 			if (!ModelState.IsValid)
 			{
 				ViewBag.Options = await _optionService.GetAllOptionsAsync();
 				return View(model);
 			}
-			var result = await _roomService.AddRoomAsync(model);
+
+			var result = model.AddManyRooms 
+				? await _roomService.AddManyRoomsAsync(model)
+				: await _roomService.AddRoomAsync(model);
+
 			if (result.Success)
 			{
+				TempData["Success"] = result.Message;
 				return RedirectToAction("Index");
 			}
 
@@ -135,7 +118,7 @@ namespace HotelApp.UI.Controllers
 			var room = await _roomService.GetRoomToEditByIdAsync(Id);
 			ViewBag.Options = await _optionService.GetAllOptionsAsync();
 
-			return PartialView("_EditRoom" ,room);
+			return View(room);
 		}
 
 		[HttpPost]
@@ -146,12 +129,19 @@ namespace HotelApp.UI.Controllers
 			if (!ModelState.IsValid)
 			{
 				ViewBag.Options = await _optionService.GetAllOptionsAsync();
-				return PartialView("_EditRoom" , model);
+				return View(model);
 			}
             var result = await _roomService.EditRoomAsync(model);
-            
-            return Json(new { success = result.Success, message = result.Message });
-			
+			if(result.Success)
+			{
+				TempData["Success"] = result.Message;
+				return RedirectToAction("Index");
+			}
+
+			TempData["Error"] = result.Message;
+			ViewBag.Options = await _optionService.GetAllOptionsAsync();
+			return View(model);
+
 		}
 
         [HttpGet]

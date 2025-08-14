@@ -56,7 +56,7 @@
         <div class="panel-heading">
             <h5 class="panel-title">Companies</h5>
             <div class="heading-elements" style=" margin-right:0px">
-                @if ((await AuthorizationService.AuthorizeAsync(User, "Company.Add")).Succeeded)
+                @if (User.HasClaim("permission", "Company.Add"))
                 {
                     <button data-title="Add New Company" data-url="/Company/AddCompany" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
                         <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -97,11 +97,11 @@
                         <td>@item.Phone</td>
                         <td>@item.Address</td>
                         <td>
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Company.Edit")).Succeeded)
+                            @if (User.HasClaim("permission", "Company.Edit"))
                             {
                                 <a data-title="Edit Floor" data-url="/Company/EditCompany/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Company.Delete")).Succeeded @* && !item.IsActive *@)
+                            @if (User.HasClaim("permission", "Company.Delete") @* && !item.IsActive *@)
                             {
                                 <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
                             }

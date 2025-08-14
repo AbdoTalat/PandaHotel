@@ -17,5 +17,6 @@ namespace HotelApp.Application.Services.RoomStatusService
 		Task<EditRoomStatusDTO?> GetRoomStatusToEditByIdAsync(int Id);
         Task<ServiceResponse<AddRoomStatusDTO>> AddRoomStatusAsync(AddRoomStatusDTO roomStatusDTO);
         Task<ServiceResponse<EditRoomStatusDTO>> EditRoomStatusAsync(EditRoomStatusDTO roomStatusDTO);
+        Task<ServiceResponse<object>> DeleteRoomStatusByIdAsync(int Id);
     }
 }

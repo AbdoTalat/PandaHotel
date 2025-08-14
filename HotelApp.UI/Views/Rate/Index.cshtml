@@ -55,7 +55,7 @@
         <div class="panel-heading">
             <h5 class="panel-title">Rates</h5>
             <div class="heading-elements" style=" margin-right:0px">
-                @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Add")).Succeeded)
+                @if (User.HasClaim("permission", "Rate.Add"))
                 {
                     <a asp-action="AddRate" asp-controller="Rate" type="button" class="btn bg-teal-400 btn-md">
                         <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
@@ -117,11 +117,11 @@
                             <td><span class="label label-rounded label-danger">Not Active</span></td>
                         }
                         <td>
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Edit")).Succeeded)
+                            @if (User.HasClaim("permission", "Option.Edit"))
                             {
                                 <a asp-action="EditRate" asp-controller="Rate" asp-route-Id="@item.Id" class="text-teal-600 edit-rate-btn"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if ((await AuthorizationService.AuthorizeAsync(User, "Rate.Delete")).Succeeded)
+                            @if (User.HasClaim("permission", "Option.Delete"))
                             {
                                 <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
                             }

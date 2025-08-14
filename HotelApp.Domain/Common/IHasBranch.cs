@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Domain.Common
 {
-    public interface IBranchEntity
+    public interface IHasBranch
     {
         int BranchId { get; set; }
     }

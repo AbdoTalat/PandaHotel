@@ -92,6 +92,7 @@ namespace HotelApp.UI.Controllers
 
 
 
+		[HttpGet]
 		public async Task<JsonResult> GetRoomTypeData(int roomTypeId)
 		{
 			var roomType = await _roomTypeService.GetRoomTypeByIdAsync(roomTypeId);
@@ -109,5 +110,6 @@ namespace HotelApp.UI.Controllers
 				maxChildren = roomType.MaxNumOfChildrens
 			});
 		}
+
 	}
 }

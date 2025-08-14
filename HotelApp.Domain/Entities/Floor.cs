@@ -7,7 +7,7 @@ using HotelApp.Domain.Common;
 
 namespace HotelApp.Domain.Entities
 {
-    public class Floor : BaseEntity, IBranchEntity
+    public class Floor : BaseEntity, IHasBranch
     {
         public int Id { get; set; }
         public int Number { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Domain.Entities
 {
-    public class Option : BaseEntity
+    public class Option : BaseEntity, IHasBranch
     {
         public int Id { get; set; }
         public string Name { get; set; }

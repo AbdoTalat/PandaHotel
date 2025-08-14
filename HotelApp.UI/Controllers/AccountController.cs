@@ -16,66 +16,66 @@ using System.ComponentModel.DataAnnotations;
 namespace HotelApp.UI.Controllers
 {
 
-    public class AccountController : Controller
+	public class AccountController : Controller
 	{
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+		private readonly UserManager<User> _userManager;
+		private readonly SignInManager<User> _signInManager;
 		private readonly IBranchService _branchService;
 
-		public AccountController(UserManager<User> userManager, 
+		public AccountController(UserManager<User> userManager,
 			SignInManager<User> signInManager, IBranchService branchService)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
+		{
+			_userManager = userManager;
+			_signInManager = signInManager;
 			_branchService = branchService;
 		}
-        [HttpGet]
+		[HttpGet]
 		public IActionResult Login()
 		{
 			return View();
 		}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginDTO model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.email);
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Login(LoginDTO model)
+		{
+			if (!ModelState.IsValid)
+				return View(model);
 
-            if (user == null)
-            {
-                ModelState.AddModelError("email", "This Email Does Not Exist.");
-                return View(model);
-            }
+			var user = await _userManager.FindByEmailAsync(model.email);
 
-            if (!await _userManager.CheckPasswordAsync(user, model.password))
-            {
-                ModelState.AddModelError("password", "Invalid Password!");
-                return View(model);
-            }
+			if (user == null)
+			{
+				ModelState.AddModelError("email", "This Email Does Not Exist.");
+				return View(model);
+			}
 
-            if (!user.isActive)
-            {
-                TempData["NotActive"] = "This user account is not active.";
-                return View(model);
-            }
+			if (!await _userManager.CheckPasswordAsync(user, model.password))
+			{
+				ModelState.AddModelError("password", "Invalid Password!");
+				return View(model);
+			}
+
+			if (!user.isActive)
+			{
+				TempData["NotActive"] = "This user account is not active.";
+				return View(model);
+			}
 
 
 			await _signInManager.SignInAsync(user, isPersistent: model.rememberMe); // ← this adds all claims via your factory
 
-            return RedirectToAction("Index", "Home");
-        }
+			return RedirectToAction("Index", "Home");
+		}
 
 
-        [Authorize]
+		[Authorize]
 		public async Task<IActionResult> LogOut()
 		{
 			await _signInManager.SignOutAsync();
 			return RedirectToAction("Login", "Account");
 		}
-
 
 	}
 }
