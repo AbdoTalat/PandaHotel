@@ -49,58 +49,13 @@
 
 
 
-
-/* Apply error styling to all input, select, and textarea fields */
-/*input.input-validation-error,
-select.input-validation-error,
-textarea.input-validation-error {
-    border: 1.5px solid #e74c3c !important;
-    background-color: #fff !important;
-    color: #e74c3c !important;*/ /* Make input text red */
-/*}*/
-
-    /* Change placeholder text to red when validation fails */
-    /*input.input-validation-error::placeholder,
-    textarea.input-validation-error::placeholder {
-        color: #e74c3c !important;
-        opacity: 1;
-    }*/
-
-/* Ensure form group has relative positioning */
-/*.form-group {
-    position: relative;
-}*/
-
-/* Validation badge */
-/*.validation-badge {
-    background-color: #e74c3c;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 5px 5px 0 0;
-    position: absolute;
-    top: 3px;*/ /* Adjust to prevent overlap */
-    /*right: 5px;
-    z-index: 10;
-    display: none;*/ /* Hide by default */
-/*}*/
-
-/* Show badge correctly for inputs, selects, and textareas */
-/*.form-group .input-validation-error ~ .validation-badge,
-.form-group select.input-validation-error ~ .validation-badge,
-.form-group textarea.input-validation-error ~ .validation-badge {
-    display: inline-block;
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-    */
-
-	.checkbox-container {
-		display: flex; /* Align checkbox and text in a row */
-align-items: center; /* Align vertically */
-gap: 8px; /* Space between checkbox and text */
-}
-
+/* hidden real input */
 .checkbox-input {
     opacity: 0;
     position: absolute;
@@ -108,25 +63,26 @@ gap: 8px; /* Space between checkbox and text */
     height: 0;
 }
 
+/* custom square */
 .checkbox-custom {
     width: 20px;
     height: 20px;
     background-color: #fff;
     border-radius: 2px;
+    border: 1.5px solid #00897B;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    border: solid #00897B;
-    border-width: 1.5px;
+    cursor: pointer;
     position: relative;
-    cursor: pointer; /* Only applied to the checkbox */
 }
 
-.checkbox-container span {
-    cursor: pointer; /* Apply pointer only to the text */
+/* label text */
+.checkbox-label {
+    cursor: pointer;
 }
 
+/* checked state */
 .checkbox-input:checked + .checkbox-custom {
     background-color: #00897B;
 }
@@ -153,58 +109,4 @@ gap: 8px; /* Space between checkbox and text */
 
 
 
-
-
-
-.checkbox-container {
-    display: flex;
-    */ /* Align checkbox and text in a row */
-    /*align-items: center;*/ /* Align vertically */
-    /*gap: 8px;*/ /* Space between checkbox and text */
-    /*cursor: pointer;
-}
-
-.checkbox-input {
-    opacity: 0;
-    position: absolute;
-    width: 0;
-    height: 0;
-}
-
-.checkbox-custom {
-    width: 25px;
-    height: 25px;
-    background-color: #fff;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    border: solid #26A69A;
-    border-width: 2px;
-    position: relative;*/ /* Ensure checkmark aligns correctly */
-    /*}
-
-.checkbox-input:checked + .checkbox-custom {
-    background-color: #26A69A;*/
-    /* box-shadow: 0 1px 2px #00897B; */
-    /*}
-
-.checkbox-custom::after {
-    content: "";
-    width: 7px;
-    height: 15px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
-    position: absolute;
-    bottom: 4px;*/ /* Adjusted for better centering */
-    /*left: 7px;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.checkbox-input:checked + .checkbox-custom::after {
-    opacity: 1;
-}*/
 

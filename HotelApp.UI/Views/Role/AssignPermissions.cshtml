@@ -1,0 +1,156 @@
+﻿@model AssignPermissionDTO
+@{
+    // Define entity icons
+    var entityIcons = new Dictionary<string, string>
+    {
+        { "User", "icon-user" },
+        { "Role", "icon-cogs" },
+        { "Branch", "icon-location4" },
+        { "Room", "icon-bed2" },
+        { "RoomType", "icon-bed2" },
+        { "Guest", "icon-users2" },
+        { "Reservation", "icon-calendar" },
+        { "Floor", "icon-office "}
+    };
+
+    TempData["Title"] = "Assing Permission";
+}
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Assign Permissions</span></h4>
+        </div>
+
+        <div class="heading-elements">
+            <div class="heading-btn-group">
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li><a asp-action="Index" asp-controller="Role">Roles</a></li>
+            <li class="active">Assign Permissions</li>
+        </ul>
+
+        <ul class="breadcrumb-elements">
+            <li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-gear position-left"></i>
+                    Settings
+                    <span class="caret"></span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                    <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                    <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="content">
+    <div class="row">
+        <form asp-action="AssignPermissions" asp-controller="Role" asp-route-Id="@Model.Id" method="post">
+            <div class="col-md-12">
+                <div class="panel panel-flat border-left-md border-left-teal">
+                    <div class="panel-heading">
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li><a data-action="collapse" class=""></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <legend class="text-semibold"><i class="icon-user-lock"></i> Edit Role <span class="label bg-teal-300 label-rounded" style="font-size:15px">@Model.RoleName</span> Permissions</legend>
+                        </div>
+
+                        @if (!Model.IsBasic)
+                        {
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="checkbox-container">
+                                        <input type="checkbox" id="selectAll" class="checkbox-input" />
+                                        <label for="selectAll" class="checkbox-custom"></label>
+                                        <label for="selectAll" class="checkbox-label" style="cursor:pointer">Select All</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        }
+                        <br />
+                        <br />
+
+                        @foreach (var group in Model.PermissionGroups)
+                        {
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h5> @group.Key</h5>
+                                </div>
+                                @foreach (var perm in group.Value)
+                                {
+                                    var checkboxId = $"perm_{perm.Value.Replace(" ", "_")}";
+                                    <div class="col-md-2">
+                                        <div class="checkbox-container">
+                                            <input type="checkbox"
+                                                   id="@checkboxId"
+                                                   name="permissionStrings"
+                                                   value="@perm.Value"
+                                                   class="checkbox-input"
+                                            @(perm.IsAssigned ? "checked" : "")
+                                            @(Model.IsBasic ? "disabled" : "") />
+
+                                            <label for="@checkboxId" class="checkbox-custom"></label>
+                                            <label for="@checkboxId" class="checkbox-label" style="cursor:pointer">@perm.Value</label>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Role">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg" @(Model.IsBasic ? "disabled" : "")>
+                    <i class="icon-checkmark4"></i> Save
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#selectAll").change(function () {
+                let isChecked = this.checked;
+                $(".checkbox-input").prop("checked", isChecked);
+            });
+
+            $(".checkbox-input").change(function () {
+                let allChecked = $(".checkbox-input").length === $(".checkbox-input:checked").length;
+                $("#selectAll").prop("checked", allChecked);
+            });
+        });
+    </script>
+
+    @* @await Html.PartialAsync("_ValidationScriptsPartial"); *@
+}

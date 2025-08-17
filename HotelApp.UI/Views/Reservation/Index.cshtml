@@ -1,6 +1,5 @@
 ﻿@model IEnumerable<GetAllReservationsDTO>
 @{
-	int rowNumber = 1;
 	TempData["Title"] = "Reservations";
 }
 
@@ -97,7 +96,7 @@
 				@foreach (var item in Model)
 				{
 					<tr id="item-@item.Id">
-						<td>@rowNumber</td>
+						<td><a>@item.Id</a></td>
 						<td>@item.PrimaryGuestName</td>
 						<td>@item.CheckInDate.ToShortDateString()</td>
 						<td>@item.CheckOutDate.ToShortDateString()</td>
@@ -119,7 +118,6 @@
 							
 						</td>
 					</tr>
-					rowNumber++;
 				}
 			</tbody>
 		</table>

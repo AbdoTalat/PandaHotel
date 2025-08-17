@@ -110,13 +110,10 @@
 							<td>
 							@if (User.HasClaim("permission", "Role.Edit"))
 							{
-								<a data-title="Edit Role Permissions"
-								data-popup="popover" 
-								title="Assign Permissions" 
-								data-trigger="hover"
-								data-content="" 
-								   data-role-id="@item.Id"
-								   class="text-primary-600 btnEditRoleOpenModal">
+								<a data-popup="popover" title="Assign Permissions" 
+								data-trigger="hover" data-content=""
+								   asp-action="AssignPermissions" asp-controller="Role" asp-route-Id="@item.Id"
+								   class="text-primary-600">
 									<i class="icon-cog7" style="font-size:20px; margin-right:8px"></i>
 								</a>
 

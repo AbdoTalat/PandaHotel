@@ -102,6 +102,14 @@ namespace HotelApp.Application.Services.RoomService
         }
 		public async Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto)
 		{
+            if(dto.RoomNumberTo > 100)
+            {
+                return ServiceResponse<AddRoomDTO>.ResponseFailure("Can't add more than 100 rooms in one operation.");
+            }
+			if (dto.RoomNumberFrom < 1 || dto.RoomNumberTo < 1)
+			{
+				return ServiceResponse<AddRoomDTO>.ResponseFailure("Numbers Must be positive.");
+			}
 			try
 			{
 				var roomsToAdd = new List<Room>();
@@ -122,9 +130,7 @@ namespace HotelApp.Application.Services.RoomService
 
 					var room = new Room
 					{
-						RoomNumber = string.IsNullOrEmpty(dto.RoomNumberText) 
-                        ? i.ToString()
-                        : $"{dto.RoomNumberText}{i}",
+						RoomNumber = roomNumber,
 						BranchId = dto.BranchId,
 						Description = dto.Description,
 						FloorId = dto.FloorId,

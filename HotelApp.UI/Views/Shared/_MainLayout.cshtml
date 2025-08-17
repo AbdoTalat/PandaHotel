@@ -461,8 +461,8 @@
 											}
 											@if (User.HasClaim("permission", "Role.View"))
 											{
-												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Role" && ViewContext.RouteData.Values["action"]?.ToString() == "GetRoles" ? "active" : "")">
-													<a asp-action="GetRoles" asp-controller="Role"><i class="icon-cog52"></i> Roles</a>
+												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Role" ? "active" : "")">
+													<a asp-action="Index" asp-controller="Role"><i class="icon-cog52"></i> Roles</a>
 												</li>
 											}
 										</ul>
@@ -503,7 +503,7 @@
 									</li>
 								}
 
-								@if (User.HasClaim("permission", "Reservation.View"))
+								@if (User.HasClaim("permission", "Reservation.View") || User.HasClaim("Permission","Reservation.Add"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Reservation") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-file-spreadsheet2"></i> <span>Reservation Management</span></a>
@@ -511,13 +511,15 @@
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
 												<a asp-action="Index" asp-controller="Reservation"><i class="icon-calendar"></i> Reservations</a>
 											</li>
+											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "AddReservation" ? "active" : "")">
+												<a asp-action="AddReservation" asp-controller="Reservation"><i class="icon-file-plus2"></i> Add Reservation</a>
+											</li>
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "Reservation" ? "active" : "")">
 												<a href="#"><i class="icon-list-unordered" style="font-size:13px"></i> More</a>
 											</li>
 										</ul>
 									</li>
 								}
-
 								@if (User.HasClaim("permission", "Branch.View") || User.HasClaim("permission", "Floor.View") || User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") || User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Branch") == true ? "active navigation-open" : "")">

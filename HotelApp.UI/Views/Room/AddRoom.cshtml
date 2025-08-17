@@ -74,6 +74,17 @@
 
 								<div class="col-md-12">
 									<div class="form-group">
+										<label class="radio-inline">
+											<input type="radio" asp-for="AddManyRooms" id="singleRoomRadio" value="false" checked="checked">
+											Single Room
+										</label>
+
+										<label class="radio-inline">
+											<input type="radio" asp-for="AddManyRooms" id="multipleRoomRadio" value="true">
+											Multiple Rooms
+										</label>
+									</div>
+									@* <div class="form-group">
 										<div class="radio">
 											<label>
 												<input type="radio" asp-for="AddManyRooms" id="singleRoomRadio" value="false" checked="checked">
@@ -87,7 +98,7 @@
 											</label>
 										</div>
 										
-									</div>
+									</div> *@
 								</div>
 							</div>
 
@@ -112,14 +123,14 @@
 										<div class="col-md-4">
 											<div class="form-group">
 												<label>From</label>
-												<input asp-for="RoomNumberFrom" type="number" class="form-control" placeholder="1">
+												<input asp-for="RoomNumberFrom" min="1" type="number" class="form-control" placeholder="1">
 												<span asp-validation-for="RoomNumberFrom" class="text-danger validation-error-label"></span>
 											</div>
 										</div>
 										<div class="col-md-4">
 											<div class="form-group">
 												<label>To</label>
-												<input asp-for="RoomNumberTo" type="number" class="form-control" placeholder="10">
+												<input asp-for="RoomNumberTo" max="100" type="number" class="form-control" placeholder="10">
 												<span asp-validation-for="RoomNumberTo" class="text-danger validation-error-label"></span>
 											</div>
 										</div>

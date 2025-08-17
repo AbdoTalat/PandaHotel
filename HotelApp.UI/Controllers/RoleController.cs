@@ -31,7 +31,7 @@ namespace HotelApp.UI.Controllers
         #region Roles
 
         [Authorize(Policy = "Role.View")]
-        public async Task<IActionResult> GetRoles()
+        public async Task<IActionResult> Index()
         {
             var roles = await _roleService.GetRolesAsync();
 
@@ -170,30 +170,36 @@ namespace HotelApp.UI.Controllers
         //}
         [HttpGet]
         [Authorize(Policy = "Role.Edit")]
-        public async Task<IActionResult> AssignPermissions(int id)
+        public async Task<IActionResult> AssignPermissions(int Id)
         {
-            var role = await _roleService.GetRoleByIdAsync(id);
+            var role = await _roleService.GetRoleByIdAsync(Id);
             if (role == null)
                 return NotFound();
 
-            var dto = await _roleService.GetAssignPermissionsDTOAsync(id);
-            return PartialView("_AssignPermissions", dto);
+            var dto = await _roleService.GetAssignPermissionsDTOAsync(Id);
+            return View(dto);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Role.Edit")]
-        public async Task<IActionResult> AssignPermissions(int roleId, List<string> permissionStrings)
+        public async Task<IActionResult> AssignPermissions(int Id, List<string> permissionStrings)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data.");
+            {
+                return View();
+            }
 
-            var result = await _roleService.AssignPermissionsAsync(roleId, permissionStrings);
+            var result = await _roleService.AssignPermissionsAsync(Id, permissionStrings);
 
             if (result.Success)
-                return Json(new { success = true, message = result.Message });
+            {
+                TempData["Success"] = result.Message;
+                return RedirectToAction("Index");
+            }
 
-            return Json(new { success = false, message = result.Message });
+            TempData["Error"] = result.Message;
+            return View();
         }
 
 
