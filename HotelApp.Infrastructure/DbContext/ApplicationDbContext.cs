@@ -74,7 +74,7 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<RoomStatus> RoomStatuses { get; set; }
 		public DbSet<Guest> Guests { get; set; }
 		public DbSet<Reservation> Reservations { get; set; }
-		public DbSet<GuestReservation> guestReservations { get; set; }
+		public DbSet<GuestReservation> GuestReservations { get; set; }
 		public DbSet<UserBranch> UserBranches { get; set; }
 		public DbSet<Floor> Floors { get; set; }
 		public DbSet<Option> Options { get; set; }
@@ -87,6 +87,7 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<ReservationRoomType> ReservationRoomTypes { get; set; }
 		public DbSet<SystemSetting> SystemSettings { get; set; }
 		public DbSet<Company> Companies { get; set; }
+		public DbSet<ProofType> ProofTypes { get; set; }
         #endregion
 
 
@@ -143,6 +144,7 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new ReservationRoomTypeConfiguration());
 			builder.ApplyConfiguration(new SystemSettingConfiguration());
 			builder.ApplyConfiguration(new CompanyConfiguration());
+			builder.ApplyConfiguration(new ProofTypeConfiguration());
 			
 
 		}

@@ -24,7 +24,6 @@ namespace HotelApp.Domain.Entities
 
 		public bool IsConfirmed { get; set; }
 		public bool IsPending { get; set; }
-		public bool IsStarted { get; set; }
 		public bool IsCheckedIn { get; set; }
 		public bool IsCheckedOut { get; set; }
 		public bool IsClosed { get; set; }

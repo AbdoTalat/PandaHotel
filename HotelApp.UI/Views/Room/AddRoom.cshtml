@@ -140,9 +140,11 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Floor<span class="text-danger">*</span></label>
-                                        <select asp-for="FloorId" id="floorSelect" name="FloorId" class="form-control select" required data-placeholder="Select Floor">
-                                            <option></option>
-                                        </select>
+										<select asp-for="FloorId" id="floorSelect" required data-placeholder="Choose Floor"
+												class="form-control select"
+												data-selected="@Model?.FloorId">
+											<option value=""></option>
+										</select>
                                         <span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
                                     </div>
                                 </div>
@@ -152,7 +154,9 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Status<span class="text-danger">*</span></label>
-										<select asp-for="RoomStatusId" id="StatusSelect" name="RoomStatusId" class="form-control select" required data-placeholder="Choose Status">
+										<select asp-for="RoomStatusId" id="statusSelect" required data-placeholder="Choose Room Status"
+												class="form-control select"
+												data-selected="@Model?.RoomStatusId">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomStatusId" class="text-danger validation-error-label"></span>
@@ -161,7 +165,13 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Type<span class="text-danger">*</span></label>
-										<select asp-for="RoomTypeId" id="roomTypeSelect" name="RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
+										@* <select asp-for="RoomTypeId" id="roomTypeSelect" name="RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
+											<option value=""></option>
+										</select> *@
+
+
+										<select asp-for="RoomTypeId" id="roomTypeSelect" class="form-control select" required data-placeholder="Choose Room Type"
+												data-selected="@Model?.RoomTypeId">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomTypeId" class="text-danger validation-error-label"></span>
@@ -209,7 +219,7 @@
 
 							<div class="row">
 								<div class="col-md-12">
-									<label>Description<span class="text-danger">*</span></label>
+									<label>Description</label>
 									<textarea asp-for="Description" class="form-control" placeholder="Room Description"></textarea>
 									<span class="text-danger validation-error-label" asp-validation-for="Description"></span>
 								</div>
@@ -230,26 +240,32 @@
 											<h6 class="panel-title">Setup</h6>
 										</div>
 										<div class="panel-body">
-											<div class="form-group ">
-												<div class="checkbox">
-													<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-														<input type="checkbox" asp-for="IsActive" class="switchery">
-														Is Active
-													</label>
-												</div>
-												<div class="checkbox">
-													<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-														<input type="checkbox" asp-for="IsAffectedByRoomType" class="switchery">
-														Is Affected by Room Type
-														<a data-popup="popover" data-content="When checked, this room’s settings follow its room type.Uncheck to manage independently."       
-														data-trigger="hover">
-															<i class="icon-info22"></i>
-														</a>
-													</label>
+											<div class="row">
+												<div class="col-md-12">
+													<div class="form-group ">
+														<div class="checkbox">
+															<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+																<input type="checkbox" asp-for="IsActive" class="switchery" checked>
+																Is Active
+															</label>
+														</div>
+														<div class="checkbox">
+															<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+																<input type="checkbox" asp-for="IsAffectedByRoomType" class="switchery" checked>
+																Is Affected by Room Type
+																<a data-popup="popover"
+																   data-content="When checked, this room’s settings follow its room type.Uncheck to manage independently."
+																   data-trigger="hover">
+																	<i class="icon-info22"></i>
+																</a>
+															</label>
 
-												</div>
+														</div>
 
+													</div>
+												</div>
 											</div>
+											
 										</div>
 									</div>
 								</div>
@@ -312,69 +328,12 @@
             });
         </script>
     }
-
 	<script>
 		$(document).ready(function () {
-			$.ajax({
-				url: '/RoomType/GetRoomTypesJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#roomTypeSelect');
-					select.empty();
-					select.append('<option value="">Select Room Type</option>');
-
-					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.typeName + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load room types.');
-				}
-			});
+			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
+			loadSelect("#floorSelect", "/Floor/GetFloorsJson", "number", "id");
+			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "name", "id");
 		});
-
-		$(document).ready(function () {
-			$.ajax({
-				url: '/Floor/GetFloorsJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#floorSelect');
-					select.empty();
-					select.append('<option value="">Select Floor</option>');
-
-					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.number + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load room types.');
-				}
-			});
-		});
-
-		$(document).ready(function () {
-			$.ajax({
-				url: '/RoomStatus/GetRoomStatusJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#StatusSelect');
-					select.empty();
-					select.append('<option value="">Select Status</option>');
-
-					$.each(response, function (index, item) {
-						select.append('<option value="' + item.id + '">' + item.name + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load room types.');
-				}
-			});
-		});
-
-
 	</script>
 
 	<script>

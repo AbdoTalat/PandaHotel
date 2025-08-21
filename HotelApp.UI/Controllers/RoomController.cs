@@ -8,11 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using HotelApp.Application;
 using BenchmarkDotNet.Attributes;
 using HotelApp.Domain.Entities;
+using System.Linq.Expressions;
 //using HotelApp.UI.Helper;
 
 namespace HotelApp.UI.Controllers
 {
-    public class RoomController : BaseController
+
+
+	public class RoomController : BaseController
 	{
 		private readonly IRoomService _roomService;
         private readonly IBranchService _branchService;
@@ -42,24 +45,13 @@ namespace HotelApp.UI.Controllers
 			return View(rooms);
 		}
 
-		public async Task<IActionResult> GetRoomsJson(string roomNumber, int? maxAdults, int? maxChildren)
+
+		[HttpGet]
+		public async Task<IActionResult> GetRoomsJson([FromQuery] RoomFilterDTO filter)
 		{
-			var rooms = await _roomService.GetAllRoomsAsync();
+			var filteredRooms = await _roomService.GetFilteredRoomsAsync(filter);
 
-			if (!string.IsNullOrEmpty(roomNumber))
-			{
-				rooms = rooms.Where(r => r.RoomNumber.Contains(roomNumber)).ToList();
-			}
-			if (maxAdults.HasValue)
-			{
-				rooms = rooms.Where(r => r.MaxNumOfAdults == maxAdults.Value).ToList();
-			}
-			if (maxChildren.HasValue)
-			{
-				rooms = rooms.Where(r => r.MaxNumOfChildren == maxChildren.Value).ToList();
-			}
-
-			var result = rooms.Select(item => new
+			var result = filteredRooms.Select(item => new
 			{
 				id = item.Id,
 				roomNumber = item.RoomNumber,
@@ -74,8 +66,6 @@ namespace HotelApp.UI.Controllers
 
 			return Json(new { success = true, data = result });
 		}
-
-
 
 		[HttpGet]
         [Authorize(Policy = ("Room.Add"))]

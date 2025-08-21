@@ -36,11 +36,41 @@ namespace HotelApp.UI.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
-		public async Task<IActionResult> Index(string searchTerm)
+		public async Task<IActionResult> Index()
 		{
 			var allReservations = await _reservationService.GetAllReservationAsync();
 
 			return View(allReservations);
+		}
+
+		[HttpGet]
+		[Authorize(Policy = "Reservation.View")]
+		public async Task<IActionResult> GetReservationJson([FromQuery] ReservationFilterDTO model)
+		{
+			var filteredReservations = await _reservationService.GetFilteredReservationsAsync(model);
+
+			var result = filteredReservations.Select(r => new
+			{
+				id = r.Id,
+				PrimaryGuestName = r.PrimaryGuestName,
+				CheckInDate = r.CheckInDate,
+				CheckOutDate = r.CheckOutDate,
+				CreatedBy = r.CreatedBy,
+				Status = r.Status,
+                ReservationSource = r.ReservationSource,
+                NumberOfNights = r.NumberOfNights,
+                NumberOfPeople = r.NumberOfPeople,
+                TotalPrice = r.TotalPrice,
+				IsConfirmed = r.IsConfirmed,
+				IsPending = r.IsPending,
+				IsStarted = r.IsStarted,
+				IsCheckedIn = r.IsCheckedIn,
+				IsCheckedOut = r.IsCheckedOut,
+				IsClosed = r.IsClosed,
+				IsCancelled = r.IsCancelled,
+			}).ToList();
+
+			return Json(new { success = true, data = result });
 		}
 
 		[HttpGet]

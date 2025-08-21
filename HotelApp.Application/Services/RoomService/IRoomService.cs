@@ -14,13 +14,14 @@ namespace HotelApp.Application.Services.RoomService
 		GetRoomsReview GetRoomsReview();
 		Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id);
 		Task<GetRoomByIdDTO?> GetRoomByIdAsync(int Id);
-		Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO room);
+		Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO dto);
 		Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto);
-		Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO room);
+		Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO dto);
 		Task<ServiceResponse<Room>> DeleteRoomAsync(int Id);
 		Task<ServiceResponse<string>> CheckRoomAvailabilityAsync(int roomTypeId, int numberOfRooms);
-
 		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
+
+		Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
 
      }
 }

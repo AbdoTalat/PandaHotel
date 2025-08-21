@@ -84,12 +84,11 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Type Of Proof</label>
-                                <select asp-for="TypeOfProof" id="TypeOfProof" class="form-control select" data-placeholder="Type of proof">
-                                    <option></option>
-                                    <option value="Passport">Passport</option>
-                                    <option value="National ID">National ID</option>
-                                </select>
-                                <span class="text-danger validation-error-label" asp-validation-for="TypeOfProof"></span>
+								<select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select" required
+										data-placeholder="Choose Proof Type" data-selected="@Model?.ProofTypeId">
+									<option value=""></option>
+								</select>
+                                <span class="text-danger validation-error-label" asp-validation-for="ProofTypeId"></span>
                             </div>
                         </div>
 
@@ -229,18 +228,16 @@
 						$('#Email').val(guest.email);
 						$('#Phone').val(guest.phone);
 						$('#Address').val(guest.address);
-						$('#TypeOfProof').val(guest.typeOfProof).trigger('change');
+						$('#proofTypeSelect').val(guest.proofTypeId).trigger('change'); // ✅ FIXED
 						$('#ProofNumber').val(guest.proofNumber);
 						$('#BranchId').val(guest.branchId);
 
-						// Format and set DateOfBirth
 						if (guest.dateOfBirth) {
 							$('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
 						} else {
 							$('#DateOfBirth').val('');
 						}
 
-						// Clear Select2 input after selection
 						$('#guestSearchSelect').val(null).trigger('change');
 					},
 					error: function () {
@@ -250,6 +247,12 @@
 			}
 		});
 
+	});
+</script>
+
+<script>
+	$(document).ready(function () {
+		loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
 	});
 </script>
 
@@ -276,7 +279,7 @@
 			const address = $('#Address').val().trim();
 			const phone = $('#Phone').val().trim();
 			const email = $('#Email').val().trim();
-			const typeOfProof = $('#TypeOfProof').val().trim();
+			const proofTypeId = $('#proofTypeSelect').val();
 			const proofNumber = $('#ProofNumber').val().trim();
 
 			if (!dateOfBirth) {
@@ -295,7 +298,7 @@
 				isValid = false;
 				errorMessages.push("Email is required for a primary guest.");
 			}
-			if (!typeOfProof) {
+			if (!proofTypeId) {
 				isValid = false;
 				errorMessages.push("Type of Proof is required for a primary guest.");
 			}
@@ -317,7 +320,8 @@
 			fullName: fullName,
 			email: $('#Email').val(),
 			phone: $('#Phone').val(),
-			typeOfProof: $('#TypeOfProof').val(),
+			proofTypeId: $('#proofTypeSelect').val(), // ✅ FIX
+			proofTypeName: $('#proofTypeSelect option:selected').text(),
 			proofNumber: $('#ProofNumber').val(),
 			dateOfBirth: $('#DateOfBirth').val(),
 			address: $('#Address').val(),
@@ -354,6 +358,7 @@
 					$('#guestId').val(0);
 					$('#isPrimary').prop('checked', false);
 					form.validate().resetForm();
+					$('#proofTypeSelect').val('').trigger('change');
 
 					toastr.success("Guest added successfully.");
 				} else {
@@ -476,7 +481,7 @@
 		$('#guestForm')[0].reset(); // Reset native form
 
 		// Clear select2 fields
-		$('#TypeOfProof').val(null).trigger('change');
+		$('#proofTypeSelect').val(null).trigger('change');
 
 		// Reset hidden and checkbox fields
 		$('#guestId').val('');

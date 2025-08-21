@@ -25,7 +25,8 @@ namespace HotelApp.Application.Services.ReservationService
 
 		public async Task<IEnumerable<GetAllReservationsDTO>> GetAllReservationAsync()
         {
-			var reservation = await _unitOfWork.Repository<Reservation>().GetAllAsDtoAsync<GetAllReservationsDTO>();
+			var reservation = await _unitOfWork.Repository<Reservation>()
+				.GetAllAsDtoAsync<GetAllReservationsDTO>();
 
 			return reservation;
 		}
@@ -98,7 +99,12 @@ namespace HotelApp.Application.Services.ReservationService
 			}
 		}
 
+		public async Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto)
+		{
+			var reservations = await _reservationRepository.GetFilteredReservationsAsync(dto);
 
-		
+			return reservations;
+		}
+
 	}
 }

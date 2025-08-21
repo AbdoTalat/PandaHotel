@@ -1,7 +1,7 @@
 {
   "RoomType": [ "RoomType.View", "RoomType.Add", "RoomType.Edit", "RoomType.Delete" ],
   "Room": [ "Room.View", "Room.Add", "Room.Edit", "Room.Delete" ],
-  "Reservation": [ "Reservation.View", "Reservation.Add", "Reservation.Edit", "Reservation.Delete" ],
+  "Reservation": [ "Reservation.View", "Reservation.Add", "Reservation.Edit", "Reservation.Delete", "Reservation.Start", "Reservation.End" ],
   "User": [ "User.View", "User.Add", "User.Edit", "User.Delete" ],
   "Role": [ "Role.View", "Role.Add", "Role.Edit", "Role.Delete" ],
   "Branch": [ "Branch.View", "Branch.Add", "Branch.Edit", "Branch.Delete" ],
@@ -12,5 +12,6 @@
   "RoomStatus": [ "RoomStatus.View", "RoomStatus.Add", "RoomStatus.Edit", "RoomStatus.Delete" ],
   "SystemSetting": [ "SystemSetting.View", "SystemSetting.Add", "SystemSetting.Edit", "SystemSetting.Delete" ],
   "Company": [ "Company.View", "Company.Add", "Company.Edit", "Company.Delete" ],
-  "Report" : ["Report.View"]
+  "Report": [ "Report.View" ],
+  "ProofType": [ "ProofType.View", "ProofType.Add", "ProofType.Edit", "ProofType.Delete" ]
 }

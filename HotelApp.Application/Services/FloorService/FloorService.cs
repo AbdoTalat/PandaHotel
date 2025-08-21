@@ -26,9 +26,9 @@ namespace HotelApp.Application.Services.FloorService
             _mapper = mapper;
 		}
          
-        public async Task<IEnumerable<DropDownDTO<int>>> GetFloorsDropDownAsync()
+        public async Task<IEnumerable<DropDownDTO<Int16>>> GetFloorsDropDownAsync()
         {
-			var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<DropDownDTO<int>>();
+			var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<DropDownDTO<Int16>>();
             return floors;
         }
 		public async Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync()

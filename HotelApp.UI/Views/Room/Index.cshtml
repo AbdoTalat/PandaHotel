@@ -140,38 +140,65 @@
 			
 		</div>
 		
-		<div class="row " style="padding-left:50px; padding-right:50px">
+		<div class="row" style="padding-left:50px; padding-right:50px">
 			<div class="col-md-12">
 				<div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
-                    
-                            <div class="panel panel-flat">
-                                <div class="panel-heading">
-                                    <h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-                                    <div class="heading-elements">
-                                        <ul class="icons-list">
-                                            <li><a data-action="collapse"></a></li>
-                                            <li><a data-action="reload"></a></li>
-                                            <li><a data-action="close"></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-								<div class="panel-body">
-							<form >
+                    <div class="panel panel-flat">
+						<div class="panel-heading">
+							<h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+							<div class="heading-elements">
+								<ul class="icons-list">
+									<li><a data-action="collapse"></a></li>
+									<li><a data-action="reload"></a></li>
+								</ul>
+							</div>
+						</div>
+					
+						<div class="panel-body">
+							<form id="roomFilterForm">
 								<div class="row">
 									<div class="col-md-4">
 										<div class="form-group">
-											<input type="text" class="form-control" name="roomNumber" placeholder="Room Number" value="@Context.Request.Query["roomNumber"]">
+											<input type="text" class="form-control" name="roomNumber" placeholder="Room Number">
 										</div>
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
-											<input type="number" class="form-control" name="maxAdults" placeholder="Max Adults" value="@Context.Request.Query["maxAdults"]">
+											<input type="number" class="form-control" name="maxNumOfAdults" placeholder="Max Adults">
 										</div>
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
-											<input type="number" class="form-control" name="maxChildren" placeholder="Max Children" value="@Context.Request.Query["maxChildren"]">
+											<input type="number" class="form-control" name="maxNumOfChildrens" placeholder="Max Children">
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+											<select id="roomTypeSelect" class="form-control select" name="roomTypeId" data-placeholder="Choose Room Type">
+												<option value=""></option>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<select id="statusSelect" class="form-control select" name="roomStatusId" data-placeholder="Choose Status">
+												<option value=""></option>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<div class="checkbox">
+												<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+													<input type="checkbox" id="activeSelect" name="isActive" checked class="switchery">
+													Is Active
+												</label>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -181,9 +208,7 @@
 								</div>
 							</form>
 						</div>
-
-                            </div>
-                       
+                    </div>   
                 </div>
 
 			</div>
@@ -234,7 +259,7 @@
 							}
 							@if (User.HasClaim("permission", "Room.Edit"))
 							{
-								<a asp-action="EditRoom" asp-controller="Room" asp-route-Id="@item.Id" class="text-teal-600 btnEditOpenModal">
+								<a asp-action="EditRoom" asp-controller="Room" asp-route-Id="@item.Id" class="text-teal-600">
 									<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
 								</a>
 							}
@@ -258,81 +283,13 @@
 
 @section Scripts {
 
-
 	<script>
 		$(document).ready(function () {
-			const swalWithBootstrapButtons = Swal.mixin({
-				customClass: {
-					confirmButton: 'btn btn-danger',
-					cancelButton: 'btn btn-default custom-cancel-btn'
-				},
-				buttonsStyling: false
-			});
-
-			// Use event delegation for dynamically created elements
-			$('#MyTable tbody').on('click', '.btn-delete', function () {
-				let button = $(this);  // Reference to the clicked button
-				let itemId = button.data("id");
-				let row = button.closest("tr"); // Get the row that contains the button
-
-				swalWithBootstrapButtons.fire({
-					position: "top",
-					title: "Are you sure?",
-					text: "You won't be able to revert this!",
-					icon: "warning",
-					iconColor: "red",
-					showCancelButton: true,
-					confirmButtonText: "Delete!",
-					cancelButtonText: "Cancel",
-					reverseButtons: true
-				}).then((result) => {
-					if (result.isConfirmed) {
-						$.ajax({
-							url: '/Room/DeleteRoom/' + itemId,
-							type: 'DELETE',
-							success: function (response) {
-								if (response.success) {
-									swalWithBootstrapButtons.fire({
-										position: "top",
-										title: "Deleted!",
-										text: response.message,
-										icon: "success",
-										customClass: {
-											confirmButton: 'btn btn-success'
-										}
-									}).then(() => {
-										row.fadeOut(400, function () { // Fade out the row smoothly
-											$(this).remove(); // Remove the row from DOM
-										});
-									});
-								} else {
-									swalWithBootstrapButtons.fire({
-										position: "top",
-										title: "Warning!",
-										text: response.message,
-										icon: "warning",
-										customClass: {
-											confirmButton: 'btn btn-warning'
-										}
-									});
-								}
-							},
-							error: function () {
-								swalWithBootstrapButtons.fire({
-									position: "top",
-									title: "Error!",
-									text: "Something went wrong!",
-									icon: "error"
-								});
-							}
-						});
-					}
-				});
-			});
+			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
+			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "name", "id");
 		});
-
 	</script>
-
+	
 	<script>
 		$(document).ready(function () {
 			let isFiltered = false;
@@ -340,24 +297,25 @@
 			// Initialize DataTable
 			let dataTable = $("#MyTable").DataTable();
 
-			function loadRooms(roomNumber = "", maxAdults = "", maxChildren = "", isRefresh = false) {
+			function loadRooms(roomNumber = "", maxNumOfAdults = "", maxNumOfChildrens = "", roomTypeId = "", roomStatusId = "", isActive = "", isRefresh = false) {
 				$.ajax({
 					url: '/Room/GetRoomsJson',
 					type: 'GET',
 					dataType: 'json',
 					data: {
 						roomNumber: roomNumber,
-						maxAdults: maxAdults,
-						maxChildren: maxChildren
+						maxNumOfAdults: maxNumOfAdults,
+						maxNumOfChildrens: maxNumOfChildrens,
+						roomTypeId: roomTypeId,
+						roomStatusId: roomStatusId,
+						isActive: isActive
 					},
 					success: function (response) {
 						if (response.success) {
 							let roomsToShow = response.data;
 
-							// Clear table
 							dataTable.clear();
 
-							// Populate rows
 							$.each(roomsToShow, function (index, item) {
 								let isActiveLabel = item.isActive
 									? '<span class="label label-flat border-success text-success-600">Active</span>'
@@ -391,22 +349,30 @@
 			}
 
 			// Filter button
-			$(".btn-primary").click(function (e) {
+			$("#roomFilterForm").submit(function (e) {
 				e.preventDefault();
 				let roomNumber = $("input[name='roomNumber']").val();
-				let maxAdults = $("input[name='maxAdults']").val();
-				let maxChildren = $("input[name='maxChildren']").val();
+				let maxNumOfAdults = $("input[name='maxNumOfAdults']").val();
+				let maxNumOfChildrens = $("input[name='maxNumOfChildrens']").val();
+				let roomTypeId = $("select[name='roomTypeId']").val();
+				let roomStatusId = $("select[name='roomStatusId']").val();
+				let isActive = $("#activeSelect").is(":checked"); // true or false
+
 				isFiltered = true;
-				loadRooms(roomNumber, maxAdults, maxChildren, false);
+				loadRooms(roomNumber, maxNumOfAdults, maxNumOfChildrens, roomTypeId, roomStatusId, isActive, false);
 			});
 
+			
 			// Refresh button
 			$("#refreshRoomsBtn").click(function (e) {
 				e.preventDefault();
-				$("input[name='roomNumber'], input[name='maxAdults'], input[name='maxChildren']").val("");
+				$("#roomFilterForm")[0].reset();
+				$("#roomTypeSelect, #statusSelect, #activeSelect").val("").trigger("change");
+
 				isFiltered = false;
-				loadRooms("", "", "", true);
+				loadRooms("", "", "", "", "", "", true);
 			});
+
 
 			// Status badge using DB color
 			function getStatusBadge(item) {
@@ -422,9 +388,10 @@
 				let canDelete = @canDelete.ToString().ToLower();
 
 				return (canView ? `<a data-title="Room Details" data-url="/Room/GetRoomDetails/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
-					(canEdit ? `<a data-title="Edit Room" data-url="/Room/EditRoom/${item.id}" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+					(canEdit ? `<a href="/Room/EditRoom/${item.id}" class="text-teal-600"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
 					(canDelete && !item.isActive ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
 			}
+
 
 
 			// Optional: Load on page load
@@ -432,6 +399,79 @@
 		});
 	</script>
 
+    <script>
+        $(document).ready(function () {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-default custom-cancel-btn'
+                },
+                buttonsStyling: false
+            });
+
+            // Use event delegation for dynamically created elements
+            $('#MyTable tbody').on('click', '.btn-delete', function () {
+                let button = $(this);  // Reference to the clicked button
+                let itemId = button.data("id");
+                let row = button.closest("tr"); // Get the row that contains the button
+
+                swalWithBootstrapButtons.fire({
+                    position: "top",
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    iconColor: "red",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete!",
+                    cancelButtonText: "Cancel",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Room/DeleteRoom/' + itemId,
+                            type: 'DELETE',
+                            success: function (response) {
+                                if (response.success) {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        }
+                                    }).then(() => {
+                                        row.fadeOut(400, function () { // Fade out the row smoothly
+                                            $(this).remove(); // Remove the row from DOM
+                                        });
+                                    });
+                                } else {
+                                    swalWithBootstrapButtons.fire({
+                                        position: "top",
+                                        title: "Warning!",
+                                        text: response.message,
+                                        icon: "warning",
+                                        customClass: {
+                                            confirmButton: 'btn btn-warning'
+                                        }
+                                    });
+                                }
+                            },
+                            error: function () {
+                                swalWithBootstrapButtons.fire({
+                                    position: "top",
+                                    title: "Error!",
+                                    text: "Something went wrong!",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
 }
 
 

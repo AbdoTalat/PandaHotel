@@ -27,7 +27,6 @@ namespace HotelApp.Application.Mapping
 			   .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.confirmReservationDTO.Comment))
 			   .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsConfirmed))
 			   .ForMember(dest => dest.IsPending, opt => opt.MapFrom(src => src.confirmReservationDTO.IsPending))
-			   .ForMember(dest => dest.IsStarted, opt => opt.MapFrom(src => src.confirmReservationDTO.IsStarted))
 			   .ForMember(dest => dest.IsCheckedIn, opt => opt.MapFrom(src => src.confirmReservationDTO.IsCheckedIn))
 			   .ForMember(dest => dest.IsCheckedOut, opt => opt.MapFrom(src => src.confirmReservationDTO.IsCheckedOut))
 			   .ForMember(dest => dest.IsClosed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsClosed))
@@ -49,7 +48,6 @@ namespace HotelApp.Application.Mapping
 					src.IsClosed ? "Closed" :
 					src.IsCheckedOut ? "Checked Out" :
 					src.IsCheckedIn ? "Checked In" :
-					src.IsStarted ? "Started" :
 					src.IsPending ? "Pending" :
 					src.IsConfirmed ? "Confirmed" :
 					""
@@ -58,13 +56,14 @@ namespace HotelApp.Application.Mapping
                     .Where(gr => gr.IsPrimaryGuest)
                     .Select(gr => gr.Guest.FullName)
                     .FirstOrDefault()))
-                .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(dst => dst.CreatedBy.UserName));
+                .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(dst => dst.CreatedBy.UserName))
+                .ForMember(dest => dest.ReservationSource, opt => opt.MapFrom(dst => dst.ReservationSource.Name));
 
 
 
 
-			/* Reservation Source */
-			CreateMap<ReservationSource, DropDownDTO<string>>()
+            /* Reservation Source */
+            CreateMap<ReservationSource, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
 

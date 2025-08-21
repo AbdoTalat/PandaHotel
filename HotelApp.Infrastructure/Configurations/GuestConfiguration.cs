@@ -22,12 +22,9 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasMaxLength(50);
 
 			builder.Property(b => b.Address)
-				.HasMaxLength(50);
+				.HasMaxLength(100);
 
 			builder.Property(b => b.Phone)
-				.HasMaxLength(20);
-
-			builder.Property(b => b.TypeOfProof)
 				.HasMaxLength(20);
 
 			builder.Property(b => b.ProofNumber)
@@ -38,16 +35,21 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasForeignKey(g => g.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 
-			builder.HasOne(b => b.CreatedBy)
+			builder.HasOne(g => g.CreatedBy)
 				.WithMany()
-				.HasForeignKey(b => b.CreatedById)
+				.HasForeignKey(g => g.CreatedById)
 				.OnDelete(DeleteBehavior.Restrict);
 
-			builder.HasOne(b => b.LastModifiedBy)
+			builder.HasOne(g => g.LastModifiedBy)
 				.WithMany()
-				.HasForeignKey(b => b.LastModifiedById)
+				.HasForeignKey(g => g.LastModifiedById)
 				.OnDelete(DeleteBehavior.Restrict);
 
-		}
+            builder.HasOne(g => g.ProofType)
+                .WithMany(pt => pt.Guests)
+                .HasForeignKey(b => b.ProofTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        }
 	}
 }

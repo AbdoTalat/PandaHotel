@@ -1,18 +1,5 @@
 ﻿@model AssignPermissionDTO
 @{
-    // Define entity icons
-    var entityIcons = new Dictionary<string, string>
-    {
-        { "User", "icon-user" },
-        { "Role", "icon-cogs" },
-        { "Branch", "icon-location4" },
-        { "Room", "icon-bed2" },
-        { "RoomType", "icon-bed2" },
-        { "Guest", "icon-users2" },
-        { "Reservation", "icon-calendar" },
-        { "Floor", "icon-office "}
-    };
-
     TempData["Title"] = "Assing Permission";
 }
 <div class="page-header page-header-default">
@@ -138,6 +125,16 @@
 
 
 @section Scripts{
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '@TempData["Error"]'
+            });
+        </script>
+    }
     <script>
         $(document).ready(function () {
             $("#selectAll").change(function () {
@@ -152,5 +149,5 @@
         });
     </script>
 
-    @* @await Html.PartialAsync("_ValidationScriptsPartial"); *@
+    @await Html.PartialAsync("_ValidationScriptsPartial");
 }

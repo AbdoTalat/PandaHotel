@@ -32,6 +32,11 @@ namespace HotelApp.Infrastructure
         }
 
 		#region Get Methods
+
+		public IQueryable<T> GetAllIQueryable()
+		{
+			return _dbSet.AsQueryable();
+		}
 		public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false)
         {
 			IQueryable<T> query = _dbSet.AsNoTracking()
@@ -105,6 +110,32 @@ namespace HotelApp.Infrastructure
                 .ProjectTo<TDto>(_mapperConfig)
                 .FirstOrDefaultAsync();
         }
+		#endregion
+
+		#region Filter Methods
+
+		public async Task<IEnumerable<T>> GetFilteredAsync(object filterDto, bool SkipBranchFilter = false)
+		{
+			IQueryable<T> query = _dbSet.AsNoTracking()
+				.BranchFilter(SkipBranchFilter);
+
+			// Apply generic filter here
+			query = query.ApplyFilter(filterDto);
+
+			return await query.ToListAsync();
+		}
+
+		public async Task<IEnumerable<TDto>> GetFilteredAsDtoAsync<TDto>(object filterDto, bool SkipBranchFilter = false) where TDto : class
+		{
+			IQueryable<T> query = _dbSet.AsNoTracking()
+				.BranchFilter(SkipBranchFilter);
+
+			// Apply generic filter here
+			query = query.ApplyFilter(filterDto);
+
+			return await query.ProjectTo<TDto>(_mapperConfig).ToListAsync();
+		}
+
 		#endregion
 
 		#region Add & Edit & Delete

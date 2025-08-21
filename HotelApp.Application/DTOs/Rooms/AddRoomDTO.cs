@@ -16,9 +16,7 @@ namespace HotelApp.Application.DTOs.Rooms
         //[RequiredEx]
         public string? RoomNumber { get; set; }
 
-		[RequiredEx]
-		[MinLength(5, ErrorMessage = "Min length is 5")]
-		public string Description { get; set; }
+		public string? Description { get; set; }
 
 		[RequiredEx]
 		public int FloorId { get; set; }
@@ -45,10 +43,10 @@ namespace HotelApp.Application.DTOs.Rooms
 
 		public bool AddManyRooms { get; set; }
 		public string? RoomNumberText { get; set; }
-		[RequiredEx]
-		public int RoomNumberFrom { get; set; }
-		[RequiredEx]
-		public int RoomNumberTo { get; set; }
+		//[RequiredEx]
+		public int? RoomNumberFrom { get; set; }
+		//[RequiredEx]
+		public int? RoomNumberTo { get; set; }
 
 		public List<int> SelectedOptions { get; set; } = new List<int>();
 	}

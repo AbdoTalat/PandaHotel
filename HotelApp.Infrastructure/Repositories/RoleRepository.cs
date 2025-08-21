@@ -66,7 +66,8 @@ namespace HotelApp.Infrastructure.Repositories
 		public async Task AddRolePermissionsAsync(int roleId, List<string> permissions)
 		{
 			var role = await _roleManager.FindByIdAsync(roleId.ToString());
-			if (role == null) return;
+			if (role == null) 
+				return;
 
 			var existingClaims = await _roleManager.GetClaimsAsync(role);
 

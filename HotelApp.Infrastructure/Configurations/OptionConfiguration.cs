@@ -18,7 +18,7 @@ namespace HotelApp.Infrastructure.Configurations
 				.IsRequired();
 
             builder.Property(o => o.Code)
-                .HasMaxLength(50)
+                .HasMaxLength(20)
                 .IsRequired();
 
             builder.Property(o => o.HourlyPrice)

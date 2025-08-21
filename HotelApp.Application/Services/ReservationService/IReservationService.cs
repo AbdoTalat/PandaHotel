@@ -7,5 +7,6 @@ namespace HotelApp.Application.Services.ReservationService
         Task<IEnumerable<GetAllReservationsDTO>> GetAllReservationAsync();
         Task<ServiceResponse<AddReservationDTO>> AddReservation(AddReservationDTO reservationDTO, int userId);
        // public Task<GetReservationDetailsById> GetReservationDetailsById(int Id);
+       Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto);
     }
 }

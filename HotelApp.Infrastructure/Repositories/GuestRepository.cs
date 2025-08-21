@@ -63,7 +63,7 @@ namespace HotelApp.Infrastructure.Repositories
 
             var results = await query
                 .OrderBy(g => g.FullName)
-                .Take(15)
+                .Take(20)
                 .Select(g => new GetSearchedGuestsDTO
                 {
                     Id = g.Id,

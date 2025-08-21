@@ -4,28 +4,43 @@
 // Write your JavaScript code.
 
 
-//showInPopup = (url, title) => {
-//    $.ajax({
-//        type: 'GET',
-//        url: url,
-//        success: function (res) {
-//            $('#form-modal .modal-body').html(res);
-//            $('#form-modal .modal-title').html(title);
-//            $('#form-modal').modal('show');
-//            // to make popup draggable
-//            $('.modal-dialog').draggable({
-//                handle: ".modal-header"
-//            });
-//        }
-//    })
-//}
 
+function loadSelect(selector, url, textField, valueField) {
+    var $select = $(selector);
+    var selectedValue = $select.data("selected"); // read from data-selected attr
 
+    $select.empty().append('<option value="">Loading...</option>').prop("disabled", true);
 
-//$(document).ready(function () {
-//    // Apply Select2 to all select tags
-//    $('select').select2({
-//        placeholder: "Select an option",
-//        allowClear: true
-//    });
-//});
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            $select.empty().append('<option value=""></option>');
+
+            $.each(response, function (_, item) {
+                var option = $('<option>', {
+                    value: item[valueField],
+                    text: item[textField]
+                });
+
+                if (selectedValue && item[valueField].toString() === selectedValue.toString()) {
+                    option.prop("selected", true);
+                }
+
+                $select.append(option);
+            });
+
+            $select.prop("disabled", false);
+
+            // If using select2, refresh it
+            if ($select.hasClass("select2-hidden-accessible")) {
+                $select.trigger("change");
+            }
+        },
+        error: function (xhr) {
+            console.error("Error loading " + url, xhr.responseText);
+            $select.empty().append('<option value="">Error loading</option>').prop("disabled", false);
+        }
+    });
+}

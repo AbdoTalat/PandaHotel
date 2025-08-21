@@ -14,7 +14,8 @@ namespace HotelApp.Application.DTOs.Guests
 		public string Address { get; set; }
 		public string Phone { get; set; }
 		public string Email { get; set; }
-		public string TypeOfProof { get; set; }
+		public int? ProofTypeId { get; set; }
+		public string? ProofTypeName { get; set; }
 		public string ProofNumber { get; set; }
 		public int BranchId { get; set; }
 	}

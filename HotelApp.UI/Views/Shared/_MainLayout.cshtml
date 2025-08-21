@@ -6,16 +6,14 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
 
-@{
-	 var user = UserManager.GetUserAsync(User).Result;
 
-}
+@{	
+	var user = UserManager.GetUserAsync(User).Result;
 
-@{
 	var defaultBranchJson = User.FindFirstValue("DefaultBranchData");
 
 	var defaultBranch = string.IsNullOrEmpty(defaultBranchJson)
-		? null
+		? new UserBranchesDataDTO()
 		: JsonConvert.DeserializeObject<UserBranchesDataDTO>(defaultBranchJson);
 
 
@@ -89,7 +87,7 @@
 	<script type="text/javascript" src="/assets/js/plugins/pickers/pickadate/picker.date.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/pickers/pickadate/picker.time.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/pickers/pickadate/legacy.js"></script>
-	<script type="text/javascript" src="/assets/js/pages/picker_date.js?v=1.11"></script>
+	<script type="text/javascript" src="/assets/js/pages/picker_date.js?v=1"></script>
     <script type="text/javascript" src="/assets/js/plugins/ui/fab.min.js"></script>
     <script type="text/javascript" src="/assets/js/plugins/ui/prism.min.js"></script>
 
@@ -116,9 +114,8 @@
 	<!-- Advanced Animation -->
 	@* <script type="text/javascript" src="/assets/js/pages/animations_velocity_examples.js"></script> *@
 
-    <script type="text/javascript" src="/assets/js/core/app.js"></script>
-   
-	@RenderSection("ThemeScripts", false)
+	<script type="text/javascript" src="/assets/js/core/app.js?v=2.2"></script>
+
     <!-- /theme JS files -->
     
 </head>
@@ -415,11 +412,15 @@
 					<!-- User menu -->
 					<div class="sidebar-user">
 						<div class="category-content">
+
 							<div class="media">
 								<a href="#" class="media-left"><img src="/assets/images/placeholder.jpg" class="img-circle img-sm" alt=""></a>
-								<div class="media-body">
-									<span class="media-heading text-semibold">@defaultBranch.Name</span>
 
+								<div class="media-body">
+									<span class="media-heading text-semibold">@user.FirstName @user.LastName</span>
+									<div class="text-size-mini text-muted">
+										<i class="icon-pin text-size-small"></i> @defaultBranch.Name
+									</div>
 								</div>
 
 								<div class="media-right media-middle">
@@ -506,21 +507,24 @@
 								@if (User.HasClaim("permission", "Reservation.View") || User.HasClaim("Permission","Reservation.Add"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Reservation") == true ? "active navigation-open" : "")">
-										<a href="#"><i class="icon-file-spreadsheet2"></i> <span>Reservation Management</span></a>
+										<a href="#"><i class="icon-calendar"></i> <span>Reservation Management</span></a>
 										<ul>
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
-												<a asp-action="Index" asp-controller="Reservation"><i class="icon-calendar"></i> Reservations</a>
+												<a asp-action="Index" asp-controller="Reservation"><i class="icon-calendar"></i> Reservations
+                                                    <span class="label bg-teal-400">New</span>
+                                                </a>
+												
 											</li>
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "AddReservation" ? "active" : "")">
 												<a asp-action="AddReservation" asp-controller="Reservation"><i class="icon-file-plus2"></i> Add Reservation</a>
 											</li>
-											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "Reservation" ? "active" : "")">
-												<a href="#"><i class="icon-list-unordered" style="font-size:13px"></i> More</a>
-											</li>
 										</ul>
 									</li>
 								}
-								@if (User.HasClaim("permission", "Branch.View") || User.HasClaim("permission", "Floor.View") || User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") || User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View"))
+								@if (User.HasClaim("permission", "Branch.View") || User.HasClaim("permission", "Floor.View") ||
+									 User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") ||
+									 User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View") ||
+									 User.HasClaim("permission", "ProofType.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Branch") == true ? "active navigation-open" : "")">
 										<a href="#"><i class="icon-hammer-wrench"></i> <span>System Settings</span></a>
@@ -547,6 +551,12 @@
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Company" ? "active" : "")">
 													<a asp-action="Index" asp-controller="Company"><i class="icon-city"></i> Companies</a>
+												</li>
+											}
+											@if (User.HasClaim("permission", "ProofType.View"))
+											{
+												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ProofType" ? "active" : "")">
+													<a asp-action="Index" asp-controller="ProofType"><i class="icon-magazine"></i> Proof Types</a>
 												</li>
 											}
 											@if (User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View"))
@@ -576,7 +586,7 @@
 								@if (User.HasClaim("permission", "Report.View"))
 								{
 									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Report") == true ? "active navigation-open" : "")">
-										<a href="#"><i class="icon-magazine"></i> <span>Reports</span></a>
+										<a href="#"><i class="icon-file-text3"></i> <span>Reports</span></a>
 										<ul>
 
 											@if (User.HasClaim("permission", "Report.View"))
@@ -680,7 +690,11 @@
 	<!-- Scripts -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.7/dist/sweetalert2.all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+	<script>
+		$('#ajaxModal').on('shown.bs.modal', function () {
+			$(this).removeAttr('aria-hidden');
+		});
+		</script>
 	<script>
 		$(document).ready(function () {
 			var successMessage = '@TempData["Success"]';
@@ -899,7 +913,7 @@
 		});
 
 	</script>
-
+	<script src="~/js/site.js?v=1.12" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", false)
 
 </body> 

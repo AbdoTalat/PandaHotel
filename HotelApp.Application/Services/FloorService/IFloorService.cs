@@ -11,7 +11,7 @@ namespace HotelApp.Application.Services.FloorService
 {
     public interface IFloorService
     {
-        Task<IEnumerable<DropDownDTO<int>>> GetFloorsDropDownAsync();
+        Task<IEnumerable<DropDownDTO<Int16>>> GetFloorsDropDownAsync();
         Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync();
         Task<GetFloorByIdDTO?> GetFloorByIdAsync(int Id);
         Task<ServiceResponse<AddFloorDTO>> AddFloorAsync(AddFloorDTO floor);

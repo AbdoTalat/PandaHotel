@@ -39,7 +39,6 @@ namespace HotelApp.PL
 				await DefaultPermissionsSeeder.SeedAsync(serviceProvider);
 			}
 
-
 			// Global error handling for production
 			if (!app.Environment.IsDevelopment())
 			{

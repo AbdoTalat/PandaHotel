@@ -18,14 +18,14 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasMaxLength(20);
 
 			builder.Property(r => r.Description)
-				.IsRequired()
-				.HasMaxLength(500);
+				.HasMaxLength(50);
 
 			builder.Property(r => r.PricePerNight)
-				.IsRequired();
+				.IsRequired()
+                .HasColumnType("decimal(18,2)");
 
 
-			builder.HasOne(r => r.RoomType)
+            builder.HasOne(r => r.RoomType)
 				.WithMany(r => r.Rooms)
 				.HasForeignKey(r => r.RoomTypeId)
 				.OnDelete(DeleteBehavior.Restrict);

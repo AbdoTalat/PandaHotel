@@ -15,11 +15,11 @@ namespace HotelApp.Infrastructure.Configurations
         {
             builder.Property(c => c.Name)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(50);
 
             builder.Property(c => c.Address) 
                 .IsRequired()
-                .HasMaxLength(30);
+                .HasMaxLength(100);
 
             builder.Property(c => c.Phone)
                 .IsRequired()
@@ -30,7 +30,7 @@ namespace HotelApp.Infrastructure.Configurations
 
             builder.Property(c => c.Email)
                 .IsRequired()
-                .HasMaxLength(30);
+                .HasMaxLength(50);
 
             builder.HasOne(c => c.Branch)
                 .WithMany(b => b.Companies)

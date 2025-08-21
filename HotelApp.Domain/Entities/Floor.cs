@@ -10,7 +10,7 @@ namespace HotelApp.Domain.Entities
     public class Floor : BaseEntity, IHasBranch
     {
         public int Id { get; set; }
-        public int Number { get; set; }
+        public Int16 Number { get; set; }
         public bool IsActive { get; set; }
 
         public int BranchId { get; set; }

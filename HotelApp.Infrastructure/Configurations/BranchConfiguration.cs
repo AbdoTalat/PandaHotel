@@ -15,7 +15,7 @@ namespace HotelApp.Infrastructure.Configurations
 		{
             builder.Property(b => b.Name)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(40);
 
             builder.Property(b => b.Street)
                 .IsRequired()

@@ -1,6 +1,10 @@
 ﻿@model IEnumerable<GetAllReservationsDTO>
 @{
 	TempData["Title"] = "Reservations";
+
+	var canView = User.HasClaim("permission", "Reservation.View");
+	var canEdit = User.HasClaim("permission", "Reservation.Edit");
+	var canDelete = User.HasClaim("permission", "Reservation.Delete");
 }
 
 <!-- Page header -->
@@ -72,21 +76,72 @@
 			<div class="heading-elements">
 				<ul class="icons-list">
 					<li>
-						<button id="toggleFilterBtn" class="btn bg-teal-400 "><i class="icon-filter3"></i> Filter</button>
+						<button href="#filterForm" data-toggle="collapse" aria-expanded="false" id="toggleFilterBtn" class="btn bg-teal-400 "><i class="icon-filter3"></i> Filter</button>
 					</li>
-					<li><a class="btn bg-teal-400" id="refreshRoomsBtn" style="color:#fff" data-action="reload"></a></li>
+                    <li><a class="btn bg-teal-400" id="refreshReservationsBtn" style="color:#fff" data-action="reload"></a></li>
 					<li><a class="btn bg-teal-400" style="color:#fff" data-action="collapse"></a></li>
 				</ul>
+			</div>
+		</div>
+
+		<div class="row " style="padding-left:50px; padding-right:50px">
+			<div class="col-md-12">
+				<div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
+					<div class="panel panel-flat">
+						<div class="panel-heading">
+							<h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+							<div class="heading-elements">
+								<ul class="icons-list">
+									<li><a data-action="collapse"></a></li>
+									<li><a data-action="reload"></a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="panel-body">
+							<form id="reservationFilterForm">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+                                            <label>Check In Date</label>
+											<input type="date" class="form-control" name="checkInDate" placeholder="Check In Date">
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+                                            <label>Check Out Date</label>
+											<input type="date" class="form-control" name="checkOutDate" placeholder="Check Out Date">
+										</div>
+									</div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Primary Guest</label>
+                                            <input type="text" class="form-control" name="primaryGuestName" placeholder="Guest Name">
+                                        </div>
+                                    </div>
+								</div>
+
+								<div class="text-right">
+									<button type="submit" class="btn btn-primary"> <i class="icon-search4"></i> Search</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 
 		<table class="table datatable-button-html5-basic dataTable" id="MyTable">
 			<thead>
 				<tr class="border-double">
-					<th>#</th>
+					<th>ID#</th>
 					<th>Primary Guest</th>
 					<th>Check In Date</th>
 					<th>Check Out Date</th>
+                    <th>Nights</th>
+                    <th>People</th>
+                    <th>Source</th>
 					<th>Status</th>
 					<th>Created By</th>
 					<th>Actions</th>
@@ -100,6 +155,9 @@
 						<td>@item.PrimaryGuestName</td>
 						<td>@item.CheckInDate.ToShortDateString()</td>
 						<td>@item.CheckOutDate.ToShortDateString()</td>
+                        <td>@item.NumberOfNights</td>
+                        <td>@item.NumberOfPeople</td>
+                        <td>@item.ReservationSource</td>
 						<td>@item.Status</td>
 						<td>@item.CreatedBy</td>
 						<td>
@@ -129,11 +187,93 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            let dataTable = $("#MyTable").DataTable();
+
+            function loadReservations(checkInDate = "", checkOutDate = "", primaryGuestName = "", isRefresh = false) {
+                $.ajax({
+                    url: '/Reservation/GetReservationJson',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        checkInDate: checkInDate,
+                        checkOutDate: checkOutDate,
+                        primaryGuestName: primaryGuestName
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            let reservations = response.data;
+                            dataTable.clear();
+
+                            $.each(reservations, function (index, item) {
+                                let actionButtons = getActionButtons(item);
+
+                                dataTable.row.add([
+                                    item.id,
+                                    item.primaryGuestName,
+                                    formatDate(item.checkInDate),
+                                    formatDate(item.checkOutDate),
+                                    item.numberOfNights,
+                                    item.numberOfPeople,
+                                    item.reservationSource,
+                                    item.status,
+                                    item.createdBy,
+                                    actionButtons
+                                ]);
+                            });
+
+                            dataTable.draw();
+                        } else {
+                            console.error("Failed to load reservations.");
+                        }
+                    },
+                    error: function () {
+                        console.error("Error while fetching reservations.");
+                    }
+                });
+            }
+
+            // Filter submit
+            $("#reservationFilterForm").submit(function (e) {
+                e.preventDefault();
+                let checkInDate = $("input[name='checkInDate']").val();
+                let checkOutDate = $("input[name='checkOutDate']").val();
+                let primaryGuestName = $("input[name='primaryGuestName']").val();
+
+                loadReservations(checkInDate, checkOutDate, primaryGuestName, false);
+            });
+
+            // Reset button
+            $("#refreshReservationsBtn").click(function () {
+                $("#reservationFilterForm")[0].reset();
+                loadReservations("", "", "", true);
+            });
+
+            // Helpers
+            function formatDate(dateStr) {
+                if (!dateStr) return "";
+                let date = new Date(dateStr);
+                return date.toLocaleDateString();
+            }
+
+            function getActionButtons(item) {
+                let canView = @canView.ToString().ToLower();
+                let canEdit = @canEdit.ToString().ToLower();
+                let canDelete = @canDelete.ToString().ToLower();
+
+                return (canView ? `<a data-title="Reservation Details" data-url="/Reservation/Details/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+                    (canEdit ? `<a href="/Reservation/Edit/${item.id}" class="text-teal-600"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
+                    (canDelete ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
+            }
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
             var successMessage = '@TempData["Success"]';
             if (successMessage) {
                 toastr.success(successMessage);
             }
         });
     </script>
-
 }

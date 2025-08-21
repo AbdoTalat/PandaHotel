@@ -8,7 +8,7 @@ namespace HotelApp.Application.DTOs.Floor
 {
     public class AddFloorDTO
     {
-        public int Number { get; set; }
+        public Int16 Number { get; set; }
         public int BranchId { get; set; }
 
         public bool IsActive { get; set; }

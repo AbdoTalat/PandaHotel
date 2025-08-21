@@ -12,15 +12,22 @@ namespace HotelApp.Application.DTOs.Reservation
         public string PrimaryGuestName { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-		public bool IsConfirmed { get; set; }
+		public string CreatedBy { get; set; }
+		public string Status { get; set; }
+		public string ReservationSource { get; set; }
+        public int NumberOfNights { get; set; }
+        public int NumberOfPeople { get; set; }
+        public decimal TotalPrice { get; set; }
+
+
+        public bool IsConfirmed { get; set; }
 		public bool IsPending { get; set; }
 		public bool IsStarted { get; set; }
 		public bool IsCheckedIn { get; set; }
 		public bool IsCheckedOut { get; set; }
 		public bool IsClosed { get; set; }
 		public bool IsCancelled { get; set; }
-        public string CreatedBy { get; set; }
-		public string Status { get; set; }
+        
 	
 	}
 }

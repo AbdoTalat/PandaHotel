@@ -10,7 +10,7 @@ namespace HotelApp.Application.DTOs.Rooms
 	{
 		public int Id { get; set; }
 		public string RoomNumber { get; set; }
-		public string Description { get; set; }
+		public string? Description { get; set; }
 		public decimal PricePerNight { get; set; }
 		public int MaxNumOfAdults { get; set; }
 		public int MaxNumOfChildrens { get; set; }

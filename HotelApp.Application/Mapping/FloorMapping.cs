@@ -22,7 +22,7 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<AddFloorDTO, Floor>();
 
-            CreateMap<Floor, DropDownDTO<int>>()
+            CreateMap<Floor, DropDownDTO<Int16>>()
                 .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Number));
 		}
     }

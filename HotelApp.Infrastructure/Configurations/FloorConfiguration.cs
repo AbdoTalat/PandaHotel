@@ -8,6 +8,7 @@ namespace HotelApp.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Floor> builder)
 		{
+
             builder.HasOne(f => f.Branch)
 				.WithMany(b => b.Floors)
 				.HasForeignKey(f => f.BranchId)

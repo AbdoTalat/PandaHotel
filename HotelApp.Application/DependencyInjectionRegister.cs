@@ -5,6 +5,7 @@ using HotelApp.Application.Services.FloorService;
 using HotelApp.Application.Services.GuestService;
 using HotelApp.Application.Services.LocationsService;
 using HotelApp.Application.Services.OptionService;
+using HotelApp.Application.Services.ProofTypeService;
 using HotelApp.Application.Services.RateService;
 using HotelApp.Application.Services.ReportService;
 using HotelApp.Application.Services.ReservationService;
@@ -49,6 +50,7 @@ namespace HotelApp.Application
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IReservationSourceService, ReservationSourceService>();
             services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<IProofTypeService, ProofTypeService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -60,8 +60,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<int?>("StateId")
                         .HasColumnType("int");
@@ -99,8 +99,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("BranchId")
                         .HasColumnType("int");
@@ -113,8 +113,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -127,8 +127,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(100)
@@ -200,8 +200,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
+                    b.Property<short>("Number")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -223,8 +223,8 @@ namespace HotelApp.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("BranchId")
                         .HasColumnType("int");
@@ -261,9 +261,8 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("TypeOfProof")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int?>("ProofTypeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -272,6 +271,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("LastModifiedById");
+
+                    b.HasIndex("ProofTypeId");
 
                     b.ToTable("Guests");
                 });
@@ -299,7 +300,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("guestReservations");
+                    b.ToTable("GuestReservations");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
@@ -315,8 +316,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -365,6 +366,40 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("LastModifiedById");
 
                     b.ToTable("Options");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("LastModifiedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("LastModifiedById");
+
+                    b.ToTable("ProofTypes");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Rate", b =>
@@ -439,8 +474,8 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CancellationReason")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("CheckInDate")
                         .HasColumnType("datetime2");
@@ -477,9 +512,6 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsPending")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsStarted")
                         .HasColumnType("bit");
 
                     b.Property<int?>("LastModifiedById")
@@ -666,9 +698,8 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("FloorId")
                         .HasColumnType("int");
@@ -1345,11 +1376,18 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasForeignKey("LastModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("HotelApp.Domain.Entities.ProofType", "ProofType")
+                        .WithMany("Guests")
+                        .HasForeignKey("ProofTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Branch");
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("LastModifiedBy");
+
+                    b.Navigation("ProofType");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.GuestReservation", b =>
@@ -1390,6 +1428,23 @@ namespace HotelApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("LastModifiedBy");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
+                {
+                    b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HotelApp.Domain.Entities.User", "LastModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("LastModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -1820,6 +1875,11 @@ namespace HotelApp.Infrastructure.Migrations
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
                 {
                     b.Navigation("RoomOptions");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
+                {
+                    b.Navigation("Guests");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Rate", b =>

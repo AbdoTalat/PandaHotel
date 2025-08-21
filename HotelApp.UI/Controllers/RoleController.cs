@@ -187,7 +187,8 @@ namespace HotelApp.UI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                var model = await _roleService.GetAssignPermissionsDTOAsync(Id);
+                return View(model);
             }
 
             var result = await _roleService.AssignPermissionsAsync(Id, permissionStrings);
@@ -199,7 +200,8 @@ namespace HotelApp.UI.Controllers
             }
 
             TempData["Error"] = result.Message;
-            return View();
+            var dto = await _roleService.GetAssignPermissionsDTOAsync(Id);
+            return View(dto);
         }
 
 

@@ -22,8 +22,8 @@ namespace HotelApp.Application.Mapping
            .ForMember(dest => dest.RoomStatusColor, opt => opt.MapFrom(src => src.RoomStatus.Color))
            .ForMember(dest => dest.Floor, opt => opt.MapFrom(src => src.Floor.Number))
 		   .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.RoomType.Name))
-		   .ForMember(dest => dest.MaxNumOfAdults, opt => opt.MapFrom(src => src.RoomType.MaxNumOfAdults))
-		   .ForMember(dest => dest.MaxNumOfChildren, opt => opt.MapFrom(src => src.RoomType.MaxNumOfChildrens)); // note spelling!
+		   .ForMember(dest => dest.MaxNumOfAdults, opt => opt.MapFrom(src => src.MaxNumOfAdults))
+		   .ForMember(dest => dest.MaxNumOfChildren, opt => opt.MapFrom(src => src.MaxNumOfChildrens)); // note spelling!
 
 			CreateMap<AddRoomDTO, Room>();
 

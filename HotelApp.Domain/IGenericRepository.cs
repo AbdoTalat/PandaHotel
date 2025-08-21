@@ -10,26 +10,21 @@ namespace HotelApp.Domain
         Task<IEnumerable<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
 
 
-        public Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
+        Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
+        Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
 
-        public Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
+		Task<IEnumerable<T>> GetFilteredAsync(object filterDto, bool SkipBranchFilter = false);
+		Task<IEnumerable<TDto>> GetFilteredAsDtoAsync<TDto>(object filterDto, bool SkipBranchFilter = false) where TDto : class;
 
-
-
-        Task AddNewAsync(T entity);
+		Task AddNewAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
 
 		void Update(T entity);
         void UpdateRange(IEnumerable<T> entities);
-		//		Task BulkUpdateAsync(
-		//	Expression<Func<T, bool>> predicate,
-		//	Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties
-		//);
-		 Task BulkUpdateAsync(
-	Expression<Func<T, bool>> predicate,
-	Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
-	bool skipBranchFilter = false,
-	bool skipAuditFields = false);
+
+		 Task BulkUpdateAsync(Expression<Func<T, bool>> predicate,
+	        Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
+	        bool skipBranchFilter = false, bool skipAuditFields = false);
 
 
 		void Delete(T entity);

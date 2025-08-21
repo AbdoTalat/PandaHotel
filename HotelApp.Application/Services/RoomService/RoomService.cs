@@ -9,6 +9,8 @@ using HotelApp.Application.DTOs.RoleBased;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using BenchmarkDotNet.Running;
+using System.Web.Mvc;
+using HotelApp.Helper;
 
 namespace HotelApp.Application.Services.RoomService
 {
@@ -67,6 +69,7 @@ namespace HotelApp.Application.Services.RoomService
                 }
                 var mappedRoom = _mapper.Map<Room>(roomDTO);
                 await _unitOfWork.Repository<Room>().AddNewAsync(mappedRoom);
+                await _unitOfWork.CommitAsync();
 
                 if (roomDTO.SelectedOptions != null)
                 {
@@ -97,7 +100,7 @@ namespace HotelApp.Application.Services.RoomService
             }
             catch (Exception ex)
             {
-                return ServiceResponse<AddRoomDTO>.ResponseFailure($"Error occurred while saving the room. Please contact the site owner");
+                return ServiceResponse<AddRoomDTO>.ResponseFailure(ex.InnerException.Message);
             }
         }
 		public async Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto)
@@ -114,7 +117,7 @@ namespace HotelApp.Application.Services.RoomService
 			{
 				var roomsToAdd = new List<Room>();
 
-				for (int i = dto.RoomNumberFrom; i <= dto.RoomNumberTo; i++)
+				for (int? i = dto.RoomNumberFrom; i <= dto.RoomNumberTo; i++)
 				{
 					var roomNumber = string.IsNullOrEmpty(dto.RoomNumberText)
 				        ? i.ToString()
@@ -262,5 +265,15 @@ namespace HotelApp.Application.Services.RoomService
 
             return roomsData;
         }
+
+        public async Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto)
+        {
+            //var result = await _unitOfWork.Repository<Room>()
+            // .GetFilteredAsDtoAsync<GetAllRoomsDTO>(filter);
+
+            var result = await _roomRepository.GetFilteredRoomsAsync(dto);
+
+            return result;
+		}
 	}
 }

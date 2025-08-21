@@ -26,7 +26,7 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasMaxLength(200);
 
 			builder.Property(b => b.CancellationReason)
-			   .HasMaxLength(200);
+			   .HasMaxLength(50);
 
 			builder.Property(r => r.TotalPrice)
 				.HasColumnType("decimal(18,2)");

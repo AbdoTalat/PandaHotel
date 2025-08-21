@@ -11,35 +11,37 @@ using AutoMapper.QueryableExtensions;
 using HotelApp.Domain.Enums;
 using HotelApp.Helper;
 using HotelApp.Domain.Entities;
+using Microsoft.Identity.Client;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HotelApp.Infrastructure.Repositories
 {
     public class RoomRepository : IRoomRepository
     {
         private readonly ApplicationDbContext _context;
-		private readonly IConfigurationProvider _mapper;
+		private readonly IConfigurationProvider _mapperConfig;
 
-		public RoomRepository(ApplicationDbContext context, IConfigurationProvider mapper)
+		public RoomRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
         {
             _context = context;
-			_mapper = mapper;
+			_mapperConfig = mapperConfig;
 		}
 
 		public GetRoomsReview GetRoomsReview()
         {
 			var available = _context.Rooms
 				.BranchFilter()
-		        .Where(r =>  r.RoomStatusId == (int)RoomStatusEnum.Available)
+		        .Where(r =>  r.RoomStatus.Name.ToLower() == "available")
 		        .Count();
 
 			var Occupied = _context.Rooms
 			   .BranchFilter()
-			   .Where(r => r.RoomStatusId == (int)RoomStatusEnum.Occupied)
+			   .Where(r => r.RoomStatus.Name.ToLower() == "occupied")
 			   .Count();
 
 			var Maintainance = _context.Rooms
 			   .BranchFilter()
-			   .Where(r => r.RoomStatusId == (int)RoomStatusEnum.Maintenance)
+			   .Where(r => r.RoomStatus.Name.ToLower() == "maintenance")
 			   .Count();
 
             var result = new GetRoomsReview
@@ -66,7 +68,7 @@ namespace HotelApp.Infrastructure.Repositories
 				.Where(r => r.CreatedDate >= start && r.CreatedDate <= end);
 
 			var roomDetails = await query
-				.ProjectTo<RoomsDetailsDTO>(_mapper)
+				.ProjectTo<RoomsDetailsDTO>(_mapperConfig)
 				.ToListAsync();
 
 			var statusCounts = await query
@@ -86,9 +88,32 @@ namespace HotelApp.Infrastructure.Repositories
 				NumOfOccupied = occupied,
 				NumOfMaintainable = maintenance
 			};
-
-
 			
+		}
+		public async Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto)
+		{
+			var Query = _context.Rooms
+				 .BranchFilter();
+
+			if (!string.IsNullOrEmpty(dto.RoomNumber))
+				Query = Query.Where(r => r.RoomNumber.Contains(dto.RoomNumber));
+
+			if (dto.MaxNumOfAdults > 0)
+				Query = Query.Where(r => r.MaxNumOfAdults >= dto.MaxNumOfAdults);
+
+			if (dto.MaxNumOfChildrens > 0)
+				Query = Query.Where(r => r.MaxNumOfChildrens >= dto.MaxNumOfChildrens);
+
+			if (dto.RoomTypeId >= 1)
+				Query = Query.Where(r => r.RoomTypeId == dto.RoomTypeId);
+
+			if (dto.RoomStatusId >= 1)
+				Query = Query.Where(r => r.RoomStatusId == dto.RoomStatusId);
+
+			if (dto.IsActive.HasValue)
+				Query = Query.Where(r => r.IsActive == dto.IsActive.Value);
+
+			return await Query.ProjectTo<GetAllRoomsDTO>(_mapperConfig).ToListAsync();
 		}
 	}
 }
