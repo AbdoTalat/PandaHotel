@@ -13,6 +13,7 @@ namespace HotelApp.UI.Controllers
 {
     public class BranchController : Controller
     {
+        // Salam Alykom
         private readonly IBranchService _branchService;
         private readonly ApplicationDbContext _context;
 		private readonly UserManager<User> _userManager;
