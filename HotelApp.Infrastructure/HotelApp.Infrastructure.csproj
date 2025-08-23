@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Helper\HotelApp.Helper.csproj" />
     <ProjectReference Include="..\HotelApp.Application\HotelApp.Application.csproj" />
     <ProjectReference Include="..\HotelApp.Helper\HotelApp.Helper.csproj" />
   </ItemGroup>
