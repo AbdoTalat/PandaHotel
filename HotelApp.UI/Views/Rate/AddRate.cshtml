@@ -1,7 +1,6 @@
 ﻿@model AddRateDTO
 @{
 	TempData["Title"] = "Add Rate";
-	int? BranchId = ViewBag.BranchId;
 }
 <!-- Page header -->
 <div class="page-header page-header-default">
@@ -76,7 +75,6 @@
 <div class="content">
 	<div class="row">
 		<form class="" asp-action="AddRate" asp-controller="Rate" method="post">
-			<input type="hidden" asp-for="BranchId" value="@BranchId"/>
 			<div class="col-md-12">
 				<div class="panel panel-flat border-left-md border-left-teal">
 

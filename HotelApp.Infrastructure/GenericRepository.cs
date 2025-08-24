@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Query;
 using HotelApp.Domain.Common;
 using System.Security.Claims;
+using HotelApp.Application.Services.CurrentUserService;
 
 namespace HotelApp.Infrastructure
 {
@@ -17,18 +18,16 @@ namespace HotelApp.Infrastructure
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
-		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly ICurrentUserService _currentUserService;
 		private readonly DbSet<T> _dbSet;
 
-		private readonly int _currentUserId;
 		public GenericRepository(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig, IHttpContextAccessor httpContextAccessor)
+            IConfigurationProvider mapperConfig, ICurrentUserService currentUserService)
         {
             _context = context;
             _mapperConfig = mapperConfig;
-			_httpContextAccessor = httpContextAccessor;
+			_currentUserService = currentUserService;
 			_dbSet = _context.Set<T>();
-			_currentUserId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
 		#region Get Methods
@@ -110,39 +109,37 @@ namespace HotelApp.Infrastructure
                 .ProjectTo<TDto>(_mapperConfig)
                 .FirstOrDefaultAsync();
         }
-		#endregion
+        #endregion
 
-		#region Filter Methods
+        #region Add & Edit & Delete
+        public async Task AddNewAsync(T entity)
+        {
+            var branchId = BranchContext.CurrentBranchId;
 
-		public async Task<IEnumerable<T>> GetFilteredAsync(object filterDto, bool SkipBranchFilter = false)
-		{
-			IQueryable<T> query = _dbSet.AsNoTracking()
-				.BranchFilter(SkipBranchFilter);
+            // If entity has a BranchId property and branchId is not null
+            var prop = typeof(T).GetProperty("BranchId");
+            if (prop != null && prop.PropertyType == typeof(int) && branchId.HasValue)
+            {
+                prop.SetValue(entity, branchId.Value);
+            }
 
-			// Apply generic filter here
-			query = query.ApplyFilter(filterDto);
-
-			return await query.ToListAsync();
-		}
-
-		public async Task<IEnumerable<TDto>> GetFilteredAsDtoAsync<TDto>(object filterDto, bool SkipBranchFilter = false) where TDto : class
-		{
-			IQueryable<T> query = _dbSet.AsNoTracking()
-				.BranchFilter(SkipBranchFilter);
-
-			// Apply generic filter here
-			query = query.ApplyFilter(filterDto);
-
-			return await query.ProjectTo<TDto>(_mapperConfig).ToListAsync();
-		}
-
-		#endregion
-
-		#region Add & Edit & Delete
-		public async Task AddNewAsync(T entity)
-            => await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity);
+        }
         public async Task AddRangeAsync(IEnumerable<T> entities)
-            => await _dbSet.AddRangeAsync(entities);
+        {
+            var branchId = BranchContext.CurrentBranchId;
+
+            foreach (var entity in entities)
+            {
+                var prop = typeof(T).GetProperty("BranchId");
+                if (prop != null && prop.PropertyType == typeof(int) && branchId.HasValue)
+                {
+                    prop.SetValue(entity, branchId.Value);
+                }
+            }
+
+            await _dbSet.AddRangeAsync(entities);
+        }
         public void Update(T entity)
             => _dbSet.Update(entity);
         public void UpdateRange(IEnumerable<T> entities)
@@ -162,7 +159,7 @@ namespace HotelApp.Infrastructure
 			if (!skipAuditFields)
 			{
 				setProperties = CombineSetProperties(setProperties, s =>
-					s.SetProperty(e => EF.Property<int>(e, "LastModifiedById"), _currentUserId)
+					s.SetProperty(e => EF.Property<int>(e, "LastModifiedById"), _currentUserService.UserId)
 					 .SetProperty(e => EF.Property<DateTime>(e, "LastModifiedDate"), DateTime.UtcNow)
 				);
 			}

@@ -108,6 +108,7 @@ namespace HotelApp.UI.Controllers
 				}
             }
 
+			model.BranchId = BranchId;
             HttpContext.Session.SetString("BookRoomData", JsonConvert.SerializeObject(model));
 
             return Json(new

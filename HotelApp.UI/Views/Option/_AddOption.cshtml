@@ -1,11 +1,9 @@
 ﻿@model AddOptionDTO
 @{
-	int BranchId = ViewBag.BranchId;
 }
 
 
 <form class="form-basic ajaxForm" asp-action="AddOption" asp-controller="Option" method="post">
-	<input type="hidden" asp-for="BranchId" value="@BranchId" />
 	<div class="panel panel-flat">
 		<div class="panel-body">
 			<div class="content">

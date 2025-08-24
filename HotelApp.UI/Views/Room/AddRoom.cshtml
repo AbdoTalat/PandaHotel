@@ -1,7 +1,6 @@
 ﻿@model AddRoomDTO
 @{
 	TempData["Title"] = "Add Room";
-	int BranchId = ViewBag.BranchId;
 }
 
 <div class="page-header page-header-default">
@@ -51,7 +50,6 @@
  <div class="content">
 	 <div class="row">
         <form asp-action="AddRoom" asp-controller="Room" method="post">
-            <input type="hidden" asp-for="BranchId" value="@BranchId" />
 			<div class="col-md-12">
 				<div class="panel panel-flat border-left-md border-left-teal">
 					<div class="panel-heading">

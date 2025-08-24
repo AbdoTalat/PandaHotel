@@ -22,13 +22,15 @@ namespace HotelApp.Application.Services.SystemSettingService
 		}
         public async Task<SystemSettingDTO?> GetSystemSettingForEditAsync()
 		{
-			var systemSetting = await _unitOfWork.Repository<SystemSetting>().FirstOrDefaultAsDtoAsync<SystemSettingDTO>();
+			var systemSetting = await _unitOfWork.Repository<SystemSetting>()
+				.FirstOrDefaultAsDtoAsync<SystemSettingDTO>();
 
 			return systemSetting;
 		}
         public async Task<ServiceResponse<SystemSettingDTO>> EditSystemSettingAsync(SystemSettingDTO systemSettingDTO)
 		{
-			var OldSystemSetting = await _unitOfWork.Repository<SystemSetting>().FirstOrDefaultAsync();
+			var OldSystemSetting = await _unitOfWork.Repository<SystemSetting>()
+				.FirstOrDefaultAsync(st => st.Id == systemSettingDTO.Id);
 			if (OldSystemSetting == null)
 			{
 				return ServiceResponse<SystemSettingDTO>.ResponseFailure("System setting is no longer exists.");

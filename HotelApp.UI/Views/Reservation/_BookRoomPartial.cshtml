@@ -1,11 +1,9 @@
 ﻿@model BookRoomDTO
 @{
-    int BranchId = ViewBag.BranchId;
 }
 
 <div class="row">
     <form id="bookRoomForm">
-        <input type="hidden" asp-for="BranchId" value="@ViewBag.BranchId" />
         <fieldset>
             <div class="row">
 
@@ -337,6 +335,127 @@
 <script>
     let isGroupMode = false;
 
+    // ========== Helpers ==========
+    function fillOptions($select, start, end, includeEmpty = true) {
+        const current = $select.val();
+        $select.empty();
+        if (includeEmpty) $select.append('<option></option>');
+        for (let i = start; i <= end; i++) {
+            $select.append(`<option value="${i}">${i}</option>`);
+        }
+        // try preserve selection if still valid
+        if (current && +current >= start && +current <= end) {
+            $select.val(current).trigger('change.select2');
+        }
+    }
+
+    function updateRowCapacities($row) {
+        const $roomType = $row.find('.room-type-select');
+        const $numRooms = $row.find('.num-rooms-select');
+        const $adults = $row.find('.num-adults-select');
+        const $children = $row.find('.num-children-select');
+
+        const opt = $roomType.find('option:selected');
+        const maxAdultsPerRoom = parseInt(opt.data('max-adults') || 0, 10);
+        const maxChildrenPerRoom = parseInt(opt.data('max-children') || 0, 10);
+        const rooms = parseInt($numRooms.val() || 0, 10);
+
+        const totalMaxAdults = maxAdultsPerRoom * rooms;
+        const totalMaxChildren = maxChildrenPerRoom * rooms;
+
+        // Adults 1..totalMaxAdults (if rooms==0 or no type selected -> keep empty)
+        if (totalMaxAdults > 0) {
+            fillOptions($adults, 1, totalMaxAdults, true);
+            if (!$adults.val()) {
+                $adults.val('1').trigger('change.select2');
+            }
+        } else {
+            $adults.empty().append('<option></option>').val(null).trigger('change.select2');
+        }
+
+        // Children 0..totalMaxChildren (start at 0)
+        if (totalMaxChildren > 0) {
+            const prev = $children.val();
+            $children.empty().append('<option value="0">0</option>');
+            for (let i = 1; i <= totalMaxChildren; i++) {
+                $children.append(`<option value="${i}">${i}</option>`);
+            }
+            if (prev !== null && prev !== undefined && +prev <= totalMaxChildren) {
+                $children.val(prev).trigger('change.select2');
+            } else {
+                $children.val('0').trigger('change.select2');
+            }
+        } else {
+            $children.empty().append('<option></option>').val(null).trigger('change.select2');
+        }
+    }
+
+    function formatRoomOption(data) {
+        if (!data.id) return data.text;
+        const $option = $(data.element);
+        const name = $option.data('name') || data.text;
+        const count = $option.data('count');
+        const isDisabled = $option.prop('disabled');
+        return $(`
+                <div class="d-flex justify-content-between align-items-center w-100 ${isDisabled ? 'text-muted' : ''}">
+                    <span>${name}</span>
+                    <span class="label ${isDisabled ? 'bg-danger' : 'bg-primary'}">${count}</span>
+                </div>
+            `);
+    }
+    function formatRoomSelection(data) { return data.text; }
+
+    function initializeSelect2(container) {
+        const $container = $(container);
+        const $roomTypeSelect = $container.find('.room-type-select');
+
+        $roomTypeSelect.select2({
+            width: '100%',
+            placeholder: function () { return $(this).data('placeholder'); },
+            templateResult: formatRoomOption,
+            templateSelection: formatRoomSelection
+        });
+
+        // Prevent selecting unavailable RoomTypes
+        $roomTypeSelect.on('select2:selecting', function (e) {
+            const count = $(e.params.args.data.element).data('count');
+            if (count === 0 || count === "0") {
+                e.preventDefault();
+                toastr.warning("This room type is not available.");
+            }
+        });
+
+        $container.find('select:not(.room-type-select)').select2({
+            width: '100%',
+            placeholder: function () { return $(this).data('placeholder'); }
+        });
+
+        // When RoomType changes: populate NumRooms, then update Adults/Children (with multiplication)
+        $roomTypeSelect.on('change', function () {
+            const $row = $(this).closest('tr');
+            const roomOption = $(this).find('option:selected');
+            const maxRooms = parseInt(roomOption.data('count') || 0, 10);
+
+            const $numRooms = $row.find('.num-rooms-select');
+            fillOptions($numRooms, 1, Math.max(maxRooms, 0), true);
+            if (maxRooms >= 1) {
+                $numRooms.val('1').trigger('change.select2');
+            } else {
+                $numRooms.val(null).trigger('change.select2');
+            }
+
+            updateRowCapacities($row);
+            refreshAllRoomTypeOptions();
+        });
+
+        // When NumRooms changes: recompute Adults/Children caps (RoomType caps × rooms)
+        $container.on('change', '.num-rooms-select', function () {
+            const $row = $(this).closest('tr');
+            updateRowCapacities($row);
+        });
+    }
+
+    // ========== Modes ==========
     function setToSingleMode() {
         isGroupMode = false;
         $('#addRoomWrapper').hide();
@@ -346,6 +465,7 @@
 
         const rows = $('#roomTable tbody tr');
         if (rows.length > 1) rows.slice(1).remove();
+        refreshAllRoomTypeOptions();
     }
 
     function setToGroupMode() {
@@ -354,96 +474,11 @@
 
         $('#groupBtn').addClass('text-teal-800 border-teal btn-flat').removeClass('bg-teal');
         $('#singleBtn').removeClass('text-teal-800 border-teal btn-flat').addClass('bg-teal');
+
+        refreshAllRoomTypeOptions();
     }
 
-    function formatRoomOption(data) {
-        if (!data.id) return data.text;
-
-        const $option = $(data.element);
-        const name = $option.data('name') || data.text;
-        const count = $option.data('count');
-        const isDisabled = $option.prop('disabled');
-
-        return $(`
-                <div class="d-flex justify-content-between align-items-center w-100 ${isDisabled ? 'text-muted' : ''}">
-                    <span>${name}</span>
-                    <span class="label ${isDisabled ? 'bg-danger' : 'bg-primary'}">${count}</span>
-                </div>
-            `);
-    }
-
-    function formatRoomSelection(data) {
-        return data.text;
-    }
-
-    function initializeSelect2(container) {
-        const roomTypeSelect = $(container).find('.room-type-select');
-
-        roomTypeSelect.select2({
-            width: '100%',
-            placeholder: function () {
-                return $(this).data('placeholder');
-            },
-            templateResult: formatRoomOption,
-            templateSelection: formatRoomSelection
-        });
-
-        // Prevent selecting unavailable RoomTypes
-        roomTypeSelect.on('select2:selecting', function (e) {
-            const count = $(e.params.args.data.element).data('count');
-            if (count === 0 || count === "0") {
-                e.preventDefault();
-                toastr.warning("This room type is not available.");
-            }
-        });
-
-        $(container).find('select:not(.room-type-select)').select2({
-            width: '100%',
-            placeholder: function () {
-                return $(this).data('placeholder');
-            }
-        });
-
-        roomTypeSelect.on('change', function () {
-            const selectedId = $(this).val();
-            const roomOption = $(this).find(`option[value="${selectedId}"]`);
-
-            const maxRooms = parseInt(roomOption.data('count') || 1);
-            const maxAdults = parseInt(roomOption.data('max-adults') || 0);
-            const maxChildren = parseInt(roomOption.data('max-children') || 0);
-
-            const $row = $(this).closest('tr');
-
-            // Num of rooms
-            const roomSelect = $row.find('.num-rooms-select');
-            roomSelect.empty().append('<option></option>');
-            for (let i = 1; i <= maxRooms; i++) {
-                roomSelect.append(`<option value="${i}">${i}</option>`);
-            }
-            if (maxRooms >= 1) {
-                roomSelect.val('1').trigger('change'); // 👈 Set default to 1
-            }
-
-            // Adults
-            const adultSelect = $row.find('.num-adults-select');
-            adultSelect.empty().append('<option></option>');
-            for (let i = 0; i <= maxAdults; i++) {
-                adultSelect.append(`<option value="${i}">${i}</option>`);
-            }
-            if (maxAdults >= 1) {
-                adultSelect.val('1').trigger('change');
-            }
-
-            // Children
-            const childSelect = $row.find('.num-children-select');
-            childSelect.empty().append('<option></option>');
-            for (let i = 0; i <= maxChildren; i++) {
-                childSelect.append(`<option value="${i}">${i}</option>`);
-            }
-            childSelect.val('0').trigger('change');
-        });
-    }
-
+    // ========== Row add/remove ==========
     function addRoomRow() {
         const lastRow = $('#roomTable tbody tr').last();
 
@@ -467,14 +502,14 @@
     @foreach (var item in ViewBag.RoomTypes)
     {
         <text>
-                    if (!(isGroupMode && selectedIds.includes("@item.Id"))) {
+                        if (!(isGroupMode && selectedIds.includes("@item.Id"))) {
                 optionsHtml += `<option value="@item.Id"
-                            data-name="@item.Name"
-                            data-count="@item.NumOfAvailableRooms"
-                            data-max-adults="@item.MaxNumOfAdults"
-                            data-max-children="@item.MaxNumOfChildrens">
+                                data-name="@item.Name"
+                                data-count="@item.NumOfAvailableRooms"
+                                data-max-adults="@item.MaxNumOfAdults"
+                                data-max-children="@item.MaxNumOfChildrens">
                 @item.Name (@item.NumOfAvailableRooms available)
-                        </option>`;
+                            </option>`;
             }
         </text>
     }
@@ -503,7 +538,8 @@
         tbody.appendChild(newRow);
         initializeSelect2(newRow);
         updateRemoveButtons();
-        toggleRoomSelectsBasedOnDates(); // Apply enable/disable state to new selects
+        toggleRoomSelectsBasedOnDates(); // enable/disable based on dates
+        refreshAllRoomTypeOptions();
     }
 
     function removeRoomRow(button) {
@@ -519,6 +555,7 @@
         removeButtons.forEach(btn => btn.style.display = rows.length === 1 ? 'none' : 'inline-block');
     }
 
+    // Disable already-selected room types across rows (when in group mode)
     function refreshAllRoomTypeOptions() {
         const allSelects = $('.room-type-select');
         const selectedValues = allSelects.map(function () { return $(this).val(); }).get().filter(v => v);
@@ -530,23 +567,29 @@
                 if (!optionVal || optionVal === currentVal) {
                     $(this).prop('disabled', false);
                 } else {
-                    $(this).prop('disabled', selectedValues.includes(optionVal));
+                    // disable only in group mode
+                    $(this).prop('disabled', isGroupMode && selectedValues.includes(optionVal));
                 }
             });
         });
+
+        // refresh Select2 rendering after disabling/enabling
+        allSelects.each(function () { $(this).trigger('change.select2'); });
     }
 
+    // Enable selects only when dates are chosen
     function toggleRoomSelectsBasedOnDates() {
         const hasDates = $('#CheckInDate').val() && $('#CheckOutDate').val();
-
         $('#roomTable select').prop('disabled', !hasDates);
+
         $('#roomTable .select').each(function () {
             if (!hasDates) {
-                $(this).val(null).trigger('change'); // Reset select2
+                $(this).val(null).trigger('change.select2'); // Reset select2
             }
         });
     }
 
+    // ========== Init ==========
     document.addEventListener('DOMContentLoaded', function () {
         setToSingleMode();
         addRoomRow();
@@ -766,7 +809,7 @@
             NumOfNights: $("#NumOfNights").val(),
             ReservationSourceId: $("#ReservationSourceId").val(),
             RateId: $("#rateSelect").val(),
-            BranchId: $("input[name='BranchId']").val(),
+            //BranchId: $("input[name='BranchId']").val(),
             companyId: companyIdVal ? parseInt(companyIdVal) : null,
             roomTypeToBookDTOs: []
         };

@@ -22,14 +22,12 @@ namespace HotelApp.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
-		private readonly IHttpContextAccessor _httpContextAccessor;
 
 		public RateRepository(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig, IHttpContextAccessor httpContextAccessor)
+            IConfigurationProvider mapperConfig)
         {
             _context = context;
             _mapperConfig = mapperConfig;
-			_httpContextAccessor = httpContextAccessor;
 		}
 
         public async Task<EditRateDTO> GetRateToEditByIdAsync(int Id)

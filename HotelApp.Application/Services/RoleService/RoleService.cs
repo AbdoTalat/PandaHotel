@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
+using HotelApp.Application.Services.CurrentUserService;
 
 namespace HotelApp.Application.Services.RoleService
 {
@@ -18,7 +19,7 @@ namespace HotelApp.Application.Services.RoleService
 		private readonly IRoleRepository _roleRepository;
 		private readonly UserManager<User> _userManager;
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly ICurrentUserService _currentUserService;
 
 		public RoleService(
 			RoleManager<Role> roleManager,
@@ -26,14 +27,14 @@ namespace HotelApp.Application.Services.RoleService
 			IRoleRepository roleRepository,
 			UserManager<User> userManager,
 			IUnitOfWork unitOfWork,
-			IHttpContextAccessor httpContextAccessor)
+			ICurrentUserService currentUserService)
 		{
 			_roleManager = roleManager;
 			_mapper = mapper;
 			_roleRepository = roleRepository;
 			_userManager = userManager;
 			_unitOfWork = unitOfWork;
-			_httpContextAccessor = httpContextAccessor;
+			_currentUserService = currentUserService;
 		}
 		// ✅ Get all available permissions with info about which are assigned
 		public async Task<IEnumerable<PermissionDTO>> GetAllPermissionsAsync(int roleId)
@@ -81,7 +82,7 @@ namespace HotelApp.Application.Services.RoleService
 			{
 				Name = roleDTO.Name,
 				IsActive = roleDTO.IsActive,
-				CreatedById = GetCurrentUserId(),
+				CreatedById = _currentUserService.UserId,
 				CreatedDate = DateTime.UtcNow
 			};
 
@@ -143,7 +144,7 @@ namespace HotelApp.Application.Services.RoleService
 				await _roleRepository.AddRolePermissionsAsync(roleId, newPermissions);
 
                 var role = await _roleManager.FindByIdAsync(roleId.ToString());
-                role.LastModifiedById = GetCurrentUserId();
+                role.LastModifiedById = _currentUserService.UserId;
 				role.LastModifiedDate = DateTime.UtcNow;
 
 				await _roleManager.UpdateAsync(role);
@@ -168,7 +169,7 @@ namespace HotelApp.Application.Services.RoleService
 
 			existingRole.Name = role.Name;
 			existingRole.IsActive = role.IsActive;
-			existingRole.LastModifiedById = GetCurrentUserId();
+			existingRole.LastModifiedById = _currentUserService.UserId;
 			existingRole.LastModifiedDate = DateTime.UtcNow;
 
 			var result = await _roleManager.UpdateAsync(existingRole);
@@ -199,18 +200,5 @@ namespace HotelApp.Application.Services.RoleService
 			return ServiceResponse<Role>.ResponseFailure("Role deletion failed");
 		}
 
-
-
-		#region Helper Methods 
-		private int GetCurrentUserId()
-		{
-			if (int.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
-			{
-				return userId;
-			}
-
-			return 0;
-		}
-		#endregion
 	}
 }

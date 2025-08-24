@@ -15,6 +15,14 @@ namespace HotelApp.UI.Controllers
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
 			ViewBag.BranchId = BranchId;
+
+			if (BranchId == 0)
+			{
+				// Redirect to logout (or login page)
+				context.Result = new RedirectToActionResult("Logout", "Account", null);
+				return;
+			}
+
 			base.OnActionExecuting(context);
 		}
 	}

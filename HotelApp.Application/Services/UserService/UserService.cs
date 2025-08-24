@@ -10,6 +10,7 @@ using System.Security.Claims;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Application.DTOs.Branches;
+using HotelApp.Application.Services.CurrentUserService;
 
 namespace HotelApp.Application.Services.UserService
 {
@@ -20,7 +21,7 @@ namespace HotelApp.Application.Services.UserService
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<Role> _roleManager;
 		private readonly IUserRepository _userRepository;
-		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly ICurrentUserService _currentUserService;
 
 
 		public UserService(IUnitOfWork unitOfWork, 
@@ -28,14 +29,14 @@ namespace HotelApp.Application.Services.UserService
 			UserManager<User> userManager,
 			 RoleManager<Role> roleManager, 
 			 IUserRepository userRepository,
-			 IHttpContextAccessor httpContextAccessor)
+			 ICurrentUserService currentUserService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 			_userManager = userManager;
 			_roleManager = roleManager;
 			_userRepository = userRepository;
-			_httpContextAccessor = httpContextAccessor;
+			_currentUserService = currentUserService;
 
 		}
 
@@ -84,7 +85,7 @@ namespace HotelApp.Application.Services.UserService
 				Email = userDTO.Email,
 				DefaultBranchId = userDTO.DefaultBranchId,
 				isActive = userDTO.IsActive,
-				CreatedById = GetCurrentUserId(),
+				CreatedById = _currentUserService.UserId,
 				CreatedDate = DateTime.UtcNow
 			};			
 
@@ -133,7 +134,7 @@ namespace HotelApp.Application.Services.UserService
 			try
 			{
 				_mapper.Map(userDTO, user);
-				user.LastModifiedById = GetCurrentUserId();
+				user.LastModifiedById = _currentUserService.UserId;
 				user.LastModifiedDate = DateTime.UtcNow;
 				await _userManager.UpdateAsync(user);
 
@@ -214,17 +215,5 @@ namespace HotelApp.Application.Services.UserService
 			return ServiceResponse<string>.ResponseFailure("Somthing went wrong!.");
 		}
 
-
-		#region Helper Methods For User
-		private int GetCurrentUserId()
-		{
-			if (int.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
-			{
-				return userId;
-			}
-
-			return 0;
-		}
-		#endregion
 	}
 }

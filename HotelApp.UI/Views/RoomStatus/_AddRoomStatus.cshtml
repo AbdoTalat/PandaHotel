@@ -1,10 +1,8 @@
 ﻿@model AddRoomStatusDTO
 @{
-    int BranchId = ViewBag.BranchId;
 }
 
 <form class="form-basic ajaxForm" asp-action="AddRoomStatus" asp-controller="RoomStatus" method="post">
-    <input type="hidden" asp-for="BranchId" value="@BranchId" />
     <div class="panel panel-flat border-left-lg border-left-teal ">
         <div class="panel-body">
             <div class="content">

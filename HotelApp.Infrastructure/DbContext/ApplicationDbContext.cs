@@ -10,18 +10,20 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Security.Claims;
 using HotelApp.Domain.Common;
+using HotelApp.Application.Services.CurrentUserService;
 
 
 namespace HotelApp.Infrastructure.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<User, Role, int>
-    {		
-		private readonly IHttpContextAccessor? _httpContextAccessor;
+    {
+		private readonly ICurrentUserService _currentUserService;
+
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, 
-			IHttpContextAccessor? httpContextAccessor)
+			ICurrentUserService currentUserService)
 			: base(options)
 		{
-			_httpContextAccessor = httpContextAccessor;
+			_currentUserService = currentUserService;
 		}
 
 		#region Overrided SaveChangesAsync Method
@@ -40,11 +42,7 @@ namespace HotelApp.Infrastructure.DbContext
 
 				var now = DateTime.UtcNow;
 
-				// Get userId safely
-				var userIdStr = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-				int? userId = null;
-				if (int.TryParse(userIdStr, out var parsedUserId))
-					userId = parsedUserId;
+				int? userId = _currentUserService.UserId;
 
 				foreach (var entry in entries)
 				{
@@ -120,7 +118,7 @@ namespace HotelApp.Infrastructure.DbContext
 			//builder.Ignore<IdentityRoleClaim<int>>();
 			//builder.Ignore<IdentityUserToken<int>>();
 
-
+			#region Configurations
 			builder.ApplyConfiguration(new UserConfiguration());
 			builder.ApplyConfiguration(new RoleConfiguration());
 
@@ -145,7 +143,7 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new SystemSettingConfiguration());
 			builder.ApplyConfiguration(new CompanyConfiguration());
 			builder.ApplyConfiguration(new ProofTypeConfiguration());
-			
+			#endregion
 
 		}
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -8,13 +8,9 @@ namespace HotelApp.Domain
     {
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
         Task<IEnumerable<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
-
-
         Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
         Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
 
-		Task<IEnumerable<T>> GetFilteredAsync(object filterDto, bool SkipBranchFilter = false);
-		Task<IEnumerable<TDto>> GetFilteredAsDtoAsync<TDto>(object filterDto, bool SkipBranchFilter = false) where TDto : class;
 
 		Task AddNewAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
