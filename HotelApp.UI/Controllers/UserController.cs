@@ -45,7 +45,7 @@ namespace HotelApp.UI.Controllers
 
         [HttpGet]
         [Authorize(Policy = "User.View")]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> Index()
         {
             var users = await _userService.GetAllUsersAsync();
 

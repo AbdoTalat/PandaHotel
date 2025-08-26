@@ -13,5 +13,6 @@
   "SystemSetting": [ "SystemSetting.View", "SystemSetting.Add", "SystemSetting.Edit", "SystemSetting.Delete" ],
   "Company": [ "Company.View", "Company.Add", "Company.Edit", "Company.Delete" ],
   "Report": [ "Report.View" ],
-  "ProofType": [ "ProofType.View", "ProofType.Add", "ProofType.Edit", "ProofType.Delete" ]
+  "ProofType": [ "ProofType.View", "ProofType.Add", "ProofType.Edit", "ProofType.Delete" ],
+  "ReservationSource": [ "ReservationSource.View", "ReservationSource.Add", "ReservationSource.Edit", "ReservationSource.Delete" ]
 }

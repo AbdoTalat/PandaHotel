@@ -171,8 +171,11 @@
 							}
 							@if (User.HasClaim("permission", "Reservation.Delete"))
 							{
-								<a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
-							}
+                                <a data-url="/Reservation/DeleteReservation/@item.Id"
+                                   class="text-danger-600 btn-delete">
+                                    <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+                                </a>
+                            }
 							
 						</td>
 					</tr>
@@ -267,13 +270,12 @@
         });
     </script>
 
-
-    <script>
+@*     <script>
         $(document).ready(function () {
             var successMessage = '@TempData["Success"]';
             if (successMessage) {
                 toastr.success(successMessage);
             }
         });
-    </script>
+    </script> *@
 }

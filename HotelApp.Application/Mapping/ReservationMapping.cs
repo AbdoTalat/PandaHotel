@@ -2,6 +2,7 @@
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Guests;
 using HotelApp.Application.DTOs.Reservation;
+using HotelApp.Application.DTOs.ReservationSource;
 using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,9 @@ namespace HotelApp.Application.Mapping
             /* Reservation Source */
             CreateMap<ReservationSource, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
+
+			CreateMap<ReservationSourceDTO, ReservationSource>();
+			CreateMap<ReservationSource, ReservationSourceDTO>();
 
 
 		}

@@ -102,11 +102,11 @@ namespace HotelApp.Infrastructure.DbContext
 				);
 
             builder.Entity<ReservationSource>().HasData(
-                new ReservationSource { Id = 1, Name = "Walk In" },
-                new ReservationSource { Id = 2, Name = "Hotel website" },
-                new ReservationSource { Id = 3, Name = "Admin panel" },
-                new ReservationSource { Id = 4, Name = "Government" },
-                new ReservationSource { Id = 5, Name = "Mobile App"}
+                new ReservationSource { Id = 1, Name = "Walk In", IsActive = true },
+                new ReservationSource { Id = 2, Name = "Hotel website", IsActive = true },
+                new ReservationSource { Id = 3, Name = "Admin panel", IsActive = true },
+                new ReservationSource { Id = 4, Name = "Government", IsActive = true },
+                new ReservationSource { Id = 5, Name = "Mobile App", IsActive = true }
                 );
 
             builder.Entity<User>().ToTable("Users");

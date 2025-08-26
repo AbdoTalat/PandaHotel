@@ -112,9 +112,12 @@
                             {
                                 <a data-title="Edit Option" data-url="/Option/EditOption/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if (User.HasClaim("permission", "Option.Delete"))
+                            @if (User.HasClaim("permission", "Option.Delete") && !item.IsActive)
                             {
-                                <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
+                                <a data-url="/Option/DeleteOption/@item.Id"
+                                   class="text-danger-600 btn-delete">
+                                    <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+                                </a>
                             }
                         </td>
                     </tr>
@@ -132,84 +135,6 @@
 
 <!-- /content area -->
 @section Scripts {
-
-    <script>
-        $(document).ready(function () {
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-danger',
-                    cancelButton: 'btn btn-default custom-cancel-btn'
-                },
-                buttonsStyling: false
-            });
-
-            $(".btn-delete").click(function () {
-                let button = $(this);  // Reference to the clicked button
-                let itemId = button.data("id");
-                let row = button.closest("tr");
-
-                swalWithBootstrapButtons.fire({
-                    position: "top",
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    iconColor: "red",
-                    showCancelButton: true,
-                    confirmButtonText: "Delete!",
-                    cancelButtonText: "Cancel",
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/Option/DeleteOption/' + itemId,
-                            type: 'DELETE',
-                            success: function (response) {
-                                if (response.success == true) {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "Deleted!",
-                                        text: response.message,
-                                        icon: "success",
-                                        customClass: {
-                                            confirmButton: 'btn btn-success'
-                                        }
-                                    }).then(() => {
-                                        row.fadeOut(400, function () { // Fade out the row smoothly
-                                            $(this).remove(); // Remove the row from DOM
-                                        });
-                                    });
-                                }
-                                else if (response.success == false) {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "warning!",
-                                        text: response.message,
-                                        icon: "warning"
-                                    });
-                                }
-                                else {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "Error!",
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                            },
-                            error: function () {
-                                swalWithBootstrapButtons.fire({
-                                    position: "top",
-                                    title: "Error!",
-                                    text: "Something went wrong!",
-                                    icon: "error"
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 
 
 }

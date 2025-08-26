@@ -65,21 +65,6 @@
             </div>
         </div>
         <hr class="my-3" style="margin-top:5px; ">
-        @if (TempData["NotFound"] != null)
-        {
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    Swal.fire({
-                        position:'top',
-                        icon: 'error',
-                        title: 'Not Found',
-                        text: '@TempData["NotFound"]',
-                        confirmButtonColor: '#00897B',
-                        confirmButtonText: 'OK'
-                    });
-                });
-            </script>
-        }
 
         <div class="panel-heading" style="margin-bottom:40px">
             <div class="heading-elements">
@@ -117,13 +102,16 @@
                             <td><span class="label label-rounded label-danger">Not Active</span></td>
                         }
                         <td>
-                            @if (User.HasClaim("permission", "Option.Edit"))
+                            @if (User.HasClaim("permission", "Rate.Edit"))
                             {
                                 <a asp-action="EditRate" asp-controller="Rate" asp-route-Id="@item.Id" class="text-teal-600 edit-rate-btn"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if (User.HasClaim("permission", "Option.Delete"))
+                            @if (User.HasClaim("permission", "Rate.Delete"))
                             {
-                                <a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px; margin-right:8px"></i> </a>
+                                <a data-url="/Rate/DeleteRate/@item.Id"
+                                   class="text-danger-600 btn-delete">
+                                    <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+                                </a>
                             }
                         </td>
                     </tr>
@@ -146,83 +134,21 @@
         });
     </script>
  *@
-    <script>
-        $(document).ready(function () {
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-danger',
-                    cancelButton: 'btn btn-default custom-cancel-btn'
-                },
-                buttonsStyling: false
-            });
-
-            $(".btn-delete").click(function () {
-                let button = $(this);  // Reference to the clicked button
-                let itemId = button.data("id");
-                let row = button.closest("tr");
-
-                swalWithBootstrapButtons.fire({
-                    position: "top",
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    iconColor: "red",
-                    showCancelButton: true,
-                    confirmButtonText: "Delete!",
-                    cancelButtonText: "Cancel",
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/Rate/DeleteRate/' + itemId,
-                            type: 'DELETE',
-                            success: function (response) {Rate
-                                if (response.success == true) {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "Deleted!",
-                                        text: response.message,
-                                        icon: "success",
-                                        customClass: {
-                                            confirmButton: 'btn btn-success'
-                                        }
-                                    }).then(() => {
-                                        row.fadeOut(400, function () { // Fade out the row smoothly
-                                            $(this).remove(); // Remove the row from DOM
-                                        });
-                                    });
-                                }
-                                else if (response.success == false) {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "warning!",
-                                        text: response.message,
-                                        icon: "warning"
-                                    });
-                                }
-                                else {
-                                    swalWithBootstrapButtons.fire({
-                                        position: "top",
-                                        title: "Error!",
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                            },
-                            error: function () {
-                                swalWithBootstrapButtons.fire({
-                                    position: "top",
-                                    title: "Error!",
-                                    text: "Something went wrong!",
-                                    icon: "error"
-                                });
-                            }
-                        });
-                    }
+  
+    @if (TempData["NotFound"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                Swal.fire({
+                    position: 'top',
+                    icon: 'error',
+                    title: 'Not Found',
+                    text: '@TempData["NotFound"]',
+                    confirmButtonColor: '#00897B',
+                    confirmButtonText: 'OK'
                 });
             });
-        });
-    </script>
-
+        </script>
+    }
 
 }

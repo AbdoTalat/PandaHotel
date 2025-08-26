@@ -11,6 +11,10 @@ namespace HotelApp.Application.Services.ProofTypeService
     public interface IProofTypeService
     {
         Task<IEnumerable<DropDownDTO<string>>> GetProofTypesDropDownAsync();
-        Task<IEnumerable<GetAllProofTypesDTO>> GetAllProofTypesAsync();
-    }
+        Task<IEnumerable<ProofTypeDTO>> GetAllProofTypesAsync();
+		Task<ServiceResponse<ProofTypeDTO>> AddProofTypeAsync(ProofTypeDTO dto);	
+		Task<ProofTypeDTO?> GetProofTypeToEditByIdAsync(int Id);
+		Task<ServiceResponse<ProofTypeDTO>> EditProofTypeAsync(ProofTypeDTO dto);
+		Task<ServiceResponse<object>> DeleteProofTypeAsync(int Id);
+	}
 }

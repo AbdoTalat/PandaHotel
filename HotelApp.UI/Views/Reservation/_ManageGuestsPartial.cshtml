@@ -318,14 +318,13 @@
 			id: $('#guestId').val() || 0,
 			isPrimary: isPrimary,
 			fullName: fullName,
-			email: $('#Email').val(),
-			phone: $('#Phone').val(),
-			proofTypeId: $('#proofTypeSelect').val(), // ✅ FIX
-			proofTypeName: $('#proofTypeSelect option:selected').text(),
-			proofNumber: $('#ProofNumber').val(),
-			dateOfBirth: $('#DateOfBirth').val(),
-			address: $('#Address').val(),
-			branchId: $('#BranchId').val()
+			email: $('#Email').val() || null,
+			phone: $('#Phone').val() || null,
+			proofTypeId: $('#proofTypeSelect').val() || null, 
+			proofNumber: $('#ProofNumber').val() || null,
+			dateOfBirth: $('#DateOfBirth').val() || null,
+			address: $('#Address').val() || null,
+			branchId: $('#BranchId').val() || 0
 		};
 
 		$.ajax({

@@ -230,11 +230,9 @@
 
 <script>
     $(document).ready(function () {
-
-        // Initialize Select2
         $('#companyNameSelect').select2({
             placeholder: "Search and select company name",
-            minimumInputLength: 2,
+            minimumInputLength: 3,
             ajax: {
                 url: '/Company/GetSerachedCompaniesByName',
                 dataType: 'json',
@@ -287,9 +285,6 @@
         });
 
         $('#saveCompanySelection').on('click', function () {
-
-
-
             const payload = {
                 Id: $('#companyId').val() || 0,
                 Name: $('#CompanyName').val(),
@@ -606,7 +601,6 @@
 <script>
     $(function () {
 
-        // 🔁 Clear all date-related fields
         function clearDates() {
             $('#CheckInDate').val('').trigger('change');
             $('#CheckOutDate').val('').trigger('change');
@@ -614,10 +608,8 @@
             $('#StayRange').val('');
         }
 
-        // 🧹 Clear on page load
         clearDates();
 
-        // ✅ Handle date selection
         $('.daterange-time').on('apply.daterangepicker', function (ev, picker) {
             const checkIn = picker.startDate;
             const checkOut = picker.endDate;
@@ -635,20 +627,16 @@
                 return;
             }
 
-            // Set hidden values and trigger change
             $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm')).trigger('change');
             $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm')).trigger('change');
 
-            // Calculate number of nights
             const durationHours = checkOut.diff(checkIn, 'hours', true);
             const nights = durationHours < 24 ? 0 : Math.floor(durationHours / 24);
             $('#NumOfNights').val(nights);
 
-            // Set visible input
             $(this).val(checkIn.format('YYYY-MM-DD HH:mm') + ' - ' + checkOut.format('YYYY-MM-DD HH:mm'));
         });
 
-        // ❌ Handle cancel event
         $('.daterange-time').on('cancel.daterangepicker', function () {
             clearDates();
         });
@@ -809,7 +797,6 @@
             NumOfNights: $("#NumOfNights").val(),
             ReservationSourceId: $("#ReservationSourceId").val(),
             RateId: $("#rateSelect").val(),
-            //BranchId: $("input[name='BranchId']").val(),
             companyId: companyIdVal ? parseInt(companyIdVal) : null,
             roomTypeToBookDTOs: []
         };

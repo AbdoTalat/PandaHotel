@@ -44,3 +44,76 @@ function loadSelect(selector, url, textField, valueField) {
         }
     });
 }
+
+
+// site.js
+
+//Delete Entity
+$(document).ready(function () {
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-danger',
+            cancelButton: 'btn btn-default custom-cancel-btn'
+        },
+        buttonsStyling: false
+    });
+
+    // Delegate delete button clicks globally
+    $(document).on('click', '.btn-delete', function () {
+        let button = $(this);
+        let itemId = button.data("id");
+        let row = button.closest("tr");
+        let url = button.data("url"); // ✅ get the delete url dynamically
+
+        swalWithBootstrapButtons.fire({
+            position: "top",
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            iconColor: "red",
+            showCancelButton: true,
+            confirmButtonText: "Delete!",
+            cancelButtonText: "Cancel",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            swalWithBootstrapButtons.fire({
+                                position: "top",
+                                title: "Deleted!",
+                                text: response.message,
+                                icon: "success",
+                                customClass: { confirmButton: 'btn btn-success' }
+                            }).then(() => {
+                                row.fadeOut(400, function () {
+                                    $(this).remove();
+                                });
+                            });
+                        } else {
+                            swalWithBootstrapButtons.fire({
+                                position: "top",
+                                title: "Warning!",
+                                text: response.message,
+                                icon: "warning",
+                                customClass: { confirmButton: 'btn btn-warning' }
+                            });
+                        }
+                    },
+                    error: function () {
+                        swalWithBootstrapButtons.fire({
+                            position: "top",
+                            title: "Error!",
+                            text: "Something went wrong!",
+                            icon: "error"
+                        });
+                    }
+                });
+            }
+        });
+    });
+});

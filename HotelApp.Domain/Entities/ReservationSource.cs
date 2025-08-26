@@ -10,7 +10,7 @@ namespace HotelApp.Domain.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
+        public bool IsActive { get; set; }
         public ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
     }
 }

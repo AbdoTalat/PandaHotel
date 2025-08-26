@@ -1,14 +1,21 @@
-﻿using System;
+﻿using HotelApp.Helper.Validation;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.ProofType
 {
-	public class GetAllProofTypesDTO
+	public class ProofTypeDTO
 	{
 		public int Id { get; set; }
+
+		[MaxLength(40)]
+		[RequiredEx]
 		public string Name { get; set; }
+
+		public bool IsActive { get; set; }
 	}
 }

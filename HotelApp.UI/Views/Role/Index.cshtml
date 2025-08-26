@@ -126,7 +126,10 @@
 								}
 								@if (User.HasClaim("permission", "Role.Delete") && !item.IsActive)
 								{
-								<a data-id="@item.Id" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i> </a>
+									<a data-url="/Role/DeleteRole/@item.Id"
+									   class="text-danger-600 btn-delete">
+										<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+									</a>
 								}
 							}
 							</td>
@@ -139,113 +142,6 @@
 
 </div>
 
-
-
-<div id="modal_full" class="modal fade" style="display: none;">
-	<div class="modal-dialog modal-full">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">×</button>
-			</div>
-
-			<div class="modal-body">
-				<div id="modalContent"> <!-- Partial View will be loaded here --> </div>
-			</div>
-
-			@* <div class="modal-footer">
-				<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-			</div> *@
-		</div>
-	</div>
-</div>
-
-
 @section Scripts{
-	<script>
-		$(document).ready(function () {
-			const swalWithBootstrapButtons = Swal.mixin({
-				customClass: {
-					confirmButton: 'btn btn-danger',
-					cancelButton: 'btn btn-default custom-cancel-btn'
-				},
-				buttonsStyling: false
-			});
 
-			$(".btn-delete").click(function () {
-				let itemId = $(this).data("id");
-
-				swalWithBootstrapButtons.fire({
-					position: "top",
-					title: "Are you sure?",
-					text: "You won't be able to revert this!",
-					icon: "warning",
-					iconColor: "red",
-					showCancelButton: true,
-					confirmButtonText: "Delete!",
-					cancelButtonText: "Cancel",
-					reverseButtons: true
-				}).then((result) => {
-					if (result.isConfirmed) {
-						$.ajax({
-							url: '/Role/DeleteRole/' + itemId,
-							type: 'DELETE',
-							success: function (response) {
-								if (response.success) {
-									swalWithBootstrapButtons.fire({
-										position: "top",
-										title: "Deleted!",
-										text: response.message,
-										icon: "success",
-										customClass: {
-											confirmButton: 'btn btn-success'
-										}
-									}).then(() => {
-										location.reload();
-									});
-								} else {
-									swalWithBootstrapButtons.fire({
-										title: "Error!",
-										text: response.message,
-										icon: "error"
-									});
-								}
-							},
-							error: function () {
-								swalWithBootstrapButtons.fire({
-									title: "Error!",
-									text: "Something went wrong!",
-									icon: "error"
-								});
-							}
-						});
-					}
-				});
-			});
-		});
-	</script>
-
-	<script>
-		$(document).ready(function () {
-			$(document).on("click", ".btnEditRoleOpenModal", function (e) {
-				e.preventDefault();
-
-				var roleId = $(this).data("role-id"); // Correctly fetch the role ID
-				console.log("Opening modal for role ID:", roleId); // Debugging step
-
-				if (!roleId) {
-					alert("Role ID is missing!");
-					return;
-				}
-
-				$("#modalContent").html("<p class='text-center'>Loading...</p>"); // Show loading text
-
-				$.get("/Role/AssignPermissions", { id: roleId }, function (data) {
-					$("#modalContent").html(data); // Load the partial view inside the modal
-					$("#modal_full").modal("show"); // Show the modal
-				}).fail(function () {
-					$("#modalContent").html("<p class='text-danger text-center'>Failed to load content.</p>");
-				});
-			});
-		});
-	</script>
 }

@@ -36,7 +36,9 @@ namespace HotelApp.Application.Mapping
 			CreateMap<ProofType, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
-			CreateMap<ProofType, GetAllProofTypesDTO>();
+
+			CreateMap<ProofTypeDTO, ProofType>();
+			CreateMap<ProofType, ProofTypeDTO>();
             #endregion
         }
     }

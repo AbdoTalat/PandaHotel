@@ -63,12 +63,11 @@
 						<div class="col-md-6">
 							<label>Proof Type<span class="text-danger">*</span></label>
 							<div class="form-group">
-								<select asp-for="TypeOfProof" class="form-control" id="select" required>
-									<option></option>
-									<option value="Passport">Passport</option>
-									<option value="National ID">National ID</option>
+								<select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select" required
+										data-placeholder="Choose Proof Type" data-selected="@Model?.ProofTypeId">
+									<option value=""></option>
 								</select>
-								<span class="text-danger validation-error-label" asp-validation-for="TypeOfProof"></span>
+								<span class="text-danger validation-error-label" asp-validation-for="ProofTypeId"></span>
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -105,4 +104,10 @@
 	</div>
 </form>
 
+
+<script>
+	$(document).ready(function () {
+		loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
+	});
+</script>
 @await Html.PartialAsync("_ValidationScriptsPartial")

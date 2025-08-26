@@ -118,10 +118,10 @@ namespace HotelApp.UI.Controllers
 		{
 			if (dto == null)
 			{
-				return BadRequest(new { success = false, message = "Invalid guest data." });
+				return Json(new { success = false, message = "Invalid guest data." });
 			}
 
-			if(dto.BranchId == 0 || dto.BranchId == null)
+			if (dto.BranchId == 0 || dto.BranchId == null)
 			{
 				dto.BranchId = BranchId;
 			}

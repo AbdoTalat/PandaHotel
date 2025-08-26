@@ -1,12 +1,12 @@
-﻿@model IEnumerable<ProofTypeDTO>
+﻿@model IEnumerable<ReservationSourceDTO>
 @{
-    TempData["Title"] = "Proof Types";
+    TempData["Title"] = "Reservation Sources";
 }
 
 <div class="page-header page-header-default">
     <div class="page-header-content">
         <div class="page-title">
-            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Proof Types</span> </h4>
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Reservation Sources</span> </h4>
         </div>
 
         <div class="heading-elements">
@@ -21,7 +21,7 @@
     <div class="breadcrumb-line">
         <ul class="breadcrumb">
             <li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
-            <li class="active">Proof Types</li>
+            <li class="active">Reservation Sources</li>
         </ul>
 
         <ul class="breadcrumb-elements">
@@ -51,13 +51,13 @@
     <!-- Basic datatable -->
     <div class="panel panel-flat">
         <div class="panel-heading">
-            <h5 class="panel-title">Proof Types</h5>
+            <h5 class="panel-title">Reservation Sources</h5>
             <div class="heading-elements" style=" margin-right:0px">
-                @if (User.HasClaim("permission", "ProofType.Add"))
+                @if (User.HasClaim("permission", "ReservationSource.Add"))
                 {
-                    <button data-title="Add Proof Type" data-url="/ProofType/AddProofType" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
+                    <button data-title="Add Reservation Source" data-url="/ReservationSource/AddReservationSource" type="button" class="btn bg-teal-400 btn-lg btnOpenModal">
                     <i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
-                        Add Proof Type
+                        Add Reservation Source
                 </button>
                 }
             </div>
@@ -99,13 +99,13 @@
                             <td><span class="label label-rounded label-danger">Not Active</span></td>
                         }
                         <td>
-                            @if (User.HasClaim("permission", "ProofType.Edit"))
+                            @if (User.HasClaim("permission", "ReservationSource.Edit"))
                             {
-                                <a data-title="Edit Proof Type" data-url="/ProofType/EditProofType/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
+                                <a data-title="Edit Reservation Source" data-url="/ReservationSource/EditReservationSource/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if (User.HasClaim("permission", "ProofType.Delete") && !item.IsActive)
+                            @if (User.HasClaim("permission", "ReservationSource.Delete") && !item.IsActive)
                             {
-                                <a data-url="/ProofType/DeleteProofType/@item.Id"
+                                <a data-url="/ReservationSource/DeleteReservationSource/@item.Id"
                                    class="text-danger-600 btn-delete">
                                     <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
                                 </a>
@@ -120,4 +120,5 @@
 
 
 @section Scripts {
+
 }
