@@ -38,7 +38,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
         [Authorize(Policy = "Guest.Add")]
-        public async Task<IActionResult> AddGuest(AddGuestDTO guestDTO)
+        public async Task<IActionResult> AddGuest(GuestDTO guestDTO)
 		{
 			if(!ModelState.IsValid)
 			{
@@ -60,13 +60,13 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
         [Authorize(Policy = "Guest.Edit")]
-        public async Task<IActionResult> EditGuest(EditGuestDTO guest, int Id)
+        public async Task<IActionResult> EditGuest(GuestDTO guest)
 		{
 			if(!ModelState.IsValid)
 			{
 				return PartialView("_EditGuest", guest);
 			}
-			var result = await _guestService.EditGuestAsync(guest, Id);
+			var result = await _guestService.EditGuestAsync(guest);
 			return Json(new {success = result.Success,message = result.Message});
 		}
 
@@ -114,17 +114,21 @@ namespace HotelApp.UI.Controllers
 
 
 		[HttpPost]
-		public async Task<IActionResult> AddOrEditGuest([FromBody] AddGuestDTO dto)
+		public async Task<IActionResult> AddOrEditGuest([FromBody] GuestDTO dto)
 		{
-			if (dto == null)
+            if (!ModelState.IsValid)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Please fill in all required fields correctly."
+                });
+            }
+            if (dto == null)
 			{
 				return Json(new { success = false, message = "Invalid guest data." });
 			}
 
-			if (dto.BranchId == 0 || dto.BranchId == null)
-			{
-				dto.BranchId = BranchId;
-			}
 			var result = await _guestService.AddOrEditGuestsAsync(dto);
 			if (result.Success)
 			{

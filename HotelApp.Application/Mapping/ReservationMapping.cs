@@ -23,7 +23,7 @@ namespace HotelApp.Application.Mapping
 					src.bookRoomDTO.roomTypeToBookDTOs.Sum(r => r.NumOfAdults + r.NumOfChildren)
 				))
 			   .ForMember(dest => dest.NumberOfNights, opt => opt.MapFrom(src => src.bookRoomDTO.NumOfNights))
-			   .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.bookRoomDTO.BranchId))
+			   //.ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.bookRoomDTO.BranchId))
 			   .ForMember(dest => dest.ReservationSourceId, opt => opt.MapFrom(src => src.bookRoomDTO.ReservationSourceId))
 			   .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.confirmReservationDTO.Comment))
 			   .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsConfirmed))

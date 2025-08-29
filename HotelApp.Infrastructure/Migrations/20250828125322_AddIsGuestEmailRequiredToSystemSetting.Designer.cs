@@ -4,6 +4,7 @@ using HotelApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250828125322_AddIsGuestEmailRequiredToSystemSetting")]
+    partial class AddIsGuestEmailRequiredToSystemSetting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1031,22 +1034,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsGuestAddressRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGuestDateOfBirthRequired")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsGuestEmailRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGuestPhoneRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGuestProofNumberRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGuestProofTypeRequired")
                         .HasColumnType("bit");
 
                     b.Property<int?>("LastModifiedById")

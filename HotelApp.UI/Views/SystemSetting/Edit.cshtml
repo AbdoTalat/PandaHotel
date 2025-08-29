@@ -63,7 +63,7 @@
 			<div class="panel-body" style="display block;">
 				<div class="row">
 					<div class="col-md-12">
-						<legend class="text-semibold"> Room Status </legend>
+						<legend class="text-semibold"> Room Status Setup </legend>
 					</div>
 					<div class="col-md-12">
 						<div class="col-md-4">
@@ -83,6 +83,66 @@
 					</div>
 
 				</div>
+				<br />
+				<br />
+				<div class="row">
+					<div class="col-md-12">
+						<legend class="text-semibold"> Guests Setup </legend>
+					</div>
+					<div class="col-md-12">
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestEmailRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Email Required</a>
+							</label>
+
+
+						@* <div class="checkbox">
+							<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+								<input type="checkbox" asp-for="IsGuestEmailRequired" class="switchery">
+								Is Guest Email Required
+							</label>
+                            </div> *@
+                        </div>
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestAddressRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Address Required</a>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestDateOfBirthRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Birth Date Required</a>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestPhoneRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Phone Required</a>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestProofNumberRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Proof Number Required</a>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<label class="checkbox-container">
+								<input type="checkbox" class="checkbox-input" asp-for="IsGuestProofTypeRequired" />
+								<div class="checkbox-custom"></div>
+								<a class="text-default">Is Guest Proof Type Required</a>
+							</label>
+						</div>
+					</div>
+
+				</div>
 
 			</div>
 		</div>
@@ -95,12 +155,8 @@
 </div>
 
 
+
 @section Scripts{
-	@* @if (TempData["Success"] != null)
-	{
-		<script>toastr.success('@TempData["Success"]');</script>
-	}
- *@
 	@if (TempData["Error"] != null)
 	{
 		<script>

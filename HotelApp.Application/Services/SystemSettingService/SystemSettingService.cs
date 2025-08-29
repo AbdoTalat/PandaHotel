@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs.SystemSetting;
+using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +16,13 @@ namespace HotelApp.Application.Services.SystemSettingService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
+		private readonly ISystemSettingRepositroy _systemSettingRepositroy;
 
-		public SystemSettingService(IUnitOfWork unitOfWork, IMapper mapper)
+		public SystemSettingService(IUnitOfWork unitOfWork, IMapper mapper, ISystemSettingRepositroy systemSettingRepositroy)
         {
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
+			_systemSettingRepositroy = systemSettingRepositroy;
 		}
         public async Task<SystemSettingDTO?> GetSystemSettingForEditAsync()
 		{
@@ -48,5 +52,11 @@ namespace HotelApp.Application.Services.SystemSettingService
                 return ServiceResponse<SystemSettingDTO>.ResponseFailure(ex.Message);
             }
         }
-    }
+		public GetSystemSettingForValidationDTO? GetSystemSettingForValidation()
+		{
+			var result = _systemSettingRepositroy.GetSystemSettingForValidation();
+
+			return result;
+		}
+	}
 }

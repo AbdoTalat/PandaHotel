@@ -1,14 +1,11 @@
 using HotelApp.Infrastructure;
-using HotelApp.Infrastructure.DbContext;
-using HotelApp.UI;
 using HotelApp.Helper;
 using System;
-using static HotelApp.Infrastructure.DbContext.ApplicationDbContext;
-//using HotelApp.UI.Helper;
 using HotelApp.Infrastructure.Seed;
 using HotelApp.UI.DependencyInjectionExtentions;
 using HotelApp.Infrastructure.Repositories;
 using HotelApp.Application;
+using HotelApp.Application.Validators;
 
 namespace HotelApp.PL
 {
@@ -27,7 +24,6 @@ namespace HotelApp.PL
 			builder.Services.AddApplicationDI(builder.Configuration);
 			builder.Services.AddAuthenticationAndSessionDI();
 			builder.Services.AddAuthorizationPoliciesDIAsync(new PermissionLoader(builder.Environment));
-
 
 
 			var app = builder.Build();

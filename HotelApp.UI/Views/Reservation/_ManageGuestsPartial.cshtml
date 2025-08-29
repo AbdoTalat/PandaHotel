@@ -1,4 +1,4 @@
-﻿@model AddGuestDTO
+﻿@model GuestDTO
 @{
 	int BranchId = ViewBag.BranchId;
 }
@@ -84,7 +84,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Type Of Proof</label>
-								<select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select" required
+								<select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select"
 										data-placeholder="Choose Proof Type" data-selected="@Model?.ProofTypeId">
 									<option value=""></option>
 								</select>
@@ -123,7 +123,7 @@
                         <div class="text-right">
 							<button type="button" class="btn btn-default btn-md" id="clearGuestForm">Clear</button>
 
-                            <button type="button" id="addGuestButton" class="btn bg-teal-400 btn-md">
+                            <button type="submit" class="btn bg-teal-400 btn-md">
                                 <i class="icon-plus-circle2"></i> Add
                             </button>
 
@@ -257,118 +257,80 @@
 </script>
 
 <script>
-	let guestList = [];                // For full guest data to show in UI
-	let reservationGuestList = [];     // For saving GuestId + IsPrimary only
-	let guestCounter = 0;
+    let guestList = [];                // For full guest data to show in UI
+    let reservationGuestList = [];     // For saving GuestId + IsPrimary only
+    let guestCounter = 0;
 
-	$('#addGuestButton').click(function () {
-		const form = $('#guestForm');
-		const isPrimary = $('#isPrimary').is(':checked');
+    $("#guestForm").on("submit", function (e) {
+        e.preventDefault();
 
-		let isValid = true;
-		let errorMessages = [];
+        const formData = {
+            id: $("#guestId").val() || 0,
+            isPrimary: $("#isPrimary").is(":checked"),
+            fullName: $("#FullName").val().trim(),
+            email: $("#Email").val() || null,
+            phone: $("#Phone").val() || null,
+            proofTypeId: $("#proofTypeSelect").val() || null,
+            proofNumber: $("#ProofNumber").val() || null,
+            dateOfBirth: $("#DateOfBirth").val() || null,
+            address: $("#Address").val() || null,
+            branchId: $("#BranchId").val() || 0
+        };
 
-		const fullName = $('#FullName').val().trim();
-		if (!fullName) {
-			isValid = false;
-			errorMessages.push("Full Name is required.");
-		}
+        $.ajax({
+            url: '/Guest/AddOrEditGuest',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response.success) {
+                    const guestId = response.guestId;
 
-		if (isPrimary) {
-			const dateOfBirth = $('#DateOfBirth').val() || null;
-			const address = $('#Address').val().trim();
-			const phone = $('#Phone').val().trim();
-			const email = $('#Email').val().trim();
-			const proofTypeId = $('#proofTypeSelect').val();
-			const proofNumber = $('#ProofNumber').val().trim();
+                    // ✅ Ensure only one primary guest
+                    if (formData.isPrimary) {
+                        // Remove old primary guest from both lists
+                        reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
+                        guestList = guestList.filter(g => !g.isPrimary);
+                    }
 
-			if (!dateOfBirth) {
-				isValid = false;
-				errorMessages.push("Date of Birth is required for a primary guest.");
-			}
-			if (!address) {
-				isValid = false;
-				errorMessages.push("Address is required for a primary guest.");
-			}
-			if (!phone) {
-				isValid = false;
-				errorMessages.push("Phone is required for a primary guest.");
-			}
-			if (!email) {
-				isValid = false;
-				errorMessages.push("Email is required for a primary guest.");
-			}
-			if (!proofTypeId) {
-				isValid = false;
-				errorMessages.push("Type of Proof is required for a primary guest.");
-			}
-			if (!proofNumber) {
-				isValid = false;
-				errorMessages.push("Proof Number is required for a primary guest.");
-			}
-		}
+                    // ✅ Avoid duplicates in both lists
+                    reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
+                    reservationGuestList.push({ guestId: guestId, isPrimary: formData.isPrimary });
 
-		if (!isValid) {
-			alert(errorMessages.join('\n'));
-			return;
-		}
+                    guestList = guestList.filter(g => g.id !== guestId);
+                    guestList.push({ ...formData, id: guestId });
 
-		// Continue with AJAX only if validation passed
-		const guestDto = {
-			id: $('#guestId').val() || 0,
-			isPrimary: isPrimary,
-			fullName: fullName,
-			email: $('#Email').val() || null,
-			phone: $('#Phone').val() || null,
-			proofTypeId: $('#proofTypeSelect').val() || null, 
-			proofNumber: $('#ProofNumber').val() || null,
-			dateOfBirth: $('#DateOfBirth').val() || null,
-			address: $('#Address').val() || null,
-			branchId: $('#BranchId').val() || 0
-		};
+                    updateGuestTable();
+                    renderGuestList();
 
-		$.ajax({
-			url: '/Guest/AddOrEditGuest',
-			type: 'POST',
-			contentType: 'application/json',
-			data: JSON.stringify(guestDto),
-			success: function (response) {
-				if (response.success) {
-					const guestId = response.guestId;
+                    // ✅ Reset form
+                    $("#guestForm")[0].reset();
+                    $("#guestId").val(0);
+                    $("#isPrimary").prop("checked", false);
+                    $("#proofTypeSelect").val("").trigger("change");
 
-					if (isPrimary) {
-						reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
-					}
+                    toastr.success("Guest added successfully.");
+                } else {
+                    // ❌ Validation or server error -> re-render partial view
+                    $("#guestFormContainer").html(response);
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Failed to save guest. Please try again.", "error");
+            }
+        });
+    });
 
-					reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
 
-					reservationGuestList.push({
-						guestId: guestId,
-						isPrimary: isPrimary
-					});
 
-					guestList = guestList.filter(g => g.id !== guestId);
-					guestList.push({ ...guestDto, id: guestId });
 
-					updateGuestTable();
-					renderGuestList();
 
-					form[0].reset();
-					$('#guestId').val(0);
-					$('#isPrimary').prop('checked', false);
-					form.validate().resetForm();
-					$('#proofTypeSelect').val('').trigger('change');
 
-					toastr.success("Guest added successfully.");
-				} else {
-					Swal.fire("Error", response.message, "error");
-				}
-			},
-			error: function () {
-				Swal.fire("Error", "Failed to save guest. Please try again.", "error");
-			}
-		});
-	});
+
+
+
+
+
 
 	function updateGuestTable() {
 		const tbody = $('#normalGuestTable tbody');

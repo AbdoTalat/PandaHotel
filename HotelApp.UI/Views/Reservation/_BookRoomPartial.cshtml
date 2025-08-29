@@ -1,6 +1,5 @@
 ﻿@model BookRoomDTO
-@{
-}
+
 
 <div class="row">
     <form id="bookRoomForm">
@@ -172,7 +171,6 @@
                 </div>
                 <form id="companyForm">
                     <input type="hidden" id="companyId" value="0" />
-                    <input type="hidden" id="companyBranchId" value="0" />
 
                     <div class="panel panel-flat border-left-sm border-left-teal ">
                         <div class="panel-body">
@@ -219,7 +217,7 @@
                     </div>
                     <div class="text-center">
                         <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn bg-teal-400" id="saveCompanySelection">Save</button>
+                        <button type="submit" class="btn bg-teal-400" id="saveCompanySelection">Save</button>
 
                     </div>
                 </form>
@@ -272,7 +270,6 @@
                         $('#CompanyAddress').val(company.address);
                         $('#CompanyNotes').val(company.notes);
                         $('#CompanyEmail').val(company.email);
-                        $('#companyBranchId').val(company.branchId);
 
                         // Clear the Select2 after selecting a company
                         $('#companyNameSelect').val(null).trigger('change');
@@ -284,34 +281,31 @@
             }
         });
 
-        $('#saveCompanySelection').on('click', function () {
-            const payload = {
+
+        $("#companyForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = {
                 Id: $('#companyId').val() || 0,
-                Name: $('#CompanyName').val(),
-                Phone: $('#CompanyPhone').val(),
-                Address: $('#CompanyAddress').val(),
-                Notes: $('#CompanyNotes').val(),
-                Email: $('#CompanyEmail').val(),
-                BranchId: $('#companyBranchId').val()
-                };
+                Name: $('#CompanyName').val() || null,
+                Phone: $('#CompanyPhone').val() || null,
+                Address: $('#CompanyAddress').val() || null,
+                Notes: $('#CompanyNotes').val() || null,
+                Email: $('#CompanyEmail').val() || null,
+            };
 
             $.ajax({
                 url: '/Company/SaveCompany',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(payload),
+                data: JSON.stringify(formData),
                 success: function (response) {
                     if (response.success) {
                         $('#selectedCompanyName').val(response.name);
                         $('#CompanyId').val(response.companyId);
 
-                        $('#companyId').val(0);
-                        $('#companyBranchId').val(0);
-                        $('#CompanyName').val('');
-                        $('#CompanyPhone').val('');
-                        $('#CompanyAddress').val('');
-                        $('#CompanyNotes').val('');
-                        $('#CompanyEmail').val('');
+                        $("#companyForm")[0].reset();
+                        $("#companyId").val(0);
 
                         $('#modal_large').modal('hide');
                     } else {
@@ -322,7 +316,9 @@
                     alert('Error contacting server.');
                 }
             });
+
         });
+       
 
     });
 </script>

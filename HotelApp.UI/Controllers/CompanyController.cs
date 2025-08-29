@@ -93,12 +93,11 @@ namespace HotelApp.UI.Controllers
         public async Task<IActionResult> SaveCompany([FromBody] ReservationCompanyDTO companyDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
-
-			if(companyDto.BranchId == 0)
 			{
-				companyDto.BranchId = BranchId;
-            }
+				return Json(new { success = false, message = "Invalid Data" });
+			}
+
+			
             var result = await _companyService.CreateOrUpdateCompanyAsync(companyDto);
 
             return Json(new

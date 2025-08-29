@@ -6,12 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelApp.Application.Services.SystemSettingService
+namespace HotelApp.Application.IRepositories
 {
-	public interface ISystemSettingService
+	public interface ISystemSettingRepositroy
 	{
-		Task<SystemSettingDTO?> GetSystemSettingForEditAsync();
-		Task<ServiceResponse<SystemSettingDTO>> EditSystemSettingAsync(SystemSettingDTO systemSettingDTO);
 		GetSystemSettingForValidationDTO? GetSystemSettingForValidation();
 	}
 }

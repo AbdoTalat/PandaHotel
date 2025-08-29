@@ -20,8 +20,7 @@ namespace HotelApp.Application.DTOs.Reservation
 
         [RequiredEx]
         public int RateId { get; set; }
-        [RequiredEx]
-        public int BranchId { get; set; }
+       
         [RequiredEx]
         public int ReservationSourceId { get; set; }
 		public int? CompanyId { get; set; }

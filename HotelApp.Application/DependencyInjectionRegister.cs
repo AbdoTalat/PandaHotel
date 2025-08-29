@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.Authorization;
+﻿using FluentValidation;
+using HotelApp.Application.Authorization;
 using HotelApp.Application.Services.BranchService;
 using HotelApp.Application.Services.CompanyService;
 using HotelApp.Application.Services.CurrentUserService;
@@ -17,6 +18,7 @@ using HotelApp.Application.Services.RoomStatusService;
 using HotelApp.Application.Services.RoomTypeService;
 using HotelApp.Application.Services.SystemSettingService;
 using HotelApp.Application.Services.UserService;
+using HotelApp.Application.Validators;
 using HotelApp.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -29,11 +31,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using FluentValidation.AspNetCore;
+
 namespace HotelApp.Application
 {
     public static class DependencyInjectionRegister
     {
-        public static IServiceCollection AddApplicationDI(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddApplicationDI(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IBranchService, BranchService>();
@@ -57,8 +61,16 @@ namespace HotelApp.Application
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
+			services.AddControllersWithViews()
+	        .AddFluentValidation(fv =>
+	        {
+		        fv.RegisterValidatorsFromAssemblyContaining<GuestValidator>();
+	        });
 
-            return services;
+			services.AddFluentValidationAutoValidation();
+			services.AddFluentValidationClientsideAdapters();
+
+			return services;
         }
     }
 }

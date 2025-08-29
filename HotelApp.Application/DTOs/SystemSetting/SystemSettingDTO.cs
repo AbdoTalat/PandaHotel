@@ -11,5 +11,11 @@ namespace HotelApp.Application.DTOs.SystemSetting
 		public int Id {  get; set; }
 		public int CheckInStatusId { get; set; }
 		public int CheckOutStatusId { get; set; }
+		public bool IsGuestEmailRequired { get; set; }
+		public bool IsGuestDateOfBirthRequired { get; set; }
+		public bool IsGuestPhoneRequired { get; set; }
+		public bool IsGuestAddressRequired { get; set; }
+		public bool IsGuestProofTypeRequired { get; set; }
+		public bool IsGuestProofNumberRequired { get; set; }
 	}
 }

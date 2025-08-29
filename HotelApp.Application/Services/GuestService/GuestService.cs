@@ -33,53 +33,56 @@ namespace HotelApp.Application.Services.GuestService
 				.GetByIdAsDtoAsync<GetGuestByIdDTO>(Id);
 			return guest;
         }
-		public async Task<EditGuestDTO?> GetGuestToEditByIdAsync(int Id)
+		public async Task<GuestDTO?> GetGuestToEditByIdAsync(int Id)
 		{
-			var guest = await _unitOfWork.Repository<Guest>().GetByIdAsDtoAsync<EditGuestDTO>(Id);
+			var guest = await _unitOfWork.Repository<Guest>().GetByIdAsDtoAsync<GuestDTO>(Id);
 
 			return guest;
 		}
-		public async Task<ServiceResponse<AddGuestDTO>> AddGuestAsync(AddGuestDTO guestDTO)
+		public async Task<ServiceResponse<GuestDTO>> AddGuestAsync(GuestDTO guestDTO)
 		{
+			var checkGuestPhoneExist = await _unitOfWork.Repository<Guest>().IsExistsAsync(g => g.Phone.Contains(guestDTO.Phone));
+			if (checkGuestPhoneExist)
+				return ServiceResponse<GuestDTO>.ResponseFailure($"There is already guest with phone number: {guestDTO.Phone}");
+			
+			var checkGuestEmailExist = await _unitOfWork.Repository<Guest>().IsExistsAsync(g => g.Email.Contains(guestDTO.Email));
+			if (checkGuestEmailExist)
+				return ServiceResponse<GuestDTO>.ResponseFailure($"There is already guest with Email Address: {guestDTO.Phone}");
+			
 			try
 			{
-				var checkGuestExist = await _unitOfWork.Repository<Guest>().IsExistsAsync(g => g.Phone == guestDTO.Phone); ;
-				if (checkGuestExist)
-				{
-					return ServiceResponse<AddGuestDTO>.ResponseFailure($"There is already guest with phone number: {guestDTO.Phone}");
-				}
 				var mappedGuest = _mapper.Map<Guest>(guestDTO);
 				if (mappedGuest == null)
 				{
-                    return ServiceResponse<AddGuestDTO>.ResponseFailure($"Error Occurred: Guest failed at mapping");
-                } 
+					return ServiceResponse<GuestDTO>.ResponseFailure($"Error Occurred: Guest failed at mapping");
+				}
 				await _unitOfWork.Repository<Guest>().AddNewAsync(mappedGuest);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<AddGuestDTO>.ResponseSuccess("Guest Added Successfully");
+				return ServiceResponse<GuestDTO>.ResponseSuccess("Guest Added Successfully.");
 			}
 			catch (Exception ex)
 			{
-                return ServiceResponse<AddGuestDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
-            }
-        }
-        public async Task<ServiceResponse<EditGuestDTO>> EditGuestAsync(EditGuestDTO guestDTO, int Id)
+				return ServiceResponse<GuestDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
+			}
+		}
+        public async Task<ServiceResponse<GuestDTO>> EditGuestAsync(GuestDTO dto)
 		{
-			var OldGuest = await _unitOfWork.Repository<Guest>().GetByIdAsync(Id);
+			var OldGuest = await _unitOfWork.Repository<Guest>().GetByIdAsync(dto.Id);
 			if (OldGuest == null)
 			{
-                return ServiceResponse<EditGuestDTO>.ResponseFailure($"Guest with ID: {Id} not found");
+                return ServiceResponse<GuestDTO>.ResponseFailure($"Guest with ID: {dto.Id} not found");
             }
 			try
 			{
-				var mappedGuest = _mapper.Map(guestDTO, OldGuest);
+				var mappedGuest = _mapper.Map(dto, OldGuest);
 				_unitOfWork.Repository<Guest>().Update(mappedGuest);
 				await _unitOfWork.CommitAsync();
-				return ServiceResponse<EditGuestDTO>.ResponseSuccess("Guest Updated Successfully");
+				return ServiceResponse<GuestDTO>.ResponseSuccess("Guest Updated Successfully");
 			}
 			catch(Exception ex)
 			{
-				return ServiceResponse<EditGuestDTO>.ResponseFailure(ex.Message);
+				return ServiceResponse<GuestDTO>.ResponseFailure(ex.InnerException.Message);
 			}
 		}
         public async Task<ServiceResponse<Guest>> DeleteGuestAsync(int Id)
@@ -101,7 +104,7 @@ namespace HotelApp.Application.Services.GuestService
 			}
 		}
 
-		public async Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(AddGuestDTO guestDTO)
+		public async Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(GuestDTO guestDTO)
 		{
 			try
 			{
@@ -123,7 +126,9 @@ namespace HotelApp.Application.Services.GuestService
 				}
 				else
 				{
-					_unitOfWork.Repository<Guest>().Update(guest);
+					var oldGuest = await _unitOfWork.Repository<Guest>().GetByIdAsync(guestDTO.Id);
+					_mapper.Map(guestDTO, oldGuest);
+					_unitOfWork.Repository<Guest>().Update(oldGuest);
 				}
 				await _unitOfWork.CommitAsync();
 

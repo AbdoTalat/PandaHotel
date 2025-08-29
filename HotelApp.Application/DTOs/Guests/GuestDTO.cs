@@ -1,4 +1,7 @@
-﻿using HotelApp.Helper.Validation;
+﻿using HotelApp.Application.Services.SystemSettingService;
+using HotelApp.Domain.Common.Validation;
+using HotelApp.Helper.Validation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,11 +11,12 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Guests
 {
-    public class AddGuestDTO 
+    public class GuestDTO 
 	{
         public int Id { get; set; }
 
         [RequiredEx]
+        [MaxLengthEx(60)]
         public string FullName { get; set; }
         public bool IsPrimary { get; set; }
         public DateOnly? DateOfBirth { get; set; }
@@ -23,7 +27,5 @@ namespace HotelApp.Application.DTOs.Guests
         public string? Email { get; set; }
 		public int? ProofTypeId { get; set; }
 		public string? ProofNumber { get; set; }
-        public int BranchId { get; set; }
-
     }
 }

@@ -39,6 +39,7 @@ namespace HotelApp.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IRateRepository, RateRepository>();
+            services.AddScoped<ISystemSettingRepositroy, SystemSettingRepositroy>();
 
 			services.AddScoped<IPermissionLoader, PermissionLoader>();
 

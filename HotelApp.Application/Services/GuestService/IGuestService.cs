@@ -12,11 +12,11 @@ namespace HotelApp.Application.Services.GuestService
 	{
 		Task<IEnumerable<GetAllGuestsDTO>> GetAllGuestsAsync();
 		Task<GetGuestByIdDTO?> GetGuestByIdAsync(int Id);
-		Task<EditGuestDTO?> GetGuestToEditByIdAsync(int Id);
-        Task<ServiceResponse<AddGuestDTO>> AddGuestAsync(AddGuestDTO guestDTO);
-		Task<ServiceResponse<EditGuestDTO>> EditGuestAsync(EditGuestDTO guestDTO, int Id);
+		Task<GuestDTO?> GetGuestToEditByIdAsync(int Id);
+        Task<ServiceResponse<GuestDTO>> AddGuestAsync(GuestDTO guestDTO);
+		Task<ServiceResponse<GuestDTO>> EditGuestAsync(GuestDTO guestDTO);
 		Task<ServiceResponse<Guest>> DeleteGuestAsync(int Id);
 		Task<IEnumerable<GetSearchedGuestsDTO>> SearchGuestsAsync(string term);
-		Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(AddGuestDTO guestDTO);
+		Task<ServiceResponse<ReservationGuestDTO>> AddOrEditGuestsAsync(GuestDTO guestDTO);
 	}
 }

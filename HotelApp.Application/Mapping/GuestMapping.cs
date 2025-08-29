@@ -22,10 +22,9 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<Guest, GetSearchedGuestsDTO>();
 
-			CreateMap<AddGuestDTO, Guest>();
 
-			CreateMap<EditGuestDTO, Guest>();
-			CreateMap<Guest, EditGuestDTO>();
+			CreateMap<GuestDTO, Guest>();
+			CreateMap<Guest, GuestDTO>();
 
 			CreateMap<Guest, ReservationGuestDTO>()
 				.ForMember(dest => dest.GuestId, opt => opt.MapFrom(src => src.Id))
