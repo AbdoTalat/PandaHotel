@@ -25,7 +25,9 @@ namespace HotelApp.Application.DTOs.Reservation
         public int ReservationSourceId { get; set; }
 		public int? CompanyId { get; set; }
 
+		[RequiredEx]
 		public List<RoomTypeToBookDTO> roomTypeToBookDTOs { get; set; } = new List<RoomTypeToBookDTO>();
+		public List<int> RoomsIDs { get; set; } = new List<int>();
 	}
 	public class RoomTypeToBookDTO
 	{

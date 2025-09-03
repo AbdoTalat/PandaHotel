@@ -91,6 +91,9 @@
 </div>
 
 
+
+
+
 @section Scripts{
 
 
@@ -138,7 +141,7 @@
 							toastr.success(response.message);
 							$(document).trigger("guestFormSuccess");
 						} else {
-							Swal.fire("Error", response.message, "error");
+							showAlert('error', 'Error!', response.message);
 						}
 					},
 					error: function () {
@@ -168,10 +171,9 @@
 					contentType: "application/json",
 					success: function (response) {
 						if (response.success) {
-							Swal.fire("Success!", response.message, "success")
-								.then(() => window.location.href = "/Reservation/Index");
+								window.location.href = "/Reservation/Index";
 						} else {
-							Swal.fire("Error", response.message, "error");
+							showAlert('error', 'Error!', response.message);
 						}
 					},
 					error: function () {
@@ -218,5 +220,9 @@
 
 
 	@await Html.PartialAsync("_ValidationScriptsPartial")
-
+	<script>
+		$.validator.setDefaults({
+			ignore: [] // include hidden fields in validation
+		});
+	</script>
 }

@@ -84,7 +84,7 @@
 
 /* checked state */
 .checkbox-input:checked + .checkbox-custom {
-    background-color: #00897B;
+    background-color: #009688;
 }
 
 .checkbox-custom::after {

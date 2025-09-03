@@ -26,6 +26,7 @@ namespace HotelApp.Domain.Entities
         public Floor? Floor { get; set; }
 
         public ICollection<RoomOption> RoomOptions { get; set; } = new HashSet<RoomOption>();
+        public ICollection<ReservationRoom> ReservationsRooms { get; set;} = new HashSet<ReservationRoom>();
 
     }
 }

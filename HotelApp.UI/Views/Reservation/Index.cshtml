@@ -270,12 +270,12 @@
         });
     </script>
 
-@*     <script>
-        $(document).ready(function () {
-            var successMessage = '@TempData["Success"]';
-            if (successMessage) {
-                toastr.success(successMessage);
-            }
-        });
-    </script> *@
+   @*  @if (TempData["Success"] != null)
+    {
+        <script>
+            $(function () {
+                toastr.success("@TempData["Success"]");
+            });
+        </script>
+    } *@
 }

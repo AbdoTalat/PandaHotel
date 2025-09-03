@@ -87,28 +87,15 @@ namespace HotelApp.UI.Controllers
         {
             if (!ModelState.IsValid)
             {
-				return Json(new
-				{
-					success = false,
-					message = "Please fill in all required fields correctly."
-                });
+				return Json(new { success = false, message = "Please fill in all required fields correctly." });
             }
 
-            foreach (var roomTypeToBook in model.roomTypeToBookDTOs)
-            {
-                var availabilityResult = await _roomService.CheckRoomAvailabilityAsync(roomTypeToBook.Id, roomTypeToBook.NumOfRooms);
-
-                if (!availabilityResult.Success)
-                {
-					return Json(new
-					{
-						success = false,
-						message = availabilityResult.Message
-					});
-				}
+			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.roomTypeToBookDTOs, model.RoomsIDs);
+			if (!ValidateSelectedRooms.Success)
+			{
+				return Json(new { success = false, message = ValidateSelectedRooms.Message });
             }
 
-			//model.BranchId = BranchId;
             HttpContext.Session.SetString("BookRoomData", JsonConvert.SerializeObject(model));
 
             return Json(new
@@ -123,13 +110,6 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
 		{
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized();
-            }
-
             var roomDataJson = HttpContext.Session.GetString("BookRoomData");
 			var guestsDataJson = HttpContext.Session.GetString("ReservationGuests");
 
@@ -143,12 +123,13 @@ namespace HotelApp.UI.Controllers
 				confirmReservationDTO = confirmReservationDTO
 			};
 
-			var result = await _reservationService.AddReservation(reservationDTO, userId);
+			var result = await _reservationService.AddReservation(reservationDTO);
             if (result.Success)
             {
                 HttpContext.Session.Remove("BookRoomData");
                 HttpContext.Session.Remove("ReservationGuests");
 
+				TempData["Success"] = result.Message;
                 return Json(new { success = result.Success, message = result.Message });
             }
 

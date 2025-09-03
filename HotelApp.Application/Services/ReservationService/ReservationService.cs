@@ -31,7 +31,7 @@ namespace HotelApp.Application.Services.ReservationService
 			return reservation;
 		}
 
-		public async Task<ServiceResponse<AddReservationDTO>> AddReservation(AddReservationDTO reservationDTO, int userId)
+		public async Task<ServiceResponse<AddReservationDTO>> AddReservation(AddReservationDTO reservationDTO)
 		{
 			try
 			{
@@ -76,7 +76,17 @@ namespace HotelApp.Application.Services.ReservationService
 				}).ToList();
 
 				await _unitOfWork.Repository<ReservationRoomType>().AddRangeAsync(reservationRoomTypes);
-				await _unitOfWork.CommitAsync();
+
+				var reservationRooms = reservationDTO.bookRoomDTO.RoomsIDs.Select(rr => new ReservationRoom
+				{
+					ReservationId = reservation.Id,
+					RoomId = rr,
+					StartDate = reservation.CheckInDate,
+					EndDate = reservation.CheckOutDate
+				});
+				await _unitOfWork.Repository<ReservationRoom>().AddRangeAsync(reservationRooms);
+
+				//await _unitOfWork.CommitAsync();
 
 
 				// Link Guests to Reservation

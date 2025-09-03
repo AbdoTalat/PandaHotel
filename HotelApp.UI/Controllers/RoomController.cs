@@ -9,6 +9,7 @@ using HotelApp.Application;
 using BenchmarkDotNet.Attributes;
 using HotelApp.Domain.Entities;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 //using HotelApp.UI.Helper;
 
 namespace HotelApp.UI.Controllers
@@ -152,6 +153,19 @@ namespace HotelApp.UI.Controllers
             return Json(new {success = result.Success, message = result.Message});
         }
 
+
+		[HttpGet]
+		public async Task<IActionResult> GetAvailableRooms(string? name)
+		{
+			var rooms = await _roomService.GetAvailableRoomsAsync(name);
+
+			var result = rooms.Select(r => new
+			{
+				id = r.Id,
+                text = $"{r.RoomNumber} ({r.RoomTypeName})"
+            });
+			return Json(new { success = true, data = result });
+		}
 
 	}
 }

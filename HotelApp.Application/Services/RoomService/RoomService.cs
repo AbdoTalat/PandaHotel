@@ -11,6 +11,7 @@ using HotelApp.Domain.Entities;
 using BenchmarkDotNet.Running;
 using System.Web.Mvc;
 using HotelApp.Helper;
+using HotelApp.Application.DTOs.Reservation;
 
 namespace HotelApp.Application.Services.RoomService
 {
@@ -246,18 +247,6 @@ namespace HotelApp.Application.Services.RoomService
                 return ServiceResponse<Room>.ResponseFailure($"Error Occurred While Deleting This Room: {ex.Message}");
             }
         }
-        public async Task<ServiceResponse<string>> CheckRoomAvailabilityAsync(int roomTypeId, int numberOfRooms)
-        {
-            var roomsCount = await _roomRepository.CheckRoomAvailabilityAsync(roomTypeId, numberOfRooms);
-            var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(roomTypeId);
-
-            if (roomsCount < numberOfRooms)
-            {
-                return ServiceResponse<string>.ResponseFailure($"Only {roomsCount} rooms available for the {roomType.Name} room type.");
-            }
-
-            return ServiceResponse<string>.ResponseSuccess("Rooms are available.");
-        }
 
 		public async Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end)
         {
@@ -265,15 +254,24 @@ namespace HotelApp.Application.Services.RoomService
 
             return roomsData;
         }
+        public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name)
+        {
+            var rooms = await _unitOfWork.Repository<Room>()
+                .GetAllAsDtoAsync<GetAvailableRoomsDTO>(r => r.RoomNumber.Contains(name));
 
+            return rooms;
+        }
         public async Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto)
         {
-            //var result = await _unitOfWork.Repository<Room>()
-            // .GetFilteredAsDtoAsync<GetAllRoomsDTO>(filter);
-
             var result = await _roomRepository.GetFilteredRoomsAsync(dto);
 
             return result;
 		}
-	}
+
+        public async Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds)
+        {
+            var result = await _roomRepository.ValidateRoomSelectionsAsync(roomTypeToBookDTOs, selectedRoomIds);
+            return result;
+        }
+    }
 }

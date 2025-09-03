@@ -181,7 +181,11 @@
     </div>
 
 </div>
-
+<script>
+    $(document).ready(function () {
+        loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
+    });
+</script>
 <script>
 	$(document).ready(function () {
 
@@ -250,11 +254,7 @@
 	});
 </script>
 
-<script>
-	$(document).ready(function () {
-		loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
-	});
-</script>
+
 
 <script>
     let guestList = [];                // For full guest data to show in UI

@@ -41,5 +41,7 @@ namespace HotelApp.Domain.Entities
 
 		public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();
 		public ICollection<GuestReservation> guestReservations { get; set; } = new HashSet<GuestReservation>();
+        public ICollection<ReservationRoom> ReservationsRooms { get; set; } = new HashSet<ReservationRoom>();
+
     }
 }

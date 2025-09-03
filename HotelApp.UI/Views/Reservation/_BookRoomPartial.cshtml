@@ -3,8 +3,9 @@
 
 <div class="row">
     <form id="bookRoomForm">
+        <div asp-validation-summary="All"></div>
         <fieldset>
-            <div class="row">
+            <div class="row">                
 
                 <legend class="text-semibold">
                     <i class="icon-reading position-left"></i> Reservation Info
@@ -49,10 +50,11 @@
                                     <label>Check-in - Check-out <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                                        <input type="text" class="form-control daterange-time" id="StayRange" placeholder="Select check-in and check-out" value="" />
-                                        <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
-                                        <span asp-validation-for="CheckOutDate" class="text-danger validation-error-label"></span>
-                                    </div>
+                                        <input type="text" autocomplete="off" class="form-control daterange-time" id="StayRange" placeholder="Select check-in and check-out" value="" />
+                                    </div>     
+                                    <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
+                                   @*  <span asp-validation-for="CheckOutDate" class="text-danger validation-error-label"></span> *@
+
                                 </div>
                                 <input type="hidden" asp-for="CheckInDate" id="CheckInDate" />
                                 <input type="hidden" asp-for="CheckOutDate" id="CheckOutDate" />
@@ -62,6 +64,7 @@
                                 <div class="form-group">
                                     <label>Number of Nights</label>
                                     <input type="text" class="form-control" asp-for="NumOfNights" id="NumOfNights" readonly />
+                                    <span asp-validation-for="NumOfNights" class="text-danger validation-error-label"></span>
                                 </div>
                             </div>
                         </div>
@@ -94,29 +97,47 @@
                             <tbody>
                             </tbody>
                         </table>
+                        <span asp-validation-for="roomTypeToBookDTOs" class="text-danger validation-error-label"></span>
 
                         <div id="addRoomWrapper" style="margin-top:10px">
                             <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
                         </div>
                         <div class="row" style="margin-top:30px">
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <label class="control-label">Rate <span class="text-danger">*</span></label>
-
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="roomsSelect" class="form-label fw-semibold">
+                                        Select Available Rooms
+                                    </label>
                                     <div class="input-group">
-                                        <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
-                                            <option></option>
-                                        </select>
+                                        <select id="roomsSelect" class="form-control" multiple="multiple"></select>
                                         <div class="input-group-btn">
                                             <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal_default">
-                                                <i class="icon-spinner9"></i> Rate Details
+                                                <i class="icon-search4 text-size-base"></i>
                                             </button>
-
                                         </div>
                                     </div>
-                                    <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                        <label class="control-label">Rate <span class="text-danger">*</span></label>
+
+                                        <div class="input-group">
+                                            <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
+                                                <option></option>
+                                            </select>
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal_default">
+                                                    <i class="icon-spinner9"></i> Rate Details
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
+                                </div>
+
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -225,64 +246,81 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        const $roomsSelect = $('#roomsSelect');
+
+        $roomsSelect.select2({
+            placeholder: "Search & select available rooms...",
+            //multiple: true,
+            minimumInputLength: 2,
+            ajax: {
+                url: '/Room/GetAvailableRooms',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({
+                    name: params.term // search term
+                }),
+                processResults: data => {
+                    if (data.success) {
+                        return {
+                            results: data.data // already has id + text
+                        };
+                    }
+                    return { results: [] };
+                },
+                cache: true
+            }
+        });
+    });
+</script>
 
 <script>
     $(document).ready(function () {
-        $('#companyNameSelect').select2({
+        const $companySelect = $('#companyNameSelect');
+        const $companyForm = $('#companyForm');
+
+
+        $companySelect.select2({
             placeholder: "Search and select company name",
             minimumInputLength: 3,
             ajax: {
                 url: '/Company/GetSerachedCompaniesByName',
                 dataType: 'json',
                 delay: 250,
-                data: function (params) {
-                    return {
-                        name: params.term
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(function (company) {
-                            return {
-                                id: company.id,
-                                text: company.displayText
-                            };
-                        })
-                    };
-                },
+                data: params => ({ name: params.term }),
+                processResults: data => ({
+                    results: data.map(company => ({
+                        id: company.id,
+                        text: company.displayText
+                    }))
+                }),
                 cache: true
             }
         });
 
-        $('#companyNameSelect').on('select2:select', function (e) { // <-- fix event name
-            var companyId = e.params.data.id;
+        $companySelect.on('select2:select', e => {
+            const companyId = e.params.data.id;
+            if (!companyId) return;
 
-            if (companyId) {
-                $.ajax({
-                    url: '/Company/GetSerachedCompanyData/' + companyId,
-                    type: 'GET',
-                    success: function (company) {
-                        console.log("Company Data", company); // Debug
+            $.get(`/Company/GetSerachedCompanyData/${companyId}`)
+                .done(company => {
+                    $('#companyId').val(company.id);
+                    $('#CompanyName').val(company.name);
+                    $('#CompanyPhone').val(company.phone);
+                    $('#CompanyAddress').val(company.address);
+                    $('#CompanyNotes').val(company.notes);
+                    $('#CompanyEmail').val(company.email);
 
-                        $('#companyId').val(company.id);
-                        $('#CompanyName').val(company.name);
-                        $('#CompanyPhone').val(company.phone);
-                        $('#CompanyAddress').val(company.address);
-                        $('#CompanyNotes').val(company.notes);
-                        $('#CompanyEmail').val(company.email);
-
-                        // Clear the Select2 after selecting a company
-                        $('#companyNameSelect').val(null).trigger('change');
-                    },
-                    error: function () {
-                        alert('Failed to fetch company data.');
-                    }
+                    $companySelect.val(null).trigger('change');
+                })
+                .fail(() => {
+                    console.error('Failed to fetch company data.');
+                    alert('⚠️ Failed to fetch company data.');
                 });
-            }
         });
 
-
-        $("#companyForm").on("submit", function (e) {
+        $companyForm.on('submit', function (e) {
             e.preventDefault();
 
             const formData = {
@@ -298,30 +336,29 @@
                 url: '/Company/SaveCompany',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function (response) {
+                data: JSON.stringify(formData)
+            })
+                .done(response => {
                     if (response.success) {
                         $('#selectedCompanyName').val(response.name);
                         $('#CompanyId').val(response.companyId);
 
-                        $("#companyForm")[0].reset();
-                        $("#companyId").val(0);
+                        $companyForm[0].reset();
+                        $('#companyId').val(0);
 
                         $('#modal_large').modal('hide');
                     } else {
-                        alert('Error saving company.');
+                        alert('⚠️ Error saving company.');
                     }
-                },
-                error: function () {
-                    alert('Error contacting server.');
-                }
-            });
-
+                })
+                .fail(() => {
+                    console.error('Error contacting server.');
+                    alert('⚠️ Error contacting server.');
+                });
         });
-       
-
     });
 </script>
+
 
 <script>
     let isGroupMode = false;
@@ -596,7 +633,6 @@
 
 <script>
     $(function () {
-
         function clearDates() {
             $('#CheckInDate').val('').trigger('change');
             $('#CheckOutDate').val('').trigger('change');
@@ -611,26 +647,24 @@
             const checkOut = picker.endDate;
 
             if (checkIn >= checkOut) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Dates',
-                    text: 'Check-out must be after check-in.',
-                    position: 'top',
-                    showConfirmButton: true
-                });
-
+                showAlert('error', 'Invalid Dates', 'Check-out must be after check-in.');
                 clearDates();
                 return;
             }
 
+            // Hidden fields for backend (ISO format)
             $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm')).trigger('change');
             $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm')).trigger('change');
 
+            // Calculate nights
             const durationHours = checkOut.diff(checkIn, 'hours', true);
             const nights = durationHours < 24 ? 0 : Math.floor(durationHours / 24);
             $('#NumOfNights').val(nights);
 
-            $(this).val(checkIn.format('YYYY-MM-DD HH:mm') + ' - ' + checkOut.format('YYYY-MM-DD HH:mm'));
+            // Visible input in requested format
+            $(this).val(
+                checkIn.format('DD/MM/YYYY hh:mm a') + ' - ' + checkOut.format('DD/MM/YYYY hh:mm a')
+            );
         });
 
         $('.daterange-time').on('cancel.daterangepicker', function () {
@@ -638,6 +672,7 @@
         });
     });
 </script>
+
 
 <script>
     $(document).ready(function () {
@@ -783,36 +818,43 @@
 </script>
 
 <script>
-    $("#bookRoomForm").on("submit", function (e) {
+   $("#bookRoomForm").on("submit", function (e) {
     e.preventDefault();
 
-        const companyIdVal = $("#CompanyId").val();
-        const formData = {
-            CheckInDate: $("#CheckInDate").val(),
-            CheckOutDate: $("#CheckOutDate").val(),
-            NumOfNights: $("#NumOfNights").val(),
-            ReservationSourceId: $("#ReservationSourceId").val(),
-            RateId: $("#rateSelect").val(),
-            companyId: companyIdVal ? parseInt(companyIdVal) : null,
-            roomTypeToBookDTOs: []
-        };
+    const companyIdVal = $("#CompanyId").val();
+    const formData = {
+        CheckInDate: $("#CheckInDate").val(),
+        CheckOutDate: $("#CheckOutDate").val(),
+        NumOfNights: $("#NumOfNights").val(),
+        ReservationSourceId: $("#ReservationSourceId").val(),
+        RateId: $("#rateSelect").val(),
+        companyId: companyIdVal ? parseInt(companyIdVal) : null,
+        roomTypeToBookDTOs: [],
+        RoomsIDs: [] // ✅ init list for room IDs
+    };
 
-        // ✅ Extract selected room types from the dynamic table
-        $("#roomTable tbody tr").each(function () {
-            const roomTypeId = $(this).find("select").eq(0).val();
-            const numOfRooms = $(this).find(".num-rooms-select").val();
-            const numAdults = $(this).find(".num-adults-select").val();
-            const numChildren = $(this).find(".num-children-select").val();
+    // ✅ Extract selected room types from the dynamic table
+    $("#roomTable tbody tr").each(function () {
+        const roomTypeId = $(this).find("select").eq(0).val();
+        const numOfRooms = $(this).find(".num-rooms-select").val();
+        const numAdults = $(this).find(".num-adults-select").val();
+        const numChildren = $(this).find(".num-children-select").val();
 
-            if (roomTypeId && numOfRooms > 0) {
-                formData.roomTypeToBookDTOs.push({
-                    Id: parseInt(roomTypeId),
-                    NumOfRooms: parseInt(numOfRooms),
-                    NumOfAdults: parseInt(numAdults || 0),
-                    NumOfChildren: parseInt(numChildren || 0)
-                });
-            }
-        });
+        if (roomTypeId && numOfRooms > 0) {
+            formData.roomTypeToBookDTOs.push({
+                Id: parseInt(roomTypeId),
+                NumOfRooms: parseInt(numOfRooms),
+                NumOfAdults: parseInt(numAdults || 0),
+                NumOfChildren: parseInt(numChildren || 0)
+            });
+        }
+    });
+
+    // ✅ Add selected rooms from Select2
+    const selectedRooms = $("#roomsSelect").val(); // array of selected IDs as strings
+    if (selectedRooms && selectedRooms.length > 0) {
+        formData.RoomsIDs = selectedRooms.map(id => parseInt(id));
+    }
 
     $.ajax({
         url: '/Reservation/SaveRoomToBook',
@@ -838,8 +880,8 @@
 
                 $(document).trigger("roomBookingSuccess");
             } else {
-                //Swal.fire("Error", response.message, "error");
-                $("#bookRoomContainer").html(response);
+                    $("#bookRoomContainer").html(response);
+                showAlert('error', 'Validation Error', response.message);
             }
         },
         error: function () {
@@ -847,6 +889,7 @@
         }
     });
 });
+
 
 </script>
 

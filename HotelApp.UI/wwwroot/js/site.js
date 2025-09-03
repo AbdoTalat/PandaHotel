@@ -3,7 +3,15 @@
 
 // Write your JavaScript code.
 
-
+function showAlert(type, title, text) {
+    Swal.fire({
+        icon: type, // 'success', 'error', 'warning', 'info', 'question'
+        title: title || '',
+        text: text || '',
+        position: 'top',
+        showConfirmButton: true
+    });
+}
 
 function loadSelect(selector, url, textField, valueField) {
     var $select = $(selector);

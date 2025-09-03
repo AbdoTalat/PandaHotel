@@ -1,4 +1,5 @@
 ﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Domain.Entities;
 using System;
@@ -12,8 +13,8 @@ namespace HotelApp.Application.IRepositories
     public interface IRoomRepository
     {
         GetRoomsReview GetRoomsReview();
-        Task<int> CheckRoomAvailabilityAsync(int roomTypeId, int requestedRooms);
 		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
-        Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto); 
-	}
+        Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
+        Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
+    }
 }

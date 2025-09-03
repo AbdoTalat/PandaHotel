@@ -86,6 +86,7 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<SystemSetting> SystemSettings { get; set; }
 		public DbSet<Company> Companies { get; set; }
 		public DbSet<ProofType> ProofTypes { get; set; }
+		public DbSet<ReservationRoom> ReservationRooms { get; set; }
         #endregion
 
 
@@ -143,6 +144,7 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new SystemSettingConfiguration());
 			builder.ApplyConfiguration(new CompanyConfiguration());
 			builder.ApplyConfiguration(new ProofTypeConfiguration());
+			builder.ApplyConfiguration(new ReservationRoomConfiguration());
 			#endregion
 
 		}

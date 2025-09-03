@@ -12,7 +12,8 @@ using HotelApp.Domain.Enums;
 using HotelApp.Helper;
 using HotelApp.Domain.Entities;
 using Microsoft.Identity.Client;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using HotelApp.Application.DTOs.Reservation;
+using HotelApp.Application;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -52,15 +53,6 @@ namespace HotelApp.Infrastructure.Repositories
             };
             return result;
 		}
-        public async Task<int> CheckRoomAvailabilityAsync(int roomTypeId, int requestedRooms)
-        {
-            var availableRoomsCount = await _context.Rooms
-                .Where(r => r.RoomTypeId == roomTypeId && r.RoomStatus.Name.ToLower() == "available")
-                .BranchFilter()
-                .CountAsync();
-
-            return availableRoomsCount;
-        }
         public async Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end)
         {
 			var query = _context.Rooms
@@ -115,5 +107,50 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return await Query.ProjectTo<GetAllRoomsDTO>(_mapperConfig).ToListAsync();
 		}
-	}
+        public async Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds)
+        {
+            if (roomTypeToBookDTOs == null || !roomTypeToBookDTOs.Any())
+                return ServiceResponse<object>.ResponseFailure("No room types selected.");
+
+            if (selectedRoomIds == null || !selectedRoomIds.Any())
+                return ServiceResponse<object>.ResponseFailure("No rooms selected.");
+
+            var selectedRooms = await _context.Rooms
+                .Where(r => selectedRoomIds.Contains(r.Id))
+                .Select(r => new { r.Id, r.RoomTypeId })
+                .ToListAsync();
+
+            if (selectedRooms.Count != selectedRoomIds.Count)
+                return ServiceResponse<object>.ResponseFailure("Some selected rooms do not exist.");
+
+            var selectedByType = selectedRooms
+                .GroupBy(r => r.RoomTypeId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            foreach (var typeDto in roomTypeToBookDTOs)
+            {
+                var requestedCount = typeDto.NumOfRooms;
+
+                if (!selectedByType.TryGetValue(typeDto.Id, out var selectedCount))
+                {
+                    return ServiceResponse<object>.ResponseFailure( $"You must select {requestedCount} room(s) for {GetRoomTypeName(typeDto.Id)}.");
+                }
+
+                if (requestedCount != selectedCount)
+                {
+                    return ServiceResponse<object>.ResponseFailure($"For {GetRoomTypeName(typeDto.Id)} you selected {selectedCount}, but required {requestedCount}.");
+                }
+            }
+
+            return ServiceResponse<object>.ResponseSuccess("Room selection is valid.");
+        }
+
+        private string GetRoomTypeName(int roomTypeId)
+        {
+            return _context.RoomTypes
+                .Where(rt => rt.Id == roomTypeId)
+                .Select(rt => rt.Name)
+                .FirstOrDefault() ?? $"RoomType {roomTypeId}";
+        }
+    }
 }

@@ -40,10 +40,12 @@ $(function() {
     // Display time picker
     $('.daterange-time').daterangepicker({
         timePicker: true,
+        autoApply: true,          // user must click Apply
+        autoUpdateInput: false,  
         applyClass: 'bg-slate-600',
         cancelClass: 'btn-default',
         locale: {
-            format: 'MM/DD/YYYY h:mm a'
+            format: 'DD/MM/YYYY h:mm a'
         }
     });
 
