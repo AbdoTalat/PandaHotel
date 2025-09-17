@@ -17,6 +17,10 @@ namespace HotelApp.Infrastructure.Configurations
                 .HasMaxLength(20)
                 .IsRequired();
 
+            builder.Property(rs => rs.Code)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
             builder.Property(rs => rs.Description)
                 .HasMaxLength(200);
 

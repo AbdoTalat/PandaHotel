@@ -16,7 +16,7 @@ namespace HotelApp.Application.Mapping
 	{
         public ReservationMapping()
         {
-			CreateMap<AddReservationDTO, Reservation>()
+			CreateMap<ReservationDTO, Reservation>()
 			   .ForMember(dest => dest.CheckInDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckInDate))
 			   .ForMember(dest => dest.CheckOutDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckOutDate))
 			   .ForMember(dest => dest.NumberOfPeople, opt => opt.MapFrom(src =>
@@ -26,19 +26,19 @@ namespace HotelApp.Application.Mapping
 			   .ForMember(dest => dest.NumberOfNights, opt => opt.MapFrom(src => src.bookRoomDTO.NumOfNights))
                //.ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.bookRoomDTO.BranchId))
                .ForMember(dest => dest.ReservationSourceId, opt => opt.MapFrom(src => src.bookRoomDTO.ReservationSourceId))
-			   .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.confirmReservationDTO.Comment))
-			   .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsConfirmed))
-			   .ForMember(dest => dest.IsPending, opt => opt.MapFrom(src => src.confirmReservationDTO.IsPending))
-			   .ForMember(dest => dest.IsCheckedIn, opt => opt.MapFrom(src => src.confirmReservationDTO.IsCheckedIn))
-			   .ForMember(dest => dest.IsCheckedOut, opt => opt.MapFrom(src => src.confirmReservationDTO.IsCheckedOut))
-			   .ForMember(dest => dest.IsClosed, opt => opt.MapFrom(src => src.confirmReservationDTO.IsClosed))
-			   .ForMember(dest => dest.IsCancelled, opt => opt.MapFrom(src => src.confirmReservationDTO.IsCancelled))
-			   .ForMember(dest => dest.CancellationReason, opt => opt.MapFrom(src => src.confirmReservationDTO.CancellationReason));
+			   .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.confirmDTO.Comment))
+			   .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.confirmDTO.IsConfirmed))
+			   .ForMember(dest => dest.IsPending, opt => opt.MapFrom(src => src.confirmDTO.IsPending))
+			   .ForMember(dest => dest.IsCheckedIn, opt => opt.MapFrom(src => src.confirmDTO.IsCheckedIn))
+			   .ForMember(dest => dest.IsCheckedOut, opt => opt.MapFrom(src => src.confirmDTO.IsCheckedOut))
+			   .ForMember(dest => dest.IsClosed, opt => opt.MapFrom(src => src.confirmDTO.IsClosed))
+			   .ForMember(dest => dest.IsCancelled, opt => opt.MapFrom(src => src.confirmDTO.IsCancelled))
+			   .ForMember(dest => dest.CancellationReason, opt => opt.MapFrom(src => src.confirmDTO.CancellationReason));
 
 			CreateMap<RoomTypeToBookDTO, ReservationRoomType>()
 				.ForMember(dest => dest.RoomTypeId, opt => opt.MapFrom(src => src.Id))
 				.ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.NumOfRooms))
-				.ForMember(dest => dest.ReservationId, opt => opt.Ignore()); // set later
+				.ForMember(dest => dest.ReservationId, opt => opt.Ignore()); 
 
 
 

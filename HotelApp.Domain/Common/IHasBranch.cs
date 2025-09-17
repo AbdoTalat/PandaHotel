@@ -8,6 +8,6 @@ namespace HotelApp.Domain.Common
 {
     public interface IHasBranch
     {
-        int BranchId { get; set; }
+        int? BranchId { get; set; }
     }
 }

@@ -89,6 +89,24 @@ namespace HotelApp.Infrastructure.Migrations
                     b.ToTable("Branches");
                 });
 
+            modelBuilder.Entity("HotelApp.Domain.Entities.CalculationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CalculationTypes");
+                });
+
             modelBuilder.Entity("HotelApp.Domain.Entities.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -102,7 +120,7 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CreatedById")
@@ -182,7 +200,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CreatedById")
@@ -226,7 +244,7 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CreatedById")
@@ -311,7 +329,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
@@ -413,7 +431,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
@@ -460,7 +478,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("LastModifiedById");
 
                     b.HasIndex("Code", "BranchId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BranchId] IS NOT NULL");
 
                     b.ToTable("Rates");
                 });
@@ -473,7 +492,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<string>("CancellationReason")
@@ -485,10 +504,6 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<DateTime>("CheckOutDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
@@ -522,6 +537,10 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("NumberOfNights")
                         .HasColumnType("int");
@@ -692,7 +711,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBasic")
+                    b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
 
                     b.Property<int?>("LastModifiedById")
@@ -731,7 +750,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CreatedById")
@@ -773,7 +792,7 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("RoomStatusId")
+                    b.Property<int>("RoomStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomTypeId")
@@ -794,7 +813,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("RoomTypeId");
 
                     b.HasIndex("RoomNumber", "BranchId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BranchId] IS NOT NULL");
 
                     b.ToTable("Rooms");
                 });
@@ -830,8 +850,12 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -852,6 +876,9 @@ namespace HotelApp.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsReservable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
 
                     b.Property<int?>("LastModifiedById")
@@ -880,50 +907,60 @@ namespace HotelApp.Infrastructure.Migrations
                         {
                             Id = 1,
                             BranchId = 2,
+                            Code = "Available",
                             Color = "#20BF7E",
                             Description = "Room is ready to be booked",
                             IsActive = false,
                             IsReservable = false,
+                            IsSystem = true,
                             Name = "Available"
                         },
                         new
                         {
                             Id = 2,
                             BranchId = 2,
+                            Code = "Reserved",
                             Color = "#20BF7E",
                             Description = "Room is reserved by a guest",
                             IsActive = false,
                             IsReservable = false,
+                            IsSystem = true,
                             Name = "Reserved"
                         },
                         new
                         {
                             Id = 3,
                             BranchId = 2,
+                            Code = "Occupied",
                             Color = "#20BF7E",
                             Description = "Room is currently occupied",
                             IsActive = false,
                             IsReservable = false,
+                            IsSystem = true,
                             Name = "Occupied"
                         },
                         new
                         {
                             Id = 4,
                             BranchId = 2,
+                            Code = "Maintenance",
                             Color = "#20BF7E",
                             Description = "Room is under maintenance",
                             IsActive = false,
                             IsReservable = false,
+                            IsSystem = true,
                             Name = "Maintenance"
                         },
                         new
                         {
                             Id = 5,
                             BranchId = 2,
+                            Code = "Cleaning",
                             Color = "#20BF7E",
                             Description = "Room is being cleaned",
                             IsActive = false,
                             IsReservable = false,
+                            IsSystem = true,
                             Name = "Cleaning"
                         });
                 });
@@ -936,7 +973,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CreatedById")
@@ -1051,6 +1088,9 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CalculationTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CheckInStatusId")
                         .HasColumnType("int");
 
@@ -1089,6 +1129,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CalculationTypeId");
+
                     b.HasIndex("CheckInStatusId");
 
                     b.HasIndex("CheckOutStatusId");
@@ -1119,7 +1161,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DefaultBranchId")
@@ -1136,6 +1178,9 @@ namespace HotelApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("LastModifiedById")
                         .HasColumnType("int");
@@ -1183,12 +1228,6 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isFullAdmin")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1374,8 +1413,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Companies")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1399,8 +1437,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Floors")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1424,8 +1461,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Guests")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1475,8 +1511,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Options")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1517,8 +1552,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Rates")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1542,8 +1576,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Reservations")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.Company", "Company")
                         .WithMany("Reservations")
@@ -1637,8 +1670,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("Rooms")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1659,7 +1691,8 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.RoomStatus", "RoomStatus")
                         .WithMany("Rooms")
                         .HasForeignKey("RoomStatusId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("HotelApp.Domain.Entities.RoomType", "RoomType")
                         .WithMany("Rooms")
@@ -1704,8 +1737,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("RoomStatuses")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1729,8 +1761,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
                         .WithMany("RoomTypes")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1781,6 +1812,12 @@ namespace HotelApp.Infrastructure.Migrations
 
             modelBuilder.Entity("HotelApp.Domain.Entities.SystemSetting", b =>
                 {
+                    b.HasOne("HotelApp.Domain.Entities.CalculationType", "CalculationType")
+                        .WithMany()
+                        .HasForeignKey("CalculationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("HotelApp.Domain.Entities.RoomStatus", "CheckInStatus")
                         .WithMany()
                         .HasForeignKey("CheckInStatusId")
@@ -1802,6 +1839,8 @@ namespace HotelApp.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("LastModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CalculationType");
 
                     b.Navigation("CheckInStatus");
 

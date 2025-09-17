@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Reservation
 {
-	public class AddReservationDTO
+	public class ReservationDTO
 	{
-		public List<ReservationGuestDTO?>? GuestsDTOs { get; set; }
+		public List<ReservationGuestDTO?>? GuestDTOs { get; set; }
 		public BookRoomDTO? bookRoomDTO { get; set; }
-		public ConfirmReservationDTO confirmReservationDTO { get; set; }
+		public ConfirmReservationDTO confirmDTO { get; set; }
 	}
 }

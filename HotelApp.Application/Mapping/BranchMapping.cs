@@ -15,8 +15,8 @@ namespace HotelApp.Application.Mapping
 	{
 		public BranchMapping()
 		{
-			CreateMap<EditBranchDTO, Branch>();
-			CreateMap<Branch, EditBranchDTO>();
+			CreateMap<BranchDTO, Branch>();
+			CreateMap<Branch, BranchDTO>();
 
 			CreateMap<Branch, GetBranchByIdDTO>();
 

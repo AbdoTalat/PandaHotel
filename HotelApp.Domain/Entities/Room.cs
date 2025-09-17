@@ -16,13 +16,13 @@ namespace HotelApp.Domain.Entities
         public int RoomTypeId { get; set; }
         public RoomType? RoomType { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
-        public int? RoomStatusId { get; set; }
+        public int RoomStatusId { get; set; }
         public RoomStatus? RoomStatus { get; set; }
 
-        public int FloorId { get; set; }
+		public int FloorId { get; set; }
         public Floor? Floor { get; set; }
 
         public ICollection<RoomOption> RoomOptions { get; set; } = new HashSet<RoomOption>();

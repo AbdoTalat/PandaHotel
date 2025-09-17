@@ -31,11 +31,6 @@ namespace HotelApp.Infrastructure
         }
 
 		#region Get Methods
-
-		public IQueryable<T> GetAllIQueryable()
-		{
-			return _dbSet.AsQueryable();
-		}
 		public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false)
         {
 			IQueryable<T> query = _dbSet.AsNoTracking()
@@ -116,9 +111,8 @@ namespace HotelApp.Infrastructure
         {
             var branchId = BranchContext.CurrentBranchId;
 
-            // If entity has a BranchId property and branchId is not null
             var prop = typeof(T).GetProperty("BranchId");
-            if (prop != null && prop.PropertyType == typeof(int) && branchId.HasValue)
+            if (prop != null && prop.PropertyType == typeof(int?) && branchId.HasValue)
             {
                 prop.SetValue(entity, branchId.Value);
             }
@@ -132,7 +126,7 @@ namespace HotelApp.Infrastructure
             foreach (var entity in entities)
             {
                 var prop = typeof(T).GetProperty("BranchId");
-                if (prop != null && prop.PropertyType == typeof(int) && branchId.HasValue)
+                if (prop != null && prop.PropertyType == typeof(int?) && branchId.HasValue)
                 {
                     prop.SetValue(entity, branchId.Value);
                 }

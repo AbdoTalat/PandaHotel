@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotelApp.Domain.Common.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,17 +8,16 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.RoomStatus
 {
-	public class AddRoomStatusDTO
+	public class RoomStatusDTO
 	{
-		[MaxLength(20)]
+		public int Id { get; set; }
+		[RequiredEx]
 		public string Name { get; set; }
-
-		[MaxLength(200)]
+		[MaxLengthEx(200)]
 		public string? Description { get; set; }
+		[RequiredEx]
 		public string Color { get; set; }
-		public int BranchId { get; set; }
 		public bool IsReservable { get; set; }
 		public bool IsActive { get; set; }
-
 	}
 }

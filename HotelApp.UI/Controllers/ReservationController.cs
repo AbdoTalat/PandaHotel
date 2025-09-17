@@ -116,11 +116,11 @@ namespace HotelApp.UI.Controllers
 			var roomData = JsonConvert.DeserializeObject<BookRoomDTO>(roomDataJson);
 			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO?>>(guestsDataJson);
 
-			var reservationDTO = new AddReservationDTO
+			var reservationDTO = new ReservationDTO
 			{
-				GuestsDTOs = guestsData,
+				GuestDTOs = guestsData,
 				bookRoomDTO = roomData,
-				confirmReservationDTO = confirmReservationDTO
+				confirmDTO = confirmReservationDTO
 			};
 
 			var result = await _reservationService.AddReservation(reservationDTO);

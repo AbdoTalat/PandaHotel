@@ -13,6 +13,43 @@ function showAlert(type, title, text) {
     });
 }
 
+
+// Global toastr config (shared for all calls)
+toastr.options = {
+    closeButton: true,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    timeOut: 5000,
+    extendedTimeOut: 2000,
+    preventDuplicates: true
+};
+
+function showToast(type, title, message) {
+    switch (type) {
+        case 'success':
+            toastr.success(message || '', title || '');
+            break;
+        case 'error':
+            toastr.error(message || '', title || '');
+            break;
+        case 'warning':
+            toastr.warning(message || '', title || '');
+            break;
+        case 'info':
+            toastr.info(message || '', title || '');
+            break;
+        default:
+            console.warn('Unknown toast type:', type);
+            toastr.info(message || '', title || '');
+            break;
+    }
+}
+
+
+
+
+
+
 function loadSelect(selector, url, textField, valueField) {
     var $select = $(selector);
     var selectedValue = $select.data("selected"); // read from data-selected attr
@@ -54,7 +91,6 @@ function loadSelect(selector, url, textField, valueField) {
 }
 
 
-// site.js
 
 //Delete Entity
 $(document).ready(function () {

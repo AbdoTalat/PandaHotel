@@ -32,6 +32,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using FluentValidation.AspNetCore;
+using HotelApp.Application.Services.CalculationTypeService;
+using HotelApp.Application.Services.DashboardService;
 
 namespace HotelApp.Application
 {
@@ -57,6 +59,8 @@ namespace HotelApp.Application
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IProofTypeService, ProofTypeService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<ICalculationTypeService, CalculationTypeService>();
+            services.AddScoped<IDashboardService, DashboardService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

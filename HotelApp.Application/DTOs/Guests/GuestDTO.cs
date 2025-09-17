@@ -1,6 +1,5 @@
 ﻿using HotelApp.Application.Services.SystemSettingService;
 using HotelApp.Domain.Common.Validation;
-using HotelApp.Helper.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

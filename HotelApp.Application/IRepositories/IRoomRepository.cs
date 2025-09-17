@@ -16,5 +16,6 @@ namespace HotelApp.Application.IRepositories
 		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
         Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
         Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
-    }
+		Task<int> GetOccupancyPercentAsync();
+	}
 }

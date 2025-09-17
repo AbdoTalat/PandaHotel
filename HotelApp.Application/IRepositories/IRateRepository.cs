@@ -9,7 +9,7 @@ namespace HotelApp.Application.IRepositories
 {
     public interface IRateRepository
     {
-        Task<EditRateDTO> GetRateToEditByIdAsync(int Id);
+        Task<RateDTO> GetRateToEditByIdAsync(int Id);
         Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model);
 
 	}

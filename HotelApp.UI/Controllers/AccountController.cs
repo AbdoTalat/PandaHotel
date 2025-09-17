@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using HotelApp.Application.DTOs.Users;
@@ -9,9 +8,6 @@ using HotelApp.Application.Services.BranchService;
 using HotelApp.Application.DTOs.Account;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Domain.Entities;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
 
 namespace HotelApp.UI.Controllers
 {
@@ -57,7 +53,7 @@ namespace HotelApp.UI.Controllers
 				return View(model);
 			}
 
-			if (!user.isActive)
+			if (!user.IsActive)
 			{
 				TempData["NotActive"] = "This user account is not active.";
 				return View(model);
@@ -66,7 +62,7 @@ namespace HotelApp.UI.Controllers
 
 			await _signInManager.SignInAsync(user, isPersistent: model.rememberMe); // ← this adds all claims via your factory
 
-			return RedirectToAction("Index", "Home");
+			return RedirectToAction("Index", "Dashboard");
 		}
 
 

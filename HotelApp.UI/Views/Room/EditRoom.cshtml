@@ -1,5 +1,7 @@
 ﻿@model EditRoomDTO
-
+@{
+	TempData["Title"] = "Edit Room";
+}
 <div class="page-header page-header-default">
 	<div class="page-header-content">
 		<div class="page-title">
@@ -86,7 +88,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Floor<span class="text-danger">*</span></label>
-										<select asp-for="FloorId" id="floorSelect" name="FloorId" class="form-control select" required data-placeholder="Select Floor">
+										<select asp-for="FloorId" id="floorSelect" data-selected="@Model?.FloorId" class="form-control select" required data-placeholder="Select Floor">
 											<option></option>
 										</select>
 										<span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
@@ -98,7 +100,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Status<span class="text-danger">*</span></label>
-										<select asp-for="RoomStatusId" id="StatusSelect" name="RoomStatusId" class="form-control select" required data-placeholder="Choose Status">
+										<select asp-for="RoomStatusId" id="StatusSelect" data-selected="@Model?.RoomStatusId" class="form-control select" required data-placeholder="Choose Room Status">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomStatusId" class="text-danger validation-error-label"></span>
@@ -107,7 +109,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Type<span class="text-danger">*</span></label>
-										<select asp-for="RoomTypeId" id="roomTypeSelect" name="RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
+										<select asp-for="RoomTypeId" id="roomTypeSelect" data-selected="@Model?.RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomTypeId" class="text-danger validation-error-label"></span>
@@ -264,74 +266,10 @@
 
 	<script>
 		$(document).ready(function () {
-			var selectedRoomTypeId = '@Model.RoomTypeId'; // Current room type from model
-
-			$.ajax({
-				url: '/RoomType/GetRoomTypesJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#roomTypeSelect');
-					select.empty();
-					select.append('<option value="">Select Room Type</option>');
-
-					$.each(response, function (index, item) {
-						var isSelected = item.id == selectedRoomTypeId ? ' selected' : '';
-						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.typeName + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load room types.');
-				}
-			});
+			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
+			loadSelect("#floorSelect", "/Floor/GetFloorsJson", "number", "id");
+			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
 		});
-
-		$(document).ready(function () {
-			var selectedFloorId = '@Model.FloorId'; // Inject the existing floor ID from the model
-
-			$.ajax({
-				url: '/Floor/GetFloorsJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#floorSelect');
-					select.empty();
-					select.append('<option value="">Select Floor</option>');
-
-					$.each(response, function (index, item) {
-						var isSelected = item.id == selectedFloorId ? ' selected' : '';
-						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.number + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load floors.');
-				}
-			});
-		});
-
-		$(document).ready(function () {
-			var selectedStatusId = '@Model.RoomStatusId'; // Current status from model
-
-			$.ajax({
-				url: '/RoomStatus/GetRoomStatusJson',
-				type: 'GET',
-				dataType: 'json',
-				success: function (response) {
-					var select = $('#StatusSelect');
-					select.empty();
-					select.append('<option value="">Select Status</option>');
-
-					$.each(response, function (index, item) {
-						var isSelected = item.id == selectedStatusId ? ' selected' : '';
-						select.append('<option value="' + item.id + '"' + isSelected + '>' + item.name + '</option>');
-					});
-				},
-				error: function () {
-					console.error('Failed to load statuses.');
-				}
-			});
-		});
-
 	</script>
 
 	<script>
@@ -369,31 +307,7 @@
 		});
 	</script>
 
-    <script>
-        $(document).ready(function () {
-            $('#roomTypeSelect').change(function () {
-                var roomTypeId = $(this).val();
-                if (roomTypeId) {
-                    $.get('/RoomType/GetRoomTypeData', { roomTypeId: roomTypeId }, function (response) {
-                        if (response.success) {
-                            $('#roomPrice').val(response.price);
-                            $('#maxNumOfAdults').val(response.maxAdults);
-                            $('#maxNumOfChildren').val(response.maxChildren);
-                        } else {
-                            alert(response.message);
-                            $('#roomPrice').val('');
-                            $('#maxNumOfAdults').val('');
-                            $('#maxNumOfChildren').val('');
-                        }
-                    });
-                } else {
-                    $('#roomPrice').val('');
-                    $('#maxNumOfAdults').val('');
-                    $('#maxNumOfChildren').val('');
-                }
-            });
-        });
-    </script>
+
 
 
 	@await Html.PartialAsync("_ValidationScriptsPartial")

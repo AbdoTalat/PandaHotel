@@ -8,11 +8,11 @@ namespace HotelApp.Application.Services.RoomTypeService
 	{
 		Task<IEnumerable<GetAllRoomTypesDTO>> GetAllRoomTypesAsync();
 		Task<GetRoomTypeByIdDTO?> GetRoomTypeByIdAsync(int Id);
-        Task<EditRoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id);
+        Task<RoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id);
         Task<IEnumerable<DropDownDTO<string>>> GetRoomTypesDropDownAsync();
 		Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync();
-		Task<ServiceResponse<AddRoomTypeDTO>> AddRoomTypeAsync(AddRoomTypeDTO roomTypeDTO);
-		Task<ServiceResponse<EditRoomTypeDTO>> EditRoomTypeAsync(EditRoomTypeDTO roomTypeDTO);
+		Task<ServiceResponse<RoomTypeDTO>> AddRoomTypeAsync(RoomTypeDTO roomTypeDTO);
+		Task<ServiceResponse<RoomTypeDTO>> EditRoomTypeAsync(RoomTypeDTO roomTypeDTO);
 		Task<ServiceResponse<RoomType>> DeleteRoomTypeAsync(int Id);
 	}
 }

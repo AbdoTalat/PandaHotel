@@ -34,53 +34,29 @@ namespace HotelApp.Infrastructure
 		protected override async Task<ClaimsIdentity> GenerateClaimsAsync(User user)
 		{
 			var identity = await base.GenerateClaimsAsync(user);
-			var roles = await _userManager.GetRolesAsync(user);
 
-			foreach (var roleName in roles)
+			var roleIds = await _context.UserRoles
+				.Where(ur => ur.UserId == user.Id)
+				.Select(ur => ur.RoleId)
+				.ToListAsync();
+
+			var roleClaims = await _context.RoleClaims
+				.Where(rc => roleIds.Contains(rc.RoleId) && rc.ClaimType == "Permission")
+				.ToListAsync();
+
+			foreach (var claim in roleClaims)
 			{
-				var role = await _roleManager.FindByNameAsync(roleName);
-				if (role == null) continue;
-
-				var roleClaims = await _roleManager.GetClaimsAsync(role);
-
-				foreach (var claim in roleClaims.Where(c => c.Type == "Permission"))
+				if (!string.IsNullOrEmpty(claim.ClaimType) && !string.IsNullOrEmpty(claim.ClaimValue))
 				{
-					identity.AddClaim(claim);
+					identity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
 				}
 			}
 
-			if (user.DefaultBranchId != 0)
+			if (user.DefaultBranchId > 0)
 			{
 				identity.AddClaim(new Claim("DefaultBranchId", user.DefaultBranchId.ToString()));
-
-				var defaultBranchData = await _context.Branches
-					.Where(b => b.Id == user.DefaultBranchId)
-					.Select(b => new UserBranchesDataDTO
-					{
-						Id = b.Id,
-						Name = b.Name
-					})
-					.FirstOrDefaultAsync();
-
-				var defaultBranchJson = JsonConvert.SerializeObject(defaultBranchData);
-				identity.AddClaim(new Claim("DefaultBranchData", defaultBranchJson));
 			}
 
-			// Add UserBranches
-			var userBranchesData = await _context.UserBranches
-				.Where(ub => ub.UserId == user.Id)
-				.Select(ub => new UserBranchesDataDTO
-				{
-					Id = ub.BranchId,
-					Name = ub.Branch.Name
-				})
-				.ToListAsync();
-
-			if (userBranchesData.Any())
-			{
-				identity.AddClaim(new Claim("UserBranches", string.Join(",", userBranchesData.Select(b => b.Id))));
-				identity.AddClaim(new Claim("UserBranchesData", JsonConvert.SerializeObject(userBranchesData)));
-			}
 
 			return identity;
 		}

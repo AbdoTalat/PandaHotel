@@ -4,7 +4,7 @@ namespace HotelApp.Domain.Entities
 {
     public class Role : IdentityRole<int>
     {
-        public bool IsBasic { get; set; } = false;
+        public bool IsSystem { get; set; } = false;
         public bool IsActive { get; set; }
 
         public int? CreatedById { get; set; }

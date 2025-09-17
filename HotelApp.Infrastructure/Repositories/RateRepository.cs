@@ -30,12 +30,12 @@ namespace HotelApp.Infrastructure.Repositories
             _mapperConfig = mapperConfig;
 		}
 
-        public async Task<EditRateDTO> GetRateToEditByIdAsync(int Id)
+        public async Task<RateDTO> GetRateToEditByIdAsync(int Id)
         {
             var rateDto = await _context.Rates
                 .BranchFilter()
                 .Where(r => r.Id == Id)
-                .Select(r => new EditRateDTO
+                .Select(r => new RateDTO
                 {
                     Id = r.Id,
                     Code = r.Code,
@@ -71,11 +71,11 @@ namespace HotelApp.Infrastructure.Repositories
                 .Select(rt => new { rt.Id, rt.Name })
                 .ToListAsync();
 
-            rateDto.roomTypeRateDTOs = roomTypes.Select(rt =>
+            rateDto.RoomTypeRates = roomTypes.Select(rt =>
             {
                 var matchedRate = roomTypeRates.FirstOrDefault(rtr => rtr.RoomTypeId == rt.Id);
 
-                return new EditRoomTypeRateDTO
+                return new RoomTypeRateDTO
                 {
                     Id = matchedRate?.Id ?? 0,
                     RateId = Id,

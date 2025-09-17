@@ -1,4 +1,4 @@
-﻿using HotelApp.Helper.Validation;
+﻿using HotelApp.Domain.Common.Validation;
 using Microsoft.AspNetCore;
 using System;
 using System.Collections.Generic;
@@ -11,29 +11,23 @@ namespace HotelApp.Application.DTOs.Users
 {
     public class AddUserDTO
     {
-        [MinLength(3)]
-        [RequiredEx]
-        public string FirstName { get; set; }
-
-        [MinLength(3)]
-        [RequiredEx]
-        public string LastName { get; set; }
-        [RequiredEx]
-        [MinLength(3)]
-        public string UserName { get; set; }
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [RequiredEx]
+		[RequiredEx]
+		public string FirstName { get; set; }
+		[RequiredEx]
+		public string LastName { get; set; }
+		[RequiredEx]
+		public string UserName { get; set; }
+		[EmailAddress]
+		[RequiredEx]
+		public string Email { get; set; }
+		[RequiredEx]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
         [RequiredEx]
         [DataType(DataType.Password)]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
+
         public int DefaultBranchId { get; set; }
         public bool IsActive { get; set; }
 

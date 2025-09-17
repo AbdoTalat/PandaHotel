@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <None Include="Permissions.json" />
-    <None Include="Views\Home\Index.cshtml" />
     <None Include="Views\Home\Privacy.cshtml" />
     <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
     <None Include="Views\_ViewImports.cshtml" />

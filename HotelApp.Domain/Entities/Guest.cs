@@ -20,7 +20,7 @@ namespace HotelApp.Domain.Entities
         public ProofType? ProofType { get; set; }
         public string? ProofNumber { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<GuestReservation> guestReservations { get; set; } = new HashSet<GuestReservation>();

@@ -269,7 +269,14 @@
             }
         });
     </script>
-
+    @if (TempData["RoomsPercent"] != null)
+    {
+        <script>
+            $(function () {
+                toastr.warning("@TempData["RoomsPercent"]");
+            });
+        </script>
+    }
    @*  @if (TempData["Success"] != null)
     {
         <script>

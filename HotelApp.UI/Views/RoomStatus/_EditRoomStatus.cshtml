@@ -1,4 +1,4 @@
-﻿@model EditRoomStatusDTO
+﻿@model RoomStatusDTO
 
 <form class="form-basic ajaxEditForm" asp-action="EditRoomStatus" asp-controller="RoomStatus" method="post">
     <input type="hidden" asp-for="Id" />
@@ -9,7 +9,7 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <label>Status Name<span class="text-danger">*</span></label>
+                            <label>Name<span class="text-danger">*</span></label>
                             <div class="form-group">
                                 <input asp-for="Name" class="form-control" required placeholder="Branch Name">
                                 <span asp-validation-for="Name" class="text-danger validation-error-label"></span>

@@ -11,6 +11,7 @@ using System.Reflection.Emit;
 using System.Security.Claims;
 using HotelApp.Domain.Common;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Domain.Enums;
 
 
 namespace HotelApp.Infrastructure.DbContext
@@ -87,6 +88,8 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<Company> Companies { get; set; }
 		public DbSet<ProofType> ProofTypes { get; set; }
 		public DbSet<ReservationRoom> ReservationRooms { get; set; }
+
+		public DbSet<CalculationType> CalculationTypes { get; set; }
         #endregion
 
 
@@ -95,11 +98,11 @@ namespace HotelApp.Infrastructure.DbContext
 			base.OnModelCreating(builder);
 
             builder.Entity<RoomStatus>().HasData(
-				new RoomStatus { Id = 1, Name = "Available", Description = "Room is ready to be booked", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 2, Name = "Reserved", Description = "Room is reserved by a guest", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 3, Name = "Occupied", Description = "Room is currently occupied", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 4, Name = "Maintenance", Description = "Room is under maintenance", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 5, Name = "Cleaning", Description = "Room is being cleaned", BranchId = 2, Color = "#20BF7E" }
+				new RoomStatus { Id = 1, Name = "Available", Code = RoomStatusEnum.Available, IsSystem = true, Description = "Room is ready to be booked", BranchId = 2, Color = "#20BF7E" },
+				new RoomStatus { Id = 2, Name = "Reserved", Code = RoomStatusEnum.Reserved, IsSystem = true, Description = "Room is reserved by a guest", BranchId = 2, Color = "#20BF7E" },
+				new RoomStatus { Id = 3, Name = "Occupied", Code = RoomStatusEnum.Occupied, IsSystem = true, Description = "Room is currently occupied", BranchId = 2, Color = "#20BF7E" },
+				new RoomStatus { Id = 4, Name = "Maintenance", Code = RoomStatusEnum.Maintenance, IsSystem = true, Description = "Room is under maintenance", BranchId = 2, Color = "#20BF7E" },
+				new RoomStatus { Id = 5, Name = "Cleaning", Code = RoomStatusEnum.Cleaning, IsSystem = true, Description = "Room is being cleaned", BranchId = 2, Color = "#20BF7E" }
 				);
 
             builder.Entity<ReservationSource>().HasData(
@@ -145,6 +148,8 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new CompanyConfiguration());
 			builder.ApplyConfiguration(new ProofTypeConfiguration());
 			builder.ApplyConfiguration(new ReservationRoomConfiguration());
+
+			builder.ApplyConfiguration(new CalculationTypeConfiguration());
 			#endregion
 
 		}

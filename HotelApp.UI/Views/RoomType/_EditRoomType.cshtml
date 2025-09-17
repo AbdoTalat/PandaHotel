@@ -1,4 +1,4 @@
-﻿@model EditRoomTypeDTO
+﻿@model RoomTypeDTO
 
 
 <form class="form-basic ajaxEditForm" asp-action="EditRoomType" asp-controller="RoomType" method="post">
@@ -19,7 +19,7 @@
 						<div class="col-md-6">
 							<label>Price Per Night<span class="text-danger">*</span></label>
 							<div class="form-group">
-								<input asp-for="PricePerNight" value="@Model.PricePerNight" class="form-control" placeholder="Floor">
+								<input asp-for="PricePerNight" type="number" value="@Model.PricePerNight" class="form-control" placeholder="Floor">
 								<span class="text-danger validation-error-label" asp-validation-for="PricePerNight"></span>
 							</div>
 						</div>
@@ -53,12 +53,18 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div class="panel panel-flat">
+								<div class="panel-heading">
+									<h6 class="panel-title">Setup</h6>
+								</div>
 								<div class="panel-body">
-									<div class="alpaca-control checkbox">
-										<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-											<input type="checkbox" asp-for="IsActive" class="switchery">
-											Is Active
-										</label>
+									<div class="form-group ">
+
+										<div class="checkbox">
+											<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+												<input type="checkbox" asp-for="IsActive" class="switchery">
+												Is Active
+											</label>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -73,5 +79,13 @@
 		<button type="submit" class="btn bg-teal-400 btn-lg"><i class="icon-checkmark4"></i> Save</button>
 	</div>
 </form>
+
+<script>
+	var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+	elems.forEach(function (html) {
+		new Switchery(html, { color: '#4CAF50', size: 'small' });
+	});
+
+</script>
 
 @await Html.PartialAsync("_ValidationScriptsPartial")

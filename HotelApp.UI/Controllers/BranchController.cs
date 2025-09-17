@@ -87,7 +87,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Branch.Add")]
-        public async Task<IActionResult> AddBranch(EditBranchDTO branchDTO)
+        public async Task<IActionResult> AddBranch(BranchDTO branchDTO)
         {
             if(!ModelState.IsValid)
             {
@@ -111,7 +111,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
         [Authorize(Policy = "Branch.Edit")]
-        public async Task<IActionResult> EditBranch(EditBranchDTO branchDTO)
+        public async Task<IActionResult> EditBranch(BranchDTO branchDTO)
 		{
 			if (!ModelState.IsValid)
 			{

@@ -1,4 +1,4 @@
-﻿@model EditBranchDTO
+﻿@model BranchDTO
 
 <form class="form-basic ajaxEditForm" asp-action="EditBranch" asp-controller="Branch" method="post">
 	<input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
@@ -103,7 +103,13 @@
 	</div>
 </form>
 
+<script>
+    var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+    elems.forEach(function (html) {
+        new Switchery(html, { color: '#4CAF50', size: 'small' });
+    });
 
+</script>
 
 <script>
     $(document).ready(function () {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Annotations;
 using HotelApp.Application.DTOs.Rates;
+using HotelApp.Application.DTOs.RoleBased;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HotelApp.Application.Services.RateService
 {
@@ -32,7 +34,7 @@ namespace HotelApp.Application.Services.RateService
 
 			return rates;
 		}
-		public async Task<EditRateDTO?> GetRateToEditByIdAsync(int Id)
+		public async Task<RateDTO?> GetRateToEditByIdAsync(int Id)
 		{
 			var rate = await _rateRepository.GetRateToEditByIdAsync(Id);
 
@@ -54,50 +56,54 @@ namespace HotelApp.Application.Services.RateService
 			return rateDetails;
         }
        
-		public async Task<ServiceResponse<AddRateDTO>> AddRateAsync(AddRateDTO rateDTO)
+		public async Task<ServiceResponse<RateDTO>> AddRateAsync(RateDTO rateDTO)
         {
             try
             {
                 var rate = _mapper.Map<Rate>(rateDTO);
                 await _unitOfWork.Repository<Rate>().AddNewAsync(rate);
-                await _unitOfWork.CommitAsync();
+				await _unitOfWork.CommitAsync();
 
 
-                var roomTypeRate = rateDTO.RoomTypeRates
-					.Where(rt => rt.IsSelected)
-					.Select(rt => new RoomTypeRate
-                {
-                    RateId = rate.Id,
-                    RoomTypeId = rt.RoomTypeId,
-                    HourlyPrice = rt.HourlyPrice,
-                    DailyPrice = rt.DailyPrice,
-                    ExtraDailyPrice = rt.ExtraDailyPrice,
-                    WeeklyPrice = rt.WeeklyPrice,
-                    MonthlyPrice = rt.MonthlyPrice
-                });
+				if (rateDTO.RoomTypeRates?.Any(r => r.IsSelected) == true)
+				{
+					var roomTypeRates = rateDTO.RoomTypeRates
+						.Where(rtr => rtr.IsSelected) // ✅ only selected ones
+						.Select(rtr => new RoomTypeRate
+						{
+							RateId = rate.Id,
+							RoomTypeId = rtr.RoomTypeId,
+							HourlyPrice = rtr.HourlyPrice,
+							DailyPrice = rtr.DailyPrice,
+							ExtraDailyPrice = rtr.ExtraDailyPrice,
+							WeeklyPrice = rtr.WeeklyPrice,
+							MonthlyPrice = rtr.MonthlyPrice
+						});
 
-                await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(roomTypeRate);
-                await _unitOfWork.CommitAsync();
+					await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(roomTypeRates);
+					await _unitOfWork.CommitAsync();
+				}
 
-				return ServiceResponse<AddRateDTO>.ResponseSuccess("Rate added successfully.");
+
+				return ServiceResponse<RateDTO>.ResponseSuccess("Rate added successfully.");
 			}
             catch (Exception ex)
             {
-                return ServiceResponse<AddRateDTO>.ResponseFailure(ex.Message);
+                return ServiceResponse<RateDTO>.ResponseFailure(ex.Message);
             }
         }
 
-		public async Task<ServiceResponse<EditRateDTO>> EditRateAsync(EditRateDTO rateDTO)
+		public async Task<ServiceResponse<RateDTO>> EditRateAsync(RateDTO rateDTO)
 		{
 			var OldRate = await _unitOfWork.Repository<Rate>().GetByIdAsync(rateDTO.Id);
 			if (OldRate == null)
 			{
-				return ServiceResponse<EditRateDTO>.ResponseFailure("Rate not found.");
+				return ServiceResponse<RateDTO>.ResponseFailure("Rate not found.");
 			}
 
 			try
 			{
-				var rate = _mapper.Map(rateDTO, OldRate);
+				_mapper.Map(rateDTO, OldRate);
 				_unitOfWork.Repository<Rate>().Update(OldRate);
 
 				var existingRoomTypeRates = await _unitOfWork.Repository<RoomTypeRate>()
@@ -107,7 +113,7 @@ namespace HotelApp.Application.Services.RateService
 				var newRoomTypeRates = new List<RoomTypeRate>();
 				var roomTypeRatesToDelete = new List<RoomTypeRate>();
 
-				foreach (var roomTypeRateDTO in rateDTO.roomTypeRateDTOs)
+				foreach (var roomTypeRateDTO in rateDTO.RoomTypeRates)
 				{
 					if (!roomTypeRateDTO.IsSelected)
 					{
@@ -121,8 +127,19 @@ namespace HotelApp.Application.Services.RateService
 
 					if (roomTypeRateDTO.Id == 0)
 					{
-						var newRoomTypeRate = _mapper.Map<RoomTypeRate>(roomTypeRateDTO);
-						newRoomTypeRate.RateId = rateDTO.Id;
+						var newRoomTypeRate = new RoomTypeRate
+						{
+							RateId = rateDTO.Id,
+							RoomTypeId = roomTypeRateDTO.RoomTypeId,
+							HourlyPrice = roomTypeRateDTO.HourlyPrice,
+							DailyPrice = roomTypeRateDTO.DailyPrice,
+							ExtraDailyPrice = roomTypeRateDTO.ExtraDailyPrice,
+							WeeklyPrice = roomTypeRateDTO.WeeklyPrice,
+							MonthlyPrice = roomTypeRateDTO.MonthlyPrice
+						};
+
+						//var newRoomTypeRate = _mapper.Map<RoomTypeRate>(roomTypeRateDTO);
+						//newRoomTypeRate.RateId = rateDTO.Id;
 						newRoomTypeRates.Add(newRoomTypeRate);
 					}
 					else
@@ -154,11 +171,11 @@ namespace HotelApp.Application.Services.RateService
 
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<EditRateDTO>.ResponseSuccess("Rate updated successfully.");
+				return ServiceResponse<RateDTO>.ResponseSuccess("Rate updated successfully.");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<EditRateDTO>.ResponseFailure(ex.Message);
+				return ServiceResponse<RateDTO>.ResponseFailure(ex.Message);
 			}
 		}
 

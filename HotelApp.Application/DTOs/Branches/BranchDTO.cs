@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotelApp.Domain.Common.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,19 +8,22 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Branches
 {
-    public class EditBranchDTO
+    public class BranchDTO
     {
         public int Id { get; set; }
+        [RequiredEx]
         public string Name { get; set; }
-        [Required(ErrorMessage = "Country Is Required")]
+        [RequiredEx]
 		public int CountryId { get; set; }
-        [Required(ErrorMessage = "State Is Required")]
+        [RequiredEx]
 		public int StateId { get; set; }
-        //public string CountryName { get; set; }
-        //public string StateName { get; set; }
+        [RequiredEx]
         public string City { get; set; }
+        [RequiredEx]
 		public string Street { get; set; }
+        [RequiredEx]
 		public string Zip_Code { get; set; }
+        [RequiredEx]
 		public string ContactNumber { get; set; }
         public bool IsActive { get; set; }
     }

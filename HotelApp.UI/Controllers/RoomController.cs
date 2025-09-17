@@ -167,5 +167,18 @@ namespace HotelApp.UI.Controllers
 			return Json(new { success = true, data = result });
 		}
 
-	}
+        [HttpGet]
+        public async Task<IActionResult> CheckOccupancy()
+        {
+            int occupancy = await _roomService.GetOccupancyPercentAsync();
+            bool isHigh = occupancy >= 90;
+
+            return Ok(new
+            {
+                OccupancyPercent = occupancy,
+                IsHigh = isHigh
+            });
+        }
+
+    }
 }

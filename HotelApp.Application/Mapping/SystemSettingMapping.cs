@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.SystemSetting;
 using HotelApp.Domain.Entities;
 using System;
@@ -15,6 +16,11 @@ namespace HotelApp.Application.Mapping
         {
             CreateMap<SystemSetting, SystemSettingDTO>();
             CreateMap<SystemSettingDTO, SystemSetting>();
+
+
+            /* Calculation Type */
+            CreateMap<CalculationType, DropDownDTO<string>>()
+                .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

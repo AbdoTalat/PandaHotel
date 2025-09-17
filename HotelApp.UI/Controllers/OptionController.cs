@@ -41,7 +41,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
 		[ValidateAntiForgeryToken]
         [Authorize(Policy = "Option.Add")]
-        public async Task<IActionResult> AddOption(AddOptionDTO model)
+        public async Task<IActionResult> AddOption(OptionDTO model)
         {
 			if(!ModelState.IsValid)
 			{
@@ -66,7 +66,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "Option.Edit")]
-		public async Task<IActionResult> EditOption(EditOptionDTO model)
+		public async Task<IActionResult> EditOption(OptionDTO model)
 		{
 			if (!ModelState.IsValid)
 			{

@@ -35,13 +35,13 @@ namespace HotelApp.Application.Services.OptionService
 
 			return options;
 		}
-		public async Task<EditOptionDTO?> GetOptionToEditByIdAsync(int Id)
+		public async Task<OptionDTO?> GetOptionToEditByIdAsync(int Id)
 		{
-			var option = await _unitOfWork.Repository<Option>().GetByIdAsDtoAsync<EditOptionDTO>(Id);
+			var option = await _unitOfWork.Repository<Option>().GetByIdAsDtoAsync<OptionDTO>(Id);
 
 			return option;
 		}
-        public async Task<ServiceResponse<AddOptionDTO>> AddOptionAsync(AddOptionDTO optionDTO)
+        public async Task<ServiceResponse<OptionDTO>> AddOptionAsync(OptionDTO optionDTO)
 		{
 			try
 			{
@@ -50,21 +50,21 @@ namespace HotelApp.Application.Services.OptionService
 				await _unitOfWork.Repository<Option>().AddNewAsync(option);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<AddOptionDTO>.ResponseSuccess("New Option added successfully.");
+				return ServiceResponse<OptionDTO>.ResponseSuccess("New Option added successfully.");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<AddOptionDTO>.ResponseFailure(ex.Message);
+				return ServiceResponse<OptionDTO>.ResponseFailure(ex.Message);
 			}
 		}
 
-		public async Task<ServiceResponse<EditOptionDTO>> EditOptionAsync(EditOptionDTO optionDTO)
+		public async Task<ServiceResponse<OptionDTO>> EditOptionAsync(OptionDTO optionDTO)
 		{
 			var oldOption = await _unitOfWork.Repository<Option>().GetByIdAsync(optionDTO.Id);
 
 			if (oldOption == null)
 			{
-				return ServiceResponse<EditOptionDTO>.ResponseFailure("Option not found.");
+				return ServiceResponse<OptionDTO>.ResponseFailure("Option not found.");
 			}
 
 			try
@@ -74,11 +74,11 @@ namespace HotelApp.Application.Services.OptionService
 				_unitOfWork.Repository<Option>().Update(oldOption);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<EditOptionDTO>.ResponseSuccess("Option updated successfully");
+				return ServiceResponse<OptionDTO>.ResponseSuccess("Option updated successfully");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<EditOptionDTO>.ResponseFailure(ex.Message);
+				return ServiceResponse<OptionDTO>.ResponseFailure(ex.Message);
 			}
 		}
 

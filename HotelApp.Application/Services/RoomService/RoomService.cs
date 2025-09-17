@@ -63,7 +63,7 @@ namespace HotelApp.Application.Services.RoomService
             try
             {
                 bool IsRoomNumberUnique = await _unitOfWork.Repository<Room>()
-                    .IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower() && r.BranchId == roomDTO.BranchId);
+                    .IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower());
                 if (IsRoomNumberUnique)
                 {
                     return ServiceResponse<AddRoomDTO>.ResponseFailure("Cannot enter duplicate room number.");
@@ -85,18 +85,6 @@ namespace HotelApp.Application.Services.RoomService
                 }
                 await _unitOfWork.CommitAsync();
 
-                var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(roomDTO.RoomTypeId);
-                if (roomType == null)
-                {
-                    return ServiceResponse<AddRoomDTO>.ResponseFailure("Room Type not found");
-                }
-                if (!roomType.IsActive)
-                {
-                    roomType.IsActive = true;
-                    _unitOfWork.Repository<RoomType>().Update(roomType);
-
-                    await _unitOfWork.CommitAsync();
-                }
                 return ServiceResponse<AddRoomDTO>.ResponseSuccess("New Room Created Successfully.");
             }
             catch (Exception ex)
@@ -125,7 +113,7 @@ namespace HotelApp.Application.Services.RoomService
 				        : $"{dto.RoomNumberText}{i}";
 
 					bool isRoomNumberExist = await _unitOfWork.Repository<Room>()
-						.IsExistsAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower() && r.BranchId == dto.BranchId);
+						.IsExistsAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower());
 
 					if (isRoomNumberExist)
 					{
@@ -135,7 +123,6 @@ namespace HotelApp.Application.Services.RoomService
 					var room = new Room
 					{
 						RoomNumber = roomNumber,
-						BranchId = dto.BranchId,
 						Description = dto.Description,
 						FloorId = dto.FloorId,
 						RoomStatusId = dto.RoomStatusId,
@@ -218,29 +205,23 @@ namespace HotelApp.Application.Services.RoomService
 
         public async Task<ServiceResponse<Room>> DeleteRoomAsync(int Id)
         {
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(Id);
+            if (room == null)
+            {
+                return ServiceResponse<Room>.ResponseFailure($"There is no room with this ID: {Id}");
+            }
+
+            bool isRoomReserved = await _unitOfWork.Repository<ReservationRoom>().IsExistsAsync(r => r.RoomId == Id);
+            if (isRoomReserved)
+            {
+                return ServiceResponse<Room>.ResponseFailure("Cannot delete room that is already reserved before.");
+            }
             try
             {
-                var room = await _unitOfWork.Repository<Room>().GetByIdAsync(Id);
-                if (room == null)
-                {
-					return ServiceResponse<Room>.ResponseFailure($"There is no room with this ID: {Id}");
-				}
-				//bool isRoomReserved = await _unitOfWork.Repository<Reservation>().IsExistsAsync(r => r.RoomId == Id);
-				//if (isRoomReserved)
-				//{
-				//	return ServiceResponse<Room>.ResponseFailure("Cannot delete room that is already reserved");
-				//}
-				_unitOfWork.Repository<Room>().Delete(room);
-				await _unitOfWork.CommitAsync();
+                _unitOfWork.Repository<Room>().Delete(room);
+                await _unitOfWork.CommitAsync();
 
-				var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(room.RoomTypeId);
-				if (roomType == null)
-				{
-					roomType.IsActive = false;
-					_unitOfWork.Repository<RoomType>().Update(roomType);
-                    await _unitOfWork.CommitAsync();
-				}
-				return ServiceResponse<Room>.ResponseSuccess("Room Deleted Successfully.");
+                return ServiceResponse<Room>.ResponseSuccess("Room Deleted Successfully.");
             }
             catch (Exception ex)
             {
@@ -257,7 +238,7 @@ namespace HotelApp.Application.Services.RoomService
         public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name)
         {
             var rooms = await _unitOfWork.Repository<Room>()
-                .GetAllAsDtoAsync<GetAvailableRoomsDTO>(r => r.RoomNumber.Contains(name));
+                .GetAllAsDtoAsync<GetAvailableRoomsDTO>(r => r.RoomNumber.Contains(name) && r.IsActive && r.RoomStatus.IsReservable);
 
             return rooms;
         }
@@ -273,5 +254,11 @@ namespace HotelApp.Application.Services.RoomService
             var result = await _roomRepository.ValidateRoomSelectionsAsync(roomTypeToBookDTOs, selectedRoomIds);
             return result;
         }
-    }
+
+        public async Task<int> GetOccupancyPercentAsync()
+        {
+            var result = await _roomRepository.GetOccupancyPercentAsync();
+            return result;
+        }
+	}
 }

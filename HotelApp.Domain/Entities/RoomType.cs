@@ -17,7 +17,7 @@ namespace HotelApp.Domain.Entities
         public int MaxNumOfAdults { get; set; }
         public int MaxNumOfChildrens { get; set; }
         public bool IsActive { get; set; }
-		public int BranchId { get; set; }
+		public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();

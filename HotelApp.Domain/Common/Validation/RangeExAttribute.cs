@@ -9,9 +9,9 @@ namespace HotelApp.Domain.Common.Validation
 {
     public class RangeExAttribute : RangeAttribute
     {
-        public RangeExAttribute(int min, int max) : base(min, max)
+        public RangeExAttribute(double min, double max) : base(min, max)
         {
             ErrorMessage = $"Value must be between {min} and {max}.";
         }
-    }
+	}
 }

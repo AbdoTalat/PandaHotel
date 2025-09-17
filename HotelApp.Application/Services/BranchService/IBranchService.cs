@@ -17,9 +17,9 @@ namespace HotelApp.Application.Services.BranchService
 		Task<IEnumerable<DropDownDTO<string>>> GetBranchsDropDownAsync();
 		Task<IEnumerable<GetAllBranches>> GetAllBranchesAsync();
 		Task<IEnumerable<GetBranchesByUserIdDTO>> GetBranchesByUserId(int userId);
-		Task<ServiceResponse<EditBranchDTO>> AddNewBranchAsync(EditBranchDTO branchDTO);
-		Task<EditBranchDTO?> GetBranchToEditByIdAsync(int Id);
-		Task<ServiceResponse<EditBranchDTO>> EditBranchAsync(EditBranchDTO branchDTO);
+		Task<ServiceResponse<BranchDTO>> AddNewBranchAsync(BranchDTO branchDTO);
+		Task<BranchDTO?> GetBranchToEditByIdAsync(int Id);
+		Task<ServiceResponse<BranchDTO>> EditBranchAsync(BranchDTO branchDTO);
 		Task<ServiceResponse<Branch>> DeleteBranchAsync(int Id);
 		
 	}

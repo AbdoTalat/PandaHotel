@@ -1,27 +1,19 @@
-﻿@inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager
+﻿@inject UserManager<User> UserManager
 
-@using HotelApp.Application.DTOs.UserBranches
-@using Newtonsoft.Json
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
+@inject HotelApp.Application.Services.BranchService.IBranchService BranchService
+@inject HotelApp.Application.Services.UserService.IUserService UserService
+@{
+	var user = UserManager.GetUserAsync(User).Result ?? new User();
 
+	var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+	var defaultBranchId = User.FindFirstValue("DefaultBranchId");
 
-@{	
-	var user = UserManager.GetUserAsync(User).Result;
+	var defaultBranch = !string.IsNullOrEmpty(defaultBranchId)
+		? await BranchService.GetBranchByIdAsync(int.Parse(defaultBranchId)) : new GetBranchByIdDTO();
 
-	var defaultBranchJson = User.FindFirstValue("DefaultBranchData");
+	var userBranches = await UserService.GetUserBranchesByUserIdAsync(int.Parse(userId));
 
-	var defaultBranch = string.IsNullOrEmpty(defaultBranchJson)
-		? new UserBranchesDataDTO()
-		: JsonConvert.DeserializeObject<UserBranchesDataDTO>(defaultBranchJson);
-
-
-	var userBranchesJson = User.FindFirstValue("UserBranchesData");
-
-	var userBranches = string.IsNullOrEmpty(userBranchesJson)
-		? new List<UserBranchesDataDTO>()
-		: JsonConvert.DeserializeObject<List<UserBranchesDataDTO>>(userBranchesJson);
 }
 
 <!DOCTYPE html>
@@ -31,7 +23,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>PandaHotel - @TempData["Title"]</title>
-   
+
 	<!-- Global stylesheets -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
 	<link href="/assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
@@ -40,16 +32,15 @@
 	<link href="/assets/css/components.css" rel="stylesheet" type="text/css">
 	<link href="/assets/css/colors.css" rel="stylesheet" type="text/css">
 	<link href="/css/site.css?v=1.2" rel="stylesheet" />
-    <!-- /global stylesheets -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+	<!-- /global stylesheets -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 	<!-- Core JS files -->
 	<script type="text/javascript" src="/assets/js/plugins/loaders/pace.min.js"></script>
 	<script type="text/javascript" src="/assets/js/core/libraries/jquery.min.js"></script>
 	<script type="text/javascript" src="/assets/js/core/libraries/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/assets/js/plugins/loaders/blockui.min.js"></script>
+	<script type="text/javascript" src="/assets/js/plugins/loaders/blockui.min.js"></script>
 	<!-- /core JS files -->
-
 	<!-- Theme JS files -->
 	<script type="text/javascript" src="/assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/forms/styling/switchery.min.js"></script>
@@ -70,7 +61,7 @@
 	<script type="text/javascript" src="/assets/js/pages/datatables_extension_buttons_html5.js"></script>
 	<script type="text/javascript" src="/assets/js/pages/datatables_basic.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/notifications/pnotify.min.js"></script>
-    <script type="text/javascript" src="/assets/js/pages/datatables_api.js"></script>
+	<script type="text/javascript" src="/assets/js/pages/datatables_api.js"></script>
 	<script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/interactions.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/notifications/bootbox.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/notifications/noty.min.js"></script>
@@ -79,7 +70,6 @@
 	<script type="text/javascript" src="/assets/js/pages/components_notifications_other.js"></script>
 	<script type="text/javascript" src="/assets/js/pages/components_notifications_pnotify.js"></script>
 	<script type="text/javascript" src="/assets/js/pages/components_modals.js"></script>
-
 	<script type="text/javascript" src="/assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/pickers/daterangepicker.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/pickers/anytime.min.js"></script>
@@ -88,38 +78,32 @@
 	<script type="text/javascript" src="/assets/js/plugins/pickers/pickadate/picker.time.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/pickers/pickadate/legacy.js"></script>
 	<script type="text/javascript" src="/assets/js/pages/picker_date.js?v=1.1"></script>
-    <script type="text/javascript" src="/assets/js/plugins/ui/fab.min.js"></script>
-    <script type="text/javascript" src="/assets/js/plugins/ui/prism.min.js"></script>
-
-    <script type="text/javascript" src="/assets/js/plugins/pickers/color/spectrum.js"></script>
-    <script type="text/javascript" src="/assets/js/pages/picker_color.js"></script>
-
+	<script type="text/javascript" src="/assets/js/plugins/ui/fab.min.js"></script>
+	<script type="text/javascript" src="/assets/js/plugins/ui/prism.min.js"></script>
+	<script type="text/javascript" src="/assets/js/plugins/pickers/color/spectrum.js"></script>
+	<script type="text/javascript" src="/assets/js/pages/picker_color.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/forms/inputs/touchspin.min.js?v=1.3"></script>
 	<script type="text/javascript" src="/assets/js/pages/form_input_groups.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/forms/wizards/steps.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/extensions/cookie.js"></script>
-
 	<script type="text/javascript" src="/assets/js/pages/wizard_steps.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/velocity/velocity.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/velocity/velocity.ui.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/buttons/spin.min.js"></script>
 	<script type="text/javascript" src="/assets/js/plugins/buttons/ladda.min.js"></script>
-
 	<script type="text/javascript" src="/assets/js/pages/components_buttons.js"></script>
-
 	<script type="text/javascript" src="/assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
 	<script type="text/javascript" src="/assets/js/pages/form_multiselect.js"></script>
 
+	<script type="text/javascript" src="/assets/js/plugins/visualization/d3/d3.min.js"></script>
+	<script type="text/javascript" src="/assets/js/plugins/visualization/d3/d3_tooltip.js"></script>
 
-	<!-- Advanced Animation -->
-	@* <script type="text/javascript" src="/assets/js/pages/animations_velocity_examples.js"></script> *@
+@*     <script type="text/javascript" src="/assets/js/pages/dashboard.js"></script>
+ *@
+    <script type="text/javascript" src="/assets/js/core/app.js?v=2.2"></script>
 
-	<script type="text/javascript" src="/assets/js/core/app.js?v=2.2"></script>
-
-    <!-- /theme JS files -->
-    
+	<!-- /theme JS files -->
 </head>
-
 
 <body class="navbar-top">
 
@@ -220,8 +204,8 @@
 			<p class="navbar-text"><span class="label bg-success">Online</span></p>
 
 
-            <ul class="nav navbar-nav navbar-right">
-				
+			<ul class="nav navbar-nav navbar-right">
+
 				<li class="dropdown language-switch">
 					<a class="dropdown-toggle" data-toggle="dropdown">
 						<img src="/assets/images/flags/gb.png" class="position-left" alt="">
@@ -236,6 +220,41 @@
 						<li><a class="espana"><img src="/assets/images/flags/es.png" alt=""> España</a></li>
 						<li><a class="russian"><img src="/assets/images/flags/ru.png" alt=""> Русский</a></li>
 					</ul>
+				</li>
+
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<i class="icon-bell3"></i>
+						<span class="visible-xs-inline-block position-right">Notifications</span>
+						<span class="badge bg-warning-400">2</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-content width-350">
+						<div class="dropdown-content-heading">
+							Notifications
+							<ul class="icons-list">
+								<li><a href="#"><i class="icon-compose"></i></a></li>
+							</ul>
+						</div>
+
+						<ul class="media-list dropdown-content-body">
+							<li class="media">
+								<div id="occupancy-alert" role="alert" class="text-warning">
+									<div class="media-left">
+										<i class="icon-alert"></i>
+									</div>
+									<div class="media-body">
+										<span class="text-semibold text-warning"></span>
+									</div>
+								</div>
+							</li>
+
+						</ul>
+
+						<div class="dropdown-content-footer">
+							<a href="#" data-popup="tooltip" title="All messages"><i class="icon-menu display-block"></i></a>
+						</div>
+					</div>
 				</li>
 
 				<li class="dropdown">
@@ -329,13 +348,10 @@
 					</div>
 				</li>
 
-				
-				
-
 				<li class="dropdown dropdown-user">
 					<a class="dropdown-toggle" data-toggle="dropdown">
 						<img src="/assets/images/placeholder.jpg" alt="">
-						<span>@user.UserName</span>
+						<span>@user.UserName </span>
 						<i class="caret"></i>
 					</a>
 
@@ -345,55 +361,20 @@
 						<li class="dropdown-submenu dropdown-submenu-left">
 							<a href="#"><i class="icon-location4"></i> Branches </a>
 							<ul class="dropdown-menu">
-
-                                <li >
-
+								<li>
 									@foreach (var item in userBranches)
 									{
-										<a href="#" class="branch-item" data-branch-id="@item.Id">@item.Name</a>
+										<a href="#" class="branch-item" data-branch-id="@item.Id">@item.DisplayText</a>
 									}
-
-									<script>
-										$(document).ready(function () {
-											$(".branch-item").click(function (e) {
-												e.preventDefault(); // Prevent default link action
-												var branchId = $(this).data("branch-id");
-
-												if (branchId) {
-													$.ajax({
-														url: '/User/ChangeDefaultBranch',
-														type: 'POST',
-														contentType: 'application/json',
-														data: JSON.stringify(branchId),
-														success: function () {
-															window.location.href = '/Home/Index'; // Always go to Dashboard
-														},
-														error: function (xhr, status, error) {
-															console.error("Error changing branch:", error);
-														}
-													});
-												}
-											});
-										});
-									</script>
-
-
-                                </li>
+								</li>
 							</ul>
 						</li>
-
-						
-
-
 						<li><a href="#"><span class="badge bg-teal-400 pull-right">58</span> <i class="icon-comment-discussion"></i> Messages</a></li>
 						<li class="divider"></li>
 						<li><a href="#"><i class="icon-cog5"></i> Account settings</a></li>
 						<li><a asp-action="LogOut" asp-controller="Account"><i class="icon-exit3"></i> Logout</a></li>
-					
 					</ul>
-                </li>
-
-                
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -403,12 +384,11 @@
 	<div class="page-container">
 
 		<!-- Page content -->
-        <div class="page-content ">
+		<div class="page-content ">
 
 			<!-- Main sidebar -->
 			<div class="sidebar sidebar-main navbar-collapse ">
 				<div class="sidebar-content">
-
 					<!-- User menu -->
 					<div class="sidebar-user">
 						<div class="category-content">
@@ -419,7 +399,7 @@
 								<div class="media-body">
 									<span class="media-heading text-semibold">@user.FirstName @user.LastName</span>
 									<div class="text-size-mini text-muted">
-										<i class="icon-pin text-size-small"></i> @defaultBranch.Name
+										<i class="icon-pin text-size-small"></i>@defaultBranch.Name
 									</div>
 								</div>
 
@@ -433,25 +413,20 @@
 							</div>
 						</div>
 					</div>
-
 					<!-- /user menu -->
-
+					<!-- Main navigation -->
 					<div class="sidebar-category sidebar-category-visible">
 						<div class="category-content no-padding">
 							<ul class="navigation navigation-main navigation-accordion">
-
-
 								<!-- Main -->
 								<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
-								<li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
-									<a asp-action="Index" asp-controller="Home"><i class="icon-home"></i> <span>Dashboard</span></a>
+								<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+									<a asp-action="Index" asp-controller="Dashboard"><i class="icon-home"></i> <span>Dashboard</span></a>
 								</li>
-
-								
 
 								@if (User.HasClaim("permission", "User.View") || User.HasClaim("permission", "Role.View"))
 								{
-									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Admin") == true ? "active navigation-open" : "")">
+									<li>
 										<a href="#"><i class="icon-users4"></i> <span>Administration</span></a>
 										<ul>
 											@if (User.HasClaim("permission", "User.View"))
@@ -472,7 +447,7 @@
 
 								@if (User.HasClaim("permission", "Room.View") || User.HasClaim("permission", "RoomType.View") || User.HasClaim("permission", "RoomStatus.View"))
 								{
-									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Room") == true ? "active navigation-open" : "")">
+									<li>
 										<a href="#"><i class="icon-library2"></i> <span>Rooms Management</span></a>
 										<ul>
 											@if (User.HasClaim("permission", "Room.View"))
@@ -504,17 +479,17 @@
 									</li>
 								}
 
-								@if (User.HasClaim("permission", "Reservation.View") || User.HasClaim("Permission","Reservation.Add"))
+								@if (User.HasClaim("permission", "Reservation.View") || User.HasClaim("Permission", "Reservation.Add"))
 								{
-									<li class="">
+									<li>
 										<a href="#"><i class="icon-calendar"></i> <span>Reservations</span></a>
 										<ul>
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
 												<a asp-action="Index" asp-controller="Reservation">
 													<i class="icon-calendar"></i> Manage Reservations
-                                                    <span class="label bg-teal-400">10</span>
-                                                </a>
-												
+													<span class="label bg-teal-400">10</span>
+												</a>
+
 											</li>
 											<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" && ViewContext.RouteData.Values["action"]?.ToString() == "AddReservation" ? "active" : "")">
 												<a asp-action="AddReservation" asp-controller="Reservation"><i class="icon-file-plus2"></i> Add Reservation</a>
@@ -522,12 +497,13 @@
 										</ul>
 									</li>
 								}
+
 								@if (User.HasClaim("permission", "Branch.View") || User.HasClaim("permission", "Floor.View") ||
-									 User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") ||
-									 User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View") ||
-									 User.HasClaim("permission", "ProofType.View") || User.HasClaim("permission", "ReservationSource.View"))
+																User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View") ||
+																User.HasClaim("permission", "SystemSetting.View") || User.HasClaim("permission", "Company.View") ||
+																User.HasClaim("permission", "ProofType.View") || User.HasClaim("permission", "ReservationSource.View"))
 								{
-									<li class="">
+									<li>
 										<a href="#"><i class="icon-hammer-wrench"></i> <span>System Settings</span></a>
 										<ul>
 											@if (User.HasClaim("permission", "SystemSetting.View"))
@@ -568,7 +544,7 @@
 											}
 											@if (User.HasClaim("permission", "Option.View") || User.HasClaim("permission", "Rate.View"))
 											{
-												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Option") == true ? "active navigation-open" : "")">
+												<li>
 													<a href="#" class="has-ul"><i class="icon-stats-growth"></i>Rates & Options</a>
 													<ul>
 														@if (User.HasClaim("permission", "Option.View"))
@@ -592,10 +568,9 @@
 
 								@if (User.HasClaim("permission", "Report.View"))
 								{
-									<li class="@(ViewContext.RouteData.Values["controller"]?.ToString().Contains("Report") == true ? "active navigation-open" : "")">
+									<li>
 										<a href="#"><i class="icon-file-text3"></i> <span>Reports</span></a>
 										<ul>
-
 											@if (User.HasClaim("permission", "Report.View"))
 											{
 												<li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
@@ -609,66 +584,65 @@
 						</div>
 					</div>
 					<!-- /main navigation -->
-
 				</div>
 			</div>
 			<!-- /main sidebar -->
 
 			<!-- Main content -->
 			<div class="content-wrapper ">
-
 				@RenderBody()
 
 				<div class="content">
-				<ul class="fab-menu fab-menu-fixed fab-menu-bottom-right" data-fab-toggle="click" data-fab-state="closed">
-					<li>
-						<a class="fab-menu-btn btn bg-teal-400 btn-float btn-rounded btn-icon">
-							<i class="fab-icon-open icon-paragraph-justify3"></i>
-							<i class="fab-icon-close icon-cross2"></i>
-						</a>
+					<ul class="fab-menu fab-menu-fixed fab-menu-bottom-right" data-fab-toggle="click" data-fab-state="closed">
+						<li>
+							<a class="fab-menu-btn btn bg-teal-400 btn-float btn-rounded btn-icon">
+								<i class="fab-icon-open icon-paragraph-justify3"></i>
+								<i class="fab-icon-close icon-cross2"></i>
+							</a>
 
-						<ul class="fab-menu-inner">
-							<li>
-								<div data-fab-label="Compose email">
-									<a href="#" class="btn bg-teal-400 btn-rounded btn-icon btn-float">
-										<i class="icon-pencil"></i>
-									</a>
-								</div>
-							</li>
-							<li>
-								<div data-fab-label="Conversations">
-									<a href="#" class="btn bg-teal-400 btn-rounded btn-icon btn-float">
-										<i class="icon-bubbles7"></i>
-									</a>
-									<span class="badge bg-primary-400">5</span>
-								</div>
-							</li>
-							<li>
-								<div data-fab-label="Chat with Jack">
-									<a href="#" class="btn bg-pink-400 btn-rounded btn-icon btn-float">
-										<img src="assets/images/placeholder.jpg" class="img-responsive" alt="">
-									</a>
-									<span class="status-mark border-pink-400"></span>
-								</div>
-							</li>
-						</ul>
-					</li>
-				</ul>
-                </div>
+							<ul class="fab-menu-inner">
+								<li>
+									<div data-fab-label="Compose email">
+										<a href="#" class="btn bg-teal-400 btn-rounded btn-icon btn-float">
+											<i class="icon-pencil"></i>
+										</a>
+									</div>
+								</li>
+								<li>
+									<div data-fab-label="Conversations">
+										<a href="#" class="btn bg-teal-400 btn-rounded btn-icon btn-float">
+											<i class="icon-bubbles7"></i>
+										</a>
+										<span class="badge bg-primary-400">5</span>
+									</div>
+								</li>
+								<li>
+									<div data-fab-label="Chat with Jack">
+										<a href="#" class="btn bg-pink-400 btn-rounded btn-icon btn-float">
+											<img src="assets/images/placeholder.jpg" class="img-responsive" alt="">
+										</a>
+										<span class="status-mark border-pink-400"></span>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+
 				<div class="content">
 					<div class="footer text-muted">
 						&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="#" target="_blank">Eugene Kopyov</a>
-					
+
 					</div>
 				</div>
 			</div>
 			<!-- /main content -->
 
-        </div>
+		</div>
 		<!-- /page content -->
 
-    </div>
-    <!-- /page container -->
+	</div>
+	<!-- /page container -->
 
 
 
@@ -693,15 +667,57 @@
 		</div>
 	</div>
 
-
 	<!-- Scripts -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.7/dist/sweetalert2.all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+	<script>
+		async function checkRoomOccupancy() {
+			try {
+				const response = await fetch('@Url.Action("CheckOccupancy", "Room")');
+				const data = await response.json();
+
+				if (data.isHigh) {
+					showToast('warning', 'warning', `High occupancy: ${data.occupancyPercent}%`);
+				}
+			} catch (err) {
+				console.error('Error checking occupancy:', err);
+			}
+		}
+
+		checkRoomOccupancy();
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			$(".branch-item").click(function (e) {
+				e.preventDefault(); // Prevent default link action
+				var branchId = $(this).data("branch-id");
+
+				if (branchId) {
+					$.ajax({
+						url: '/User/ChangeDefaultBranch',
+						type: 'POST',
+						contentType: 'application/json',
+						data: JSON.stringify(branchId),
+						success: function () {
+							window.location.href = '/Dashboard/Index'; // Always go to Dashboard
+						},
+						error: function (xhr, status, error) {
+							console.error("Error changing branch:", error);
+						}
+					});
+				}
+			});
+		});
+	</script>
+
 	<script>
 		$('#ajaxModal').on('shown.bs.modal', function () {
 			$(this).removeAttr('aria-hidden');
 		});
-		</script>
+	</script>
+
 	<script>
 		$(document).ready(function () {
 			var successMessage = '@TempData["Success"]';
@@ -719,7 +735,7 @@
 				},
 				buttonsStyling: false
 			});
-			if (jqXHR.status === 401) { 
+			if (jqXHR.status === 401) {
 				swalWithBootstrapButtons.fire({
 					position: "top",
 					title: 'Unauthorized',
@@ -741,7 +757,6 @@
 	</script>
 
 	<script>
-
 		$(document).ready(function () {
 			// Handle form submission via AJAX
 			$(document).on('submit', '.ajaxForm', function (e) {
@@ -750,39 +765,40 @@
 				const form = $(this);
 				const url = form.attr('action'); // Get the form action URL
 
-
 				$.ajax({
 					url: url,
 					type: 'POST',
 					data: form.serialize(),
 					success: function (response) {
-						if (response.success) {
-							$('#ajaxModal').modal('hide');
-							localStorage.setItem("toastr_message", response.message);
+						// Case 1: JSON response
+						if (typeof response === "object" && response !== null) {
+							if (response.success) {
+								$('#ajaxModal').modal('hide');
+								localStorage.setItem("toastr_message", response.message);
 
-							
-							//$("#refreshUsersBtn").click();
-							location.reload();
-						} 
-						else if (response.success == false) {
-							//$('#ajaxModal').modal('hide');
-							Swal.fire({
-								position: 'top',
-								icon: 'warning',
-								title: 'Error!',
-								text: response.message,
-								showConfirmButton: true
-							})
+								// Reload page after success
+								location.reload();
+							}
+							else {
+								Swal.fire({
+									position: 'top',
+									icon: 'warning',
+									title: 'Error!',
+									text: response.message,
+									showConfirmButton: true
+								});
+							}
 						}
+						// Case 2: HTML response (validation errors / partial view)
 						else {
-							// Update modal content with returned HTML (e.g., validation errors)
 							$('#modalBody').html(response);
+							$.validator.unobtrusive.parse('#modalBody');
 						}
 					},
-					error: function () {
+					error: function (xhr) {
+						console.error(xhr.responseText);
 						alert('An error occurred while processing the form.');
 					}
-					
 				});
 			});
 
@@ -799,9 +815,11 @@
 					$('#modalBody').html(data); // Populate the modal body
 					$('#ajaxModal').modal('show'); // Show the modal
 
+					// Re-parse client-side validation
 					$.validator.unobtrusive.parse('#modalBody');
 				});
 			});
+
 			// Check if there's a stored success message after reload
 			const storedMessage = localStorage.getItem("toastr_message");
 			if (storedMessage) {
@@ -815,7 +833,6 @@
 				localStorage.removeItem("toastr_message");
 			}
 		});
-
 	</script>
 
 	<script>
@@ -870,7 +887,7 @@
 					// Check if the response is JSON (branch not found scenario)
 					if (typeof data === "object" && data.success === false) {
 						Swal.fire({
-							position:'top',
+							position: 'top',
 							icon: 'error',
 							title: 'Error!',
 							text: data.message || 'Branch not found.',
@@ -883,7 +900,7 @@
 					}
 				}).fail(function () {
 					Swal.fire({
-						position:'top',
+						position: 'top',
 						icon: 'error',
 						title: 'Error!',
 						text: 'An error occurred while loading the modal content.',
@@ -899,7 +916,7 @@
 				toastr.success(storedMessage, "Success", {
 					closeButton: true,
 					progressBar: true,
-					timeOut: 3000, 
+					timeOut: 3000,
 					positionClass: "toast-top-right"
 				});
 
@@ -908,8 +925,8 @@
 		});
 
 	</script>
+
 	<script src="~/js/site.js?v=1.12" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", false)
-
-</body> 
+</body>
 </html>

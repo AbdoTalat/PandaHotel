@@ -20,7 +20,7 @@ namespace HotelApp.Domain.Entities
         public int NumberOfPeople { get; set; }
         public decimal PricePerNight { get; set; }
         public decimal TotalPrice { get; set; }
-        public string? Comment { get; set; }
+        public string? Notes { get; set; }
 
 		public bool IsConfirmed { get; set; }
 		public bool IsPending { get; set; }
@@ -36,7 +36,7 @@ namespace HotelApp.Domain.Entities
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
 		public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();

@@ -14,18 +14,14 @@ namespace HotelApp.Application.Mapping
         public RateMapping()
         {
             CreateMap<Rate, GetAllRatesDTO>();
-            CreateMap<AddRateDTO, Rate>()
-                .ForMember(dest => dest.RoomTypeRates, opt => opt.Ignore());
 
-            CreateMap<Rate, EditRateDTO>()
-            .ForMember(dest => dest.roomTypeRateDTOs, opt => opt.Ignore());
-
-            CreateMap<EditRateDTO, Rate>();
+			CreateMap<RateDTO, Rate>()
+	        .ForMember(dest => dest.RoomTypeRates, opt => opt.Ignore());
 
 
-            CreateMap<EditRoomTypeRateDTO, RoomTypeRate>();
+			CreateMap<RoomTypeRateDTO, RoomTypeRate>();
 
-            CreateMap<RoomTypeRate, GetRateDetailsForReservationDTO>()
+			CreateMap<RoomTypeRate, GetRateDetailsForReservationDTO>()
                 .ForMember(dest => dest.typeName, opt => opt.MapFrom(src => src.RoomType.Name ?? "N/A"));
 		
         }

@@ -36,6 +36,9 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<EditUserDTO, User>();
 
+			CreateMap<UserBranch, DropDownDTO<string>>()
+				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Branch.Name))
+				.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Branch.Id));
 
 
 			//Roles Mapping

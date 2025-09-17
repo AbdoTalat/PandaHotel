@@ -1,4 +1,4 @@
-﻿@model EditRateDTO
+﻿@model RateDTO
 @{
 	TempData["Title"] = "Edit Rate";
 }
@@ -178,25 +178,25 @@
 										</thead>
 										<tbody>
 
-											@for (var i = 0; i < Model.roomTypeRateDTOs.Count; i++)
+											@for (var i = 0; i < Model.RoomTypeRates.Count; i++)
 											{
 												<tr>
 													<td>
 															<label class="checkbox-container">
-															<input type="checkbox" asp-for="roomTypeRateDTOs[i].IsSelected" class="checkbox-input room-checkbox">
+															<input type="checkbox" asp-for="RoomTypeRates[i].IsSelected" class="checkbox-input room-checkbox">
 																<div class="checkbox-custom"></div>
-                                                                <span>@Model.roomTypeRateDTOs[i].RoomTypeName</span>
+                                                                <span>@Model.RoomTypeRates[i].RoomTypeName</span>
 															</label>
 														
-														<input type="hidden" asp-for="roomTypeRateDTOs[i].Id" />
-														<input type="hidden" asp-for="roomTypeRateDTOs[i].RoomTypeId">
-														<input type="hidden" asp-for="roomTypeRateDTOs[i].RateId">
+														<input type="hidden" asp-for="RoomTypeRates[i].Id" />
+														<input type="hidden" asp-for="RoomTypeRates[i].RoomTypeId">
+														<input type="hidden" asp-for="RoomTypeRates[i].RateId">
 													</td>
-													<td><input type="text" asp-for="roomTypeRateDTOs[i].HourlyPrice" class="form-control rate-input" style="@(Model.roomTypeRateDTOs[i].IsSelected ? "display:block;" : "display:none;")"></td>
-													<td><input type="text" asp-for="roomTypeRateDTOs[i].DailyPrice" class="form-control rate-input" style="@(Model.roomTypeRateDTOs[i].IsSelected ? "display:block;" : "display:none;")"></td>
-													<td><input type="text" asp-for="roomTypeRateDTOs[i].ExtraDailyPrice" class="form-control rate-input" style="@(Model.roomTypeRateDTOs[i].IsSelected ? "display:block;" : "display:none;")"></td>
-													<td><input type="text" asp-for="roomTypeRateDTOs[i].WeeklyPrice" class="form-control rate-input" style="@(Model.roomTypeRateDTOs[i].IsSelected ? "display:block;" : "display:none;")"></td>
-													<td><input type="text" asp-for="roomTypeRateDTOs[i].MonthlyPrice" class="form-control rate-input" style="@(Model.roomTypeRateDTOs[i].IsSelected ? "display:block;" : "display:none;")"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].HourlyPrice" class="form-control rate-input" style="@(Model.RoomTypeRates[i].IsSelected ? "display:block;" : "display:none;")"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].DailyPrice" class="form-control rate-input" style="@(Model.RoomTypeRates[i].IsSelected ? "display:block;" : "display:none;")"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].ExtraDailyPrice" class="form-control rate-input" style="@(Model.RoomTypeRates[i].IsSelected ? "display:block;" : "display:none;")"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].WeeklyPrice" class="form-control rate-input" style="@(Model.RoomTypeRates[i].IsSelected ? "display:block;" : "display:none;")"></td>
+													<td><input type="text" asp-for="RoomTypeRates[i].MonthlyPrice" class="form-control rate-input" style="@(Model.RoomTypeRates[i].IsSelected ? "display:block;" : "display:none;")"></td>
 												</tr>
 
 											}

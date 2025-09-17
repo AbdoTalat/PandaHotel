@@ -9,8 +9,8 @@ using HotelApp.Domain.Entities;
 
 namespace HotelApp.Application.Services.RoomService
 {
-    public interface IRoomService
-	 {
+	public interface IRoomService
+	{
 		Task<IEnumerable<GetAllRoomsDTO>> GetAllRoomsAsync();
 		GetRoomsReview GetRoomsReview();
 		Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id);
@@ -23,5 +23,6 @@ namespace HotelApp.Application.Services.RoomService
 		Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name);
 		Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
 		Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
-     }
+		Task<int> GetOccupancyPercentAsync();
+	}
 }

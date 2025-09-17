@@ -22,7 +22,7 @@ namespace HotelApp.Infrastructure.Configurations
 			builder.Property(b => b.NumberOfNights)
 				.IsRequired();
 
-			builder.Property(r => r.Comment)
+			builder.Property(r => r.Notes)
 				.HasMaxLength(200);
 
 			builder.Property(b => b.CancellationReason)

@@ -23,9 +23,12 @@ namespace HotelApp.Infrastructure.Configurations
 				.HasForeignKey(ss => ss.CheckOutStatusId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(b => b.CalculationType)
+               .WithMany()
+               .HasForeignKey(ss => ss.CalculationTypeId)
+               .OnDelete(DeleteBehavior.Restrict);
 
-
-			builder.HasOne(b => b.CreatedBy)
+            builder.HasOne(b => b.CreatedBy)
 			   .WithMany()
 			   .HasForeignKey(b => b.CreatedById)
 			   .OnDelete(DeleteBehavior.Restrict);

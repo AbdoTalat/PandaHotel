@@ -51,9 +51,9 @@ namespace HotelApp.Application.Mapping
 			CreateMap<RoomType, GetRoomTypesForReservationDTO>();
 			CreateMap<RoomType, GetRoomTypeByIdDTO>();
 
-			CreateMap<RoomType, EditRoomTypeDTO>();
-			CreateMap<EditRoomTypeDTO, RoomType>();
-			CreateMap<AddRoomTypeDTO, RoomType>();
+			CreateMap<RoomType, RoomTypeDTO>();
+			CreateMap<RoomTypeDTO, RoomType>();
+			CreateMap<RoomTypeDTO, RoomType>();
 
 			CreateMap<RoomType, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
@@ -64,9 +64,9 @@ namespace HotelApp.Application.Mapping
 			CreateMap<RoomStatus, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
-			CreateMap<AddRoomStatusDTO, RoomStatus>();
-			CreateMap<EditRoomStatusDTO, RoomStatus>();
-			CreateMap<RoomStatus, EditRoomStatusDTO>();
+			CreateMap<RoomStatusDTO, RoomStatus>();
+			CreateMap<RoomStatusDTO, RoomStatus>();
+			CreateMap<RoomStatus, RoomStatusDTO>();
 			
 		}
 	}

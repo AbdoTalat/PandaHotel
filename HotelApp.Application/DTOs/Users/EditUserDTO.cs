@@ -1,5 +1,6 @@
 ﻿using HotelApp.Application.DTOs.Branches;
 using HotelApp.Application.DTOs.RoleBased;
+using HotelApp.Domain.Common.Validation;
 using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,14 @@ namespace HotelApp.Application.DTOs.Users
     public class EditUserDTO
     {
         public int Id { get; set; }
-
+		[RequiredEx]
         public string FirstName { get; set; }
+		[RequiredEx]
 		public string LastName { get; set; }
+		[RequiredEx]
 		public string UserName { get; set; }
-
         [EmailAddress]
+		[RequiredEx]
 		public string Email { get; set; }
 		public int DefaultBranchId { get; set; }
 		public bool IsActive { get; set; }
@@ -28,18 +31,5 @@ namespace HotelApp.Application.DTOs.Users
 
 		public List<string> AllRoles { get; set; } = new();
 		public IEnumerable<DropDownDTO<string>> AllBranches { get; set; } = Enumerable.Empty<DropDownDTO<string>>();
-
-
-
-		//      public int? LastModifiedById { get; set; }
-		//      public DateTime? LastModifiedDate { get; set; }
-
-		//      public int DefaultBranchId { get; set; }
-		//public List<int> AssignedBranches { get; set; } = new();
-
-
-		//public List<string> AvailableRoles { get; set; } = new();
-		//      public IList<string> SelectedRoles { get; set; } = new List<string>();
 	}
-
 }

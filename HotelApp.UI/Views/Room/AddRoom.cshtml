@@ -163,11 +163,6 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Type<span class="text-danger">*</span></label>
-										@* <select asp-for="RoomTypeId" id="roomTypeSelect" name="RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
-											<option value=""></option>
-										</select> *@
-
-
 										<select asp-for="RoomTypeId" id="roomTypeSelect" class="form-control select" required data-placeholder="Choose Room Type"
 												data-selected="@Model?.RoomTypeId">
 											<option value=""></option>
@@ -330,7 +325,7 @@
 		$(document).ready(function () {
 			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
 			loadSelect("#floorSelect", "/Floor/GetFloorsJson", "number", "id");
-			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "name", "id");
+			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
 		});
 	</script>
 

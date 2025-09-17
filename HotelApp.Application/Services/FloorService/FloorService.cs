@@ -41,12 +41,12 @@ namespace HotelApp.Application.Services.FloorService
             var floor = await _unitOfWork.Repository<Floor>().GetByIdAsDtoAsync<GetFloorByIdDTO>(Id);
             return floor;
         }
-		public async Task<ServiceResponse<AddFloorDTO>> AddFloorAsync(AddFloorDTO floor)
+		public async Task<ServiceResponse<FloorDTO>> AddFloorAsync(FloorDTO floor)
         {
-            bool IsFloorNumberExist = await _unitOfWork.Repository<Floor>().IsExistsAsync(f => f.Number == floor.Number && f.BranchId == floor.BranchId);
+            bool IsFloorNumberExist = await _unitOfWork.Repository<Floor>().IsExistsAsync(f => f.Number == floor.Number);
             if (IsFloorNumberExist)
             {
-                return ServiceResponse<AddFloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
+                return ServiceResponse<FloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
             }
             try
             {
@@ -54,19 +54,19 @@ namespace HotelApp.Application.Services.FloorService
                 await _unitOfWork.Repository<Floor>().AddNewAsync(mappedFloor);
                 await _unitOfWork.CommitAsync();
 
-                return ServiceResponse<AddFloorDTO>.ResponseSuccess();
+                return ServiceResponse<FloorDTO>.ResponseSuccess();
             }
             catch (Exception ex)
             {
-                return ServiceResponse<AddFloorDTO>.ResponseFailure(ex.Message);
+                return ServiceResponse<FloorDTO>.ResponseFailure(ex.Message);
             }
 		}
-		public async Task<EditFloorDTO?> GetFloorToEditByIdAsync(int Id)
+		public async Task<FloorDTO?> GetFloorToEditByIdAsync(int Id)
         {
-			var floor = await _unitOfWork.Repository<Floor>().GetByIdAsDtoAsync<EditFloorDTO>(Id);
+			var floor = await _unitOfWork.Repository<Floor>().GetByIdAsDtoAsync<FloorDTO>(Id);
 			return floor;
 		}
-		public async Task<ServiceResponse<EditFloorDTO>> EditFloorAsync(EditFloorDTO floorDTO)
+		public async Task<ServiceResponse<FloorDTO>> EditFloorAsync(FloorDTO floorDTO)
         {
             var OldFloor = await _unitOfWork.Repository<Floor>().GetByIdAsync(floorDTO.Id);
 
@@ -74,7 +74,7 @@ namespace HotelApp.Application.Services.FloorService
                 .IsExistsAsync(f => f.Number == floorDTO.Number && f.Id != floorDTO.Id && f.BranchId == OldFloor.BranchId);
             if (IsFloorNumberExist)
             {
-                return ServiceResponse<EditFloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
+                return ServiceResponse<FloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
             }
             try
             {
@@ -82,11 +82,11 @@ namespace HotelApp.Application.Services.FloorService
                 _unitOfWork.Repository<Floor>().Update(OldFloor);
                 await _unitOfWork.CommitAsync();
 
-                return ServiceResponse<EditFloorDTO>.ResponseSuccess("Floor updated successfully.");
+                return ServiceResponse<FloorDTO>.ResponseSuccess("Floor updated successfully.");
             }
             catch (Exception ex)
             {
-                return ServiceResponse<EditFloorDTO>.ResponseFailure(ex.InnerException.Message);
+                return ServiceResponse<FloorDTO>.ResponseFailure(ex.InnerException.Message);
             }
         }
         public async Task<ServiceResponse<Floor>> DeleteFloorAsync(int Id)

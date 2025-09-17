@@ -101,7 +101,7 @@
                             {
                                 <a data-title="Edit Floor" data-url="/Company/EditCompany/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if (User.HasClaim("permission", "Company.Delete") @* && !item.IsActive *@)
+                            @if (User.HasClaim("permission", "Company.Delete") && !item.IsActive)
                             {
                                 <a data-url="/Company/DeleteCompany/@item.Id"
                                    class="text-danger-600 btn-delete">

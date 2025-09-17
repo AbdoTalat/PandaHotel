@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace HotelApp.Helper.Validation
+namespace HotelApp.Domain.Common.Validation
 {
     public class RequiredExAttribute : RequiredAttribute
     {

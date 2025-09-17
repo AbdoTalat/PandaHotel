@@ -1,5 +1,4 @@
-﻿using HotelApp.Helper.Validation;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using HotelApp.Domain.Common.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,7 +13,7 @@ namespace HotelApp.Application.DTOs.ReservationSource
 		public int Id { get; set; }
 
 		[RequiredEx]
-		[MaxLength(40)]
+		[MaxLengthEx(40)]
 		public string Name { get; set; }
 		public bool IsActive { get; set; }
 	}

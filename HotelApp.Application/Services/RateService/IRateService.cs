@@ -13,8 +13,8 @@ namespace HotelApp.Application.Services.RateService
         Task<IEnumerable<GetAllRatesDTO>> GetAllRatesAsync();
         Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model);
         Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId, int BranchId);
-        Task<EditRateDTO?> GetRateToEditByIdAsync(int Id);
-        Task<ServiceResponse<AddRateDTO>> AddRateAsync(AddRateDTO rateDTO);
-        Task<ServiceResponse<EditRateDTO>> EditRateAsync(EditRateDTO rateDTO);
+        Task<RateDTO?> GetRateToEditByIdAsync(int Id);
+        Task<ServiceResponse<RateDTO>> AddRateAsync(RateDTO rateDTO);
+        Task<ServiceResponse<RateDTO>> EditRateAsync(RateDTO rateDTO);
     }
 }

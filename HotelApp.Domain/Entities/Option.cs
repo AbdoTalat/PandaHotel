@@ -20,7 +20,7 @@ namespace HotelApp.Domain.Entities
         public bool IsActive { get; set; }
         public bool DisplayOnline { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<RoomOption> RoomOptions { get; set; } = new HashSet<RoomOption>();

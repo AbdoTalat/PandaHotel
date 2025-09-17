@@ -48,12 +48,12 @@
 
 
 <div class="content">
+	<div class="row">
 	<form asp-action="Edit" asp-controller="SystemSetting" method="post">
 		<input type="hidden" asp-for="Id"/>
 		<div class="panel panel-flat border-left-md border-left-teal">
 			<div class="panel-heading">
-@* 				<h5 class="panel-title">Master System Setup<a class="heading-elements-toggle"><i class="icon-more"></i></a></h5>
- *@				<div class="heading-elements">
+				<div class="heading-elements">
 					<ul class="icons-list">
 						<li><a data-action="collapse" class=""></a></li>
 					</ul>
@@ -68,14 +68,14 @@
 					<div class="col-md-12">
 						<div class="col-md-4">
 							<label>CheckIn Status<span class="text-danger">*</span></label>
-							<select asp-for="CheckInStatusId" id="CheckInStatusSelect" class="form-control select" required data-placeholder="Choose Check In Status">
+								<select asp-for="CheckInStatusId" id="CheckInStatusSelect" data-selected="@Model?.CheckInStatusId" class="form-control select" required data-placeholder="Choose Check In Status">
 								<option></option>
 							</select>
 							<span asp-validation-for="CheckInStatusId" class="text-danger validation-error-label"></span>
 						</div>
 						<div class="col-md-4">
-							<label>CheckOut Status<span class="text-danger">*</span></label>
-							<select asp-for="CheckOutStatusId" id="CheckOutStatusSelect" class="form-control select" required data-placeholder="Choose Check Out Status">
+							<label>Check Out Status<span class="text-danger">*</span></label>
+								<select asp-for="CheckOutStatusId" id="CheckOutStatusSelect" data-selected="@Model?.CheckOutStatusId" class="form-control select" required data-placeholder="Choose Check Out Status">
 								<option></option>
                             </select>
                             <span asp-validation-for="CheckOutStatusId" class="text-danger validation-error-label"></span>
@@ -83,8 +83,10 @@
 					</div>
 
 				</div>
+
 				<br />
 				<br />
+
 				<div class="row">
 					<div class="col-md-12">
 						<legend class="text-semibold"> Guests Setup </legend>
@@ -144,6 +146,24 @@
 
 				</div>
 
+				<br />
+				<br />
+
+				<div class="row">
+                    <div class="col-md-12">
+						<legend class="text-semibold"> Calculation Setup </legend>
+                    </div>
+					<div class="col-md-12">
+						<div class="col-md-4">
+							<label>Calculation Type<span class="text-danger">*</span></label>
+                            <select asp-for="CalculationTypeId" id="calculationTypeSelect" data-selected="@Model?.CalculationTypeId" class="form-control select" data-placeholder="Choose Calculation Type">
+								<option></option>
+							</select>
+							<span asp-validation-for="CalculationTypeId" class="text-danger validation-error-label"></span>
+						</div>
+				</div>
+				</div>
+
 			</div>
 		</div>
 
@@ -153,7 +173,7 @@
 		</div>
 	</form>
 </div>
-
+</div>
 
 
 @section Scripts{
@@ -169,30 +189,13 @@
 		</script>
 	}
 
-    <script>
-        function populateStatusSelect(selectId, selectedValue) {
-            $.ajax({
-                url: '/RoomStatus/GetRoomStatusWithOutBranchFilterJson',
-                type: 'GET',
-                dataType: 'json',
-                success: function (response) {
-                    var select = $('#' + selectId);
-                    select.empty().append('<option value="">Select Status</option>');
-                    $.each(response, function (index, item) {
-                        var selected = item.id == selectedValue ? 'selected' : '';
-                        select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
-                    });
-                },
-                error: function () {
-                    console.error('Failed to load room statuses.');
-                }
-            });
-        }
+	<script>
+		$(document).ready(function () {
+			loadSelect("#calculationTypeSelect", "/CalculationType/GetCalculationTypesJson", "displayText", "id");
+			loadSelect("#CheckInStatusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
+			loadSelect("#CheckOutStatusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
+		});
+	</script>
 
-        $(document).ready(function () {
-            populateStatusSelect("CheckInStatusSelect", @Model.CheckInStatusId);
-            populateStatusSelect("CheckOutStatusSelect", @Model.CheckOutStatusId);
-        });
-    </script>
 }
 

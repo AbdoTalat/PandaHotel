@@ -12,9 +12,9 @@ namespace HotelApp.Application.Services.CompanyService
 	{
 		Task<IEnumerable<GetAllCompaniesDTO>> GetAllCompaniesAsync();
 		Task<IEnumerable<DropDownDTO<string>>> GetCompaniesDropDownAsync();
-		Task<EditCompanyDTO?> GetCompanyToEditByIdAsync(int Id);
-		Task<ServiceResponse<AddCompanyDTO>> AddCompanyAsync(AddCompanyDTO companyDTO);
-		Task<ServiceResponse<EditCompanyDTO>> EditCompanyAsync(EditCompanyDTO companyDTO);
+		Task<CompanyDTO?> GetCompanyToEditByIdAsync(int Id);
+		Task<ServiceResponse<CompanyDTO>> AddCompanyAsync(CompanyDTO companyDTO);
+		Task<ServiceResponse<CompanyDTO>> EditCompanyAsync(CompanyDTO companyDTO);
 		//Task<ServiceResponse<object>> DeleteCompanyByIdAsync(int Id);
 
 		Task<IEnumerable<DropDownDTO<string>>> SerachCompanyByNameAsync(string Name);

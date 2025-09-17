@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotelApp.Domain.Common.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,21 +8,20 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Rates
 {
-	public class AddRateDTO
+	public class RateDTO
 	{
+		public int Id { get; set; }
+		[RequiredEx]
 		public string Code { get; set; }
-		[Required]
-		public DateTime? EffectiveDate { get; set; }
-
-        [Required]
-        public DateTime? EndDate { get; set; }
-
-        [Required]
-        public int MinChargeDayes { get; set; }
+		[RequiredEx]
+		public DateTime EffectiveDate { get; set; }
+		[RequiredEx]
+		public DateTime EndDate { get; set; }
+		[RequiredEx]
+		public int MinChargeDayes { get; set; }
 		public bool IsActive { get; set; }
 		public bool SkipHourly { get; set; }
 		public bool DisplayOnline { get; set; }
-		public int BranchId { get; set; }
 
 		public List<RoomTypeRateDTO> RoomTypeRates { get; set; } = new List<RoomTypeRateDTO>();
 	}

@@ -26,7 +26,7 @@ namespace HotelApp.Helper
 
 			//Check if the entity has a BranchId property of type int
 		   var propertyInfo = typeof(T).GetProperty("BranchId", BindingFlags.Public | BindingFlags.Instance);
-			if (propertyInfo == null || propertyInfo.PropertyType != typeof(int))
+			if (propertyInfo == null || propertyInfo.PropertyType != typeof(int?))
 				return query;
 
 			//Build EF-compatible expression: e => EF.Property<int>(e, "BranchId") == branchId

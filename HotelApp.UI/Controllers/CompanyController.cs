@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs.Company;
+﻿using AspNetCore;
+using HotelApp.Application.DTOs.Company;
 using HotelApp.Application.Services.CompanyService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "Company.Add")]
-		public async Task<IActionResult> AddCompany(AddCompanyDTO model)
+		public async Task<IActionResult> AddCompany(CompanyDTO model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -57,7 +58,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
 		[ValidateAntiForgeryToken]     
 		[Authorize(Policy = "Company.Edit")]
-        public async Task<IActionResult> EditCompany(EditCompanyDTO model)
+        public async Task<IActionResult> EditCompany(CompanyDTO model)
         {
 			if (!ModelState.IsValid)
 			{
@@ -97,10 +98,9 @@ namespace HotelApp.UI.Controllers
 				return Json(new { success = false, message = "Invalid Data" });
 			}
 
-			
             var result = await _companyService.CreateOrUpdateCompanyAsync(companyDto);
 
-            return Json(new
+			return Json(new
             {
                 success = result.Success,
                 message = result.Message,

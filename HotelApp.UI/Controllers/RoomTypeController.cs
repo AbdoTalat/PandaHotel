@@ -48,7 +48,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize(Policy = "RoomType.Add")]
-		public async Task<IActionResult> AddRoomType(AddRoomTypeDTO model)
+		public async Task<IActionResult> AddRoomType(RoomTypeDTO model)
 		{
             if(!ModelState.IsValid)
             {
@@ -70,7 +70,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize(Policy = "RoomType.Edit")]
-		public async Task<IActionResult> EditRoomType(EditRoomTypeDTO model)
+		public async Task<IActionResult> EditRoomType(RoomTypeDTO model)
         {
             if (!ModelState.IsValid)
             {

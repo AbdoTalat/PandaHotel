@@ -17,7 +17,7 @@ namespace HotelApp.Domain.Entities
         public string? Notes { get; set; }
         public bool IsActive { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();

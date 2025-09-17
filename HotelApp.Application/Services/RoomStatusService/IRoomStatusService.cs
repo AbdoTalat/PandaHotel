@@ -14,9 +14,9 @@ namespace HotelApp.Application.Services.RoomStatusService
         Task<IEnumerable<GetAllRoomStatusDTO>> GetAllRoomStatusAsync();
         Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownAsync();
 		Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownWithoutBranchFilterAsync();
-		Task<EditRoomStatusDTO?> GetRoomStatusToEditByIdAsync(int Id);
-        Task<ServiceResponse<AddRoomStatusDTO>> AddRoomStatusAsync(AddRoomStatusDTO roomStatusDTO);
-        Task<ServiceResponse<EditRoomStatusDTO>> EditRoomStatusAsync(EditRoomStatusDTO roomStatusDTO);
+		Task<RoomStatusDTO?> GetRoomStatusToEditByIdAsync(int Id);
+        Task<ServiceResponse<RoomStatusDTO>> AddRoomStatusAsync(RoomStatusDTO roomStatusDTO);
+        Task<ServiceResponse<RoomStatusDTO>> EditRoomStatusAsync(RoomStatusDTO roomStatusDTO);
         Task<ServiceResponse<object>> DeleteRoomStatusByIdAsync(int Id);
     }
 }

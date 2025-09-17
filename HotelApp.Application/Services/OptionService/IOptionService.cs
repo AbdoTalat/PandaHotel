@@ -13,9 +13,9 @@ namespace HotelApp.Application.Services.OptionService
 	{
 		Task<IEnumerable<DropDownDTO<string>>> GetOptionsDropDownAsync();
 		Task<IEnumerable<GetAllOptionsDTO>> GetAllOptionsAsync();
-		Task<EditOptionDTO?> GetOptionToEditByIdAsync(int Id);
-		Task<ServiceResponse<AddOptionDTO>> AddOptionAsync(AddOptionDTO optionDTO);
-		Task<ServiceResponse<EditOptionDTO>> EditOptionAsync(EditOptionDTO optionDTO);
+		Task<OptionDTO?> GetOptionToEditByIdAsync(int Id);
+		Task<ServiceResponse<OptionDTO>> AddOptionAsync(OptionDTO optionDTO);
+		Task<ServiceResponse<OptionDTO>> EditOptionAsync(OptionDTO optionDTO);
 		Task<ServiceResponse<Option>> DeleteOptionAsync(int Id);
 	}
 }

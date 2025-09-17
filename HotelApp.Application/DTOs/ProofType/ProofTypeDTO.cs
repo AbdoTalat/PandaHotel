@@ -1,4 +1,4 @@
-﻿using HotelApp.Helper.Validation;
+﻿using HotelApp.Domain.Common.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,10 +12,9 @@ namespace HotelApp.Application.DTOs.ProofType
 	{
 		public int Id { get; set; }
 
-		[MaxLength(40)]
+		[MaxLengthEx(40)]
 		[RequiredEx]
 		public string Name { get; set; }
-
 		public bool IsActive { get; set; }
 	}
 }

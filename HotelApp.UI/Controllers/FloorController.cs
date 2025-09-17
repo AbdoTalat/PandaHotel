@@ -49,7 +49,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Floor.Add")]
-        public async Task<IActionResult> AddFloor(AddFloorDTO floorDTO)
+        public async Task<IActionResult> AddFloor(FloorDTO floorDTO)
         {
             if(!ModelState.IsValid)
             {
@@ -71,7 +71,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "Floor.Edit")]
-		public async Task<IActionResult> EditFloor(EditFloorDTO floorDTO)
+		public async Task<IActionResult> EditFloor(FloorDTO floorDTO)
 		{
 			if (!ModelState.IsValid)
 			{

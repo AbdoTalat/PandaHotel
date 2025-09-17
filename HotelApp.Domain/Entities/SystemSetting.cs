@@ -17,7 +17,11 @@ namespace HotelApp.Domain.Entities
         public int CheckOutStatusId { get; set; }
         public RoomStatus? CheckOutStatus { get; set; }
 
-		public bool IsGuestEmailRequired { get; set; }
+        public int CalculationTypeId { get; set; }
+        public CalculationType? CalculationType { get; set; }
+
+
+        public bool IsGuestEmailRequired { get; set; }
         public bool IsGuestDateOfBirthRequired { get; set; }
         public bool IsGuestPhoneRequired { get; set; }
         public bool IsGuestAddressRequired { get; set; }

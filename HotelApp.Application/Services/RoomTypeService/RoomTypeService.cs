@@ -50,9 +50,9 @@ namespace HotelApp.Application.Services.RoomTypeService
 			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsDtoAsync<GetRoomTypeByIdDTO>(Id);
 			return roomType;
 		}
-        public async Task<EditRoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id)
+        public async Task<RoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id)
 		{
-			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsDtoAsync<EditRoomTypeDTO>(Id);
+			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsDtoAsync<RoomTypeDTO>(Id);
 			return roomType;
 		}
         public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync()
@@ -61,7 +61,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 			
 			return roomTypes;
         }
-        public async Task<ServiceResponse<AddRoomTypeDTO>> AddRoomTypeAsync(AddRoomTypeDTO roomTypeDTO)
+        public async Task<ServiceResponse<RoomTypeDTO>> AddRoomTypeAsync(RoomTypeDTO roomTypeDTO)
 		{
 			try
 			{
@@ -69,32 +69,32 @@ namespace HotelApp.Application.Services.RoomTypeService
 					.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
 				if (isTypeNameExist)
 				{
-					return ServiceResponse<AddRoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
+					return ServiceResponse<RoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
 				}
 
 				var mappedRoomType = _mapper.Map<RoomType>(roomTypeDTO);
 				await _unitOfWork.Repository<RoomType>().AddNewAsync(mappedRoomType);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<AddRoomTypeDTO>.ResponseSuccess("New Roomtype added successfully.");
+				return ServiceResponse<RoomTypeDTO>.ResponseSuccess("New Roomtype added successfully.");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<AddRoomTypeDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
+				return ServiceResponse<RoomTypeDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
 			}
 		}
-        public async Task<ServiceResponse<EditRoomTypeDTO>> EditRoomTypeAsync(EditRoomTypeDTO roomTypeDTO)
+        public async Task<ServiceResponse<RoomTypeDTO>> EditRoomTypeAsync(RoomTypeDTO roomTypeDTO)
 		{
 			var oldRoomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(roomTypeDTO.Id);
 			if (oldRoomType == null)
 			{
-				return ServiceResponse<EditRoomTypeDTO>.ResponseFailure($"Room Type not found.");
+				return ServiceResponse<RoomTypeDTO>.ResponseFailure($"Room Type not found.");
 			}
 			var isTypeNameExist = await _unitOfWork.Repository<RoomType>()
 				.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower() && rt.Id != roomTypeDTO.Id);
 			if (isTypeNameExist)
 			{
-				return ServiceResponse<EditRoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
+				return ServiceResponse<RoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
 			}
 			try
 			{
@@ -115,11 +115,11 @@ namespace HotelApp.Application.Services.RoomTypeService
 
 
 
-				return ServiceResponse<EditRoomTypeDTO>.ResponseSuccess($"{oldRoomType.Name} Room type updated successfully.");
+				return ServiceResponse<RoomTypeDTO>.ResponseSuccess($"{oldRoomType.Name} Room type updated successfully.");
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<EditRoomTypeDTO>.ResponseFailure($"Error Occurred while saving: {ex.Message}");
+				return ServiceResponse<RoomTypeDTO>.ResponseFailure($"Error Occurred while saving: {ex.Message}");
 			}
 		}
 		public async Task<ServiceResponse<RoomType>> DeleteRoomTypeAsync(int Id)

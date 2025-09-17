@@ -88,19 +88,19 @@
                                 </div>
                                 @foreach (var perm in group.Value)
                                 {
-                                    var checkboxId = $"perm_{perm.Value.Replace(" ", "_")}";
+                                    var checkboxId = $"perm_{perm.Action.Replace(" ", "_")}";
                                     <div class="col-md-2">
                                         <div class="checkbox-container">
                                             <input type="checkbox"
                                                    id="@checkboxId"
                                                    name="permissionStrings"
-                                                   value="@perm.Value"
+                                                   value="@perm.Action"
                                                    class="checkbox-input"
                                             @(perm.IsAssigned ? "checked" : "")
                                             @(Model.IsBasic ? "disabled" : "") />
 
                                             <label for="@checkboxId" class="checkbox-custom"></label>
-                                            <label for="@checkboxId" class="checkbox-label" style="cursor:pointer">@perm.Value</label>
+                                            <label for="@checkboxId" class="checkbox-label" style="cursor:pointer">@perm.Action</label>
                                         </div>
                                     </div>
                                 }

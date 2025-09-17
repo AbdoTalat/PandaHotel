@@ -1,4 +1,4 @@
-﻿using HotelApp.Helper.Validation;
+﻿using HotelApp.Domain.Common.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

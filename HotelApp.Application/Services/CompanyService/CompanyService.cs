@@ -38,7 +38,7 @@ namespace HotelApp.Application.Services.CompanyService
             return companies;
         }
 
-		public async Task<ServiceResponse<AddCompanyDTO>> AddCompanyAsync(AddCompanyDTO companyDTO)
+		public async Task<ServiceResponse<CompanyDTO>> AddCompanyAsync(CompanyDTO companyDTO)
         {
             try
             {
@@ -47,27 +47,27 @@ namespace HotelApp.Application.Services.CompanyService
                 await _unitOfWork.Repository<Company>().AddNewAsync(company);
                 await _unitOfWork.CommitAsync();
 
-                return ServiceResponse<AddCompanyDTO>.ResponseSuccess("new company added successfully.");
+                return ServiceResponse<CompanyDTO>.ResponseSuccess("new company added successfully.");
             }
             catch (Exception ex)
             {
-                return ServiceResponse<AddCompanyDTO>.ResponseFailure(ex.InnerException.Message);
+                return ServiceResponse<CompanyDTO>.ResponseFailure(ex.InnerException.Message);
             }
         }
 
-        public async Task<EditCompanyDTO?> GetCompanyToEditByIdAsync(int Id)
+        public async Task<CompanyDTO?> GetCompanyToEditByIdAsync(int Id)
         {
             var company = await _unitOfWork.Repository<Company>()
-                .GetByIdAsDtoAsync<EditCompanyDTO>(Id);
+                .GetByIdAsDtoAsync<CompanyDTO>(Id);
 
             return company;
         }
-        public async Task<ServiceResponse<EditCompanyDTO>> EditCompanyAsync(EditCompanyDTO companyDTO)
+        public async Task<ServiceResponse<CompanyDTO>> EditCompanyAsync(CompanyDTO companyDTO)
         {
             var OldCompany = await _unitOfWork.Repository<Company>().GetByIdAsync(companyDTO.Id);
             if (OldCompany == null)
             {
-                return ServiceResponse<EditCompanyDTO>.ResponseFailure("Company not found.");
+                return ServiceResponse<CompanyDTO>.ResponseFailure("Company not found.");
             }
             try
             {
@@ -75,11 +75,11 @@ namespace HotelApp.Application.Services.CompanyService
                 _unitOfWork.Repository<Company>().Update(OldCompany);
                 await _unitOfWork.CommitAsync();
 
-                return ServiceResponse<EditCompanyDTO>.ResponseSuccess("Company uodated successfully.");
+                return ServiceResponse<CompanyDTO>.ResponseSuccess("Company uodated successfully.");
             }
             catch (Exception ex)
             {
-                return ServiceResponse<EditCompanyDTO>.ResponseFailure(ex.Message);
+                return ServiceResponse<CompanyDTO>.ResponseFailure(ex.Message);
             }
         }
         //public async Task<ServiceResponse<object>> DeleteCompanyByIdAsync(int Id)

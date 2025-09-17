@@ -18,11 +18,8 @@ namespace HotelApp.Application.Mapping
             CreateMap<Option, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
-
-			CreateMap<AddOptionDTO, Option>();
-
-            CreateMap<EditOptionDTO, Option>();
-            CreateMap<Option, EditOptionDTO>();
+            CreateMap<OptionDTO, Option>();
+            CreateMap<Option, OptionDTO>();
         }
     }
 }

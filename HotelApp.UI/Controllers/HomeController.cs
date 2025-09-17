@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace HotelApp.UI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -27,6 +27,7 @@ namespace HotelApp.UI.Controllers
 			}
 			return View("Error"); // General error page
 		}
+        [Authorize]
 		public IActionResult Index()
         {
 			return View();

@@ -5,44 +5,94 @@ using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Security.Claims;
 
 namespace HotelApp.Infrastructure
 {
-    public class unitOfWork : IUnitOfWork
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfigurationProvider _mapperConfig;
+	public class UnitOfWork : IUnitOfWork, IAsyncDisposable
+	{
+		private readonly ApplicationDbContext _context;
+		private readonly IConfigurationProvider _mapperConfig;
 		private readonly ICurrentUserService _currentUserService;
-		private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
+		private IDbContextTransaction? _transaction;
+		private readonly Dictionary<Type, object> _repositories = new();
 
-        public unitOfWork(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig, ICurrentUserService currentUserService)
-        {
-            _context = context;
-            _mapperConfig = mapperConfig;
+		public UnitOfWork(ApplicationDbContext context,
+			IConfigurationProvider mapperConfig,
+			ICurrentUserService currentUserService)
+		{
+			_context = context;
+			_mapperConfig = mapperConfig;
 			_currentUserService = currentUserService;
 		}
 
 		public IGenericRepository<T> Repository<T>() where T : class
 		{
-			if (_repositories.ContainsKey(typeof(T)))
-				return (IGenericRepository<T>)_repositories[typeof(T)];
+			if (_repositories.TryGetValue(typeof(T), out var repo))
+				return (IGenericRepository<T>)repo;
 
-			var repo = new GenericRepository<T>(_context, _mapperConfig, _currentUserService);
-			_repositories[typeof(T)] = repo;
-			return repo;
+			var newRepo = new GenericRepository<T>(_context, _mapperConfig, _currentUserService);
+			_repositories[typeof(T)] = newRepo;
+			return newRepo;
 		}
 
-		public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
+		public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+			=> _context.SaveChangesAsync(cancellationToken);
+
+		public Task<int> CommitAsync(bool skipAuditFields, CancellationToken cancellationToken = default)
+			=> _context.SaveChangesAsync(skipAuditFields, cancellationToken);
+
+		public async Task BeginTransactionAsync()
 		{
-			return await _context.SaveChangesAsync(cancellationToken);
+			if (_transaction == null)
+				_transaction = await _context.Database.BeginTransactionAsync();
 		}
 
-		public async Task<int> CommitAsync(bool skipAuditFields, CancellationToken cancellationToken = default)
+		public async Task CommitTransactionAsync()
 		{
-			return await _context.SaveChangesAsync(skipAuditFields, cancellationToken);
+			if (_transaction == null)
+				throw new InvalidOperationException("No active transaction to commit.");
+
+			try
+			{
+				await CommitAsync();
+				await _transaction.CommitAsync();
+			}
+			catch
+			{
+				await RollbackTransactionAsync();
+				throw;
+			}
+			finally
+			{
+				await DisposeTransactionAsync();
+			}
 		}
-		public void Dispose() { }
-    }
+
+		public async Task RollbackTransactionAsync()
+		{
+			if (_transaction != null)
+			{
+				await _transaction.RollbackAsync();
+				await DisposeTransactionAsync();
+			}
+		}
+
+		private async Task DisposeTransactionAsync()
+		{
+			if (_transaction != null)
+			{
+				await _transaction.DisposeAsync();
+				_transaction = null;
+			}
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			if (_transaction != null)
+				await _transaction.DisposeAsync();
+			await _context.DisposeAsync();
+		}
+	}
 }

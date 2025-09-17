@@ -1,4 +1,4 @@
-﻿@model EditCompanyDTO
+﻿@model CompanyDTO
 
 <form class="form-basic ajaxEditForm" asp-action="EditCompany" asp-controller="Company" method="post">
 	<input type="hidden" asp-for="@Model.Id" />
@@ -33,10 +33,30 @@
 						<div class="col-md-6">
 							<label>Notes:</label>
 							<div class="form-group">
-								<textarea asp-for="Notes" class="form-control" required placeholder="Notes">
+								<textarea asp-for="Notes" class="form-control" placeholder="Notes">
 
 								</textarea>
 								<span asp-validation-for="Notes" class="text-danger validation-error-label"></span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="panel panel-flat">
+								<div class="panel-heading">
+									<h6 class="panel-title">Setup</h6>
+								</div>
+								<div class="panel-body">
+									<div class="form-group ">
+
+										<div class="checkbox">
+											<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
+												<input type="checkbox" asp-for="IsActive" class="switchery">
+												Is Active
+											</label>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -54,5 +74,11 @@
 </form>
 
 
+<script>
+	var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+	elems.forEach(function (html) {
+		new Switchery(html, { color: '#4CAF50', size: 'small' });
+	});
 
+</script>
 @await Html.PartialAsync("_ValidationScriptsPartial")

@@ -32,7 +32,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "RoomStatus.Add")]
-		public async Task<IActionResult> AddRoomStatus(AddRoomStatusDTO model)
+		public async Task<IActionResult> AddRoomStatus(RoomStatusDTO model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -55,7 +55,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "RoomStatus.Edit")]
-		public async Task<IActionResult> EditRoomStatus(EditRoomStatusDTO model)
+		public async Task<IActionResult> EditRoomStatus(RoomStatusDTO model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -75,17 +75,12 @@ namespace HotelApp.UI.Controllers
 			return Json(new {success = result.Success, message = result.Message});
 		}
 
+		[HttpGet]
 		public async Task<IActionResult> GetRoomStatusJson()
 		{
 			var roomStatus = await _roomStatusService.GetRoomStatusDropDownAsync();
 
-			var result = roomStatus.Select(rs => new
-			{
-				Id = rs.Id,
-				Name = rs.DisplayText
-			});
-
-			return Json(result);
+			return Json(roomStatus);
 		}
 
 		public async Task<IActionResult> GetRoomStatusWithOutBranchFilterJson()

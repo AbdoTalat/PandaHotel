@@ -16,13 +16,13 @@ namespace HotelApp.Application.Mapping
         {
             CreateMap<Company, GetAllCompaniesDTO>();
 
-            CreateMap<AddCompanyDTO, Company>();
+            CreateMap<CompanyDTO, Company>();
 
             CreateMap<Company, DropDownDTO<string>>()
                 .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
 
-            CreateMap<Company, EditCompanyDTO>();
-            CreateMap<EditCompanyDTO, Company>();
+            CreateMap<Company, CompanyDTO>();
+            CreateMap<CompanyDTO, Company>();
 
             CreateMap<Company, GetSearchedCompanyDTO>();
 

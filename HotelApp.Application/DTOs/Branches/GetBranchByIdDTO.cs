@@ -11,9 +11,7 @@ namespace HotelApp.Application.DTOs.Branches
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [Required(ErrorMessage = "Country Is Required")]
         public int CountryId { get; set; }
-        [Required(ErrorMessage = "State Is Required")]
         public int StateId { get; set; }
         //public string CountryName { get; set; }
         //public string StateName { get; set; }

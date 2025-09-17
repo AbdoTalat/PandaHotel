@@ -17,10 +17,10 @@ namespace HotelApp.Application.Mapping
             CreateMap<Floor, GetAllFloorsDTO>();
             CreateMap<Floor, GetFloorByIdDTO>();
 
-            CreateMap<Floor, EditFloorDTO>();
-			CreateMap<EditFloorDTO, Floor>();
+            CreateMap<Floor, FloorDTO>();
+			CreateMap<FloorDTO, Floor>();
 
-			CreateMap<AddFloorDTO, Floor>();
+			CreateMap<FloorDTO, Floor>();
 
             CreateMap<Floor, DropDownDTO<Int16>>()
                 .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Number));

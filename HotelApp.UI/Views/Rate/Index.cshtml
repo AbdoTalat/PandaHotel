@@ -106,7 +106,7 @@
                             {
                                 <a asp-action="EditRate" asp-controller="Rate" asp-route-Id="@item.Id" class="text-teal-600 edit-rate-btn"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
                             }
-                            @if (User.HasClaim("permission", "Rate.Delete"))
+                            @if (User.HasClaim("permission", "Rate.Delete") && !item.IsActive)
                             {
                                 <a data-url="/Rate/DeleteRate/@item.Id"
                                    class="text-danger-600 btn-delete">

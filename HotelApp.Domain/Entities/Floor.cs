@@ -13,7 +13,7 @@ namespace HotelApp.Domain.Entities
         public Int16 Number { get; set; }
         public bool IsActive { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public ICollection<Room> Rooms { get; set; } = new HashSet<Room>();

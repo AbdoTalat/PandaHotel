@@ -1,5 +1,5 @@
-﻿using HotelApp.Domain.Entities;
-using HotelApp.Helper.Validation;
+﻿using HotelApp.Domain.Common.Validation;
+using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,40 +12,27 @@ namespace HotelApp.Application.DTOs.Rooms
     public class AddRoomDTO
 	{
         public int Id { get; set; }
-
         //[RequiredEx]
         public string? RoomNumber { get; set; }
-
 		public string? Description { get; set; }
-
 		[RequiredEx]
 		public int FloorId { get; set; }
-
 		[RequiredEx]
 		public decimal PricePerNight { get; set; }
-
 		[RequiredEx]
 		public int MaxNumOfAdults { get; set; }
-
 		[RequiredEx]
 		public int MaxNumOfChildrens { get; set; }
-
 		[RequiredEx]
 		public int RoomStatusId { get; set; }
-
 		[RequiredEx]
 		public int RoomTypeId { get; set; }
-
-		[RequiredEx]
-		public int BranchId { get; set; }
         public bool IsActive { get; set; } 
         public bool IsAffectedByRoomType { get; set; }
 
 		public bool AddManyRooms { get; set; }
 		public string? RoomNumberText { get; set; }
-		//[RequiredEx]
 		public int? RoomNumberFrom { get; set; }
-		//[RequiredEx]
 		public int? RoomNumberTo { get; set; }
 
 		public List<int> SelectedOptions { get; set; } = new List<int>();

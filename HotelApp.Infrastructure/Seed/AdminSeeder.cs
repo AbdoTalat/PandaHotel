@@ -66,8 +66,7 @@ namespace HotelApp.Infrastructure.Seed
 					LastName = "admin",
 					Email = adminEmail,
 					EmailConfirmed = true,
-					isFullAdmin = true,
-					isActive = true
+					IsActive = true
 				};
 
 				var result = await userManager.CreateAsync(adminUser, adminPassword);

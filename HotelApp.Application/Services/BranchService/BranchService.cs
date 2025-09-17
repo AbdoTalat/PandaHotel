@@ -25,10 +25,11 @@ namespace HotelApp.Application.Services.BranchService
             _mapper = mapper;
 			_userRepository = userRepository;
 		}
-
-        public async Task<GetBranchByIdDTO?> GetBranchByIdAsync(int Id)
+		
+		public async Task<GetBranchByIdDTO?> GetBranchByIdAsync(int Id)
         {
-            var branch = await _unitOfWork.Repository<Branch>().GetByIdAsDtoAsync<GetBranchByIdDTO>(Id, SkipBranchFilter:true);
+            var branch = await _unitOfWork.Repository<Branch>()
+                .GetByIdAsDtoAsync<GetBranchByIdDTO>(Id, SkipBranchFilter:true);
 
             return branch;
 		}
@@ -48,7 +49,7 @@ namespace HotelApp.Application.Services.BranchService
                 .GetAllAsDtoAsync<GetBranchesByUserIdDTO>(ub => ub.UserId == userId, SkipBranchFilter:true);
             return branches;
         }
-        public async Task<ServiceResponse<EditBranchDTO>> AddNewBranchAsync(EditBranchDTO branchDTO)
+        public async Task<ServiceResponse<BranchDTO>> AddNewBranchAsync(BranchDTO branchDTO)
         {
             try
             {
@@ -56,19 +57,19 @@ namespace HotelApp.Application.Services.BranchService
                 await _unitOfWork.Repository<Branch>().AddNewAsync(mappedBranch);
                 await _unitOfWork.CommitAsync();
 
-                return ServiceResponse<EditBranchDTO>.ResponseSuccess($"{mappedBranch.Name} Branch Created Succesfully");
+                return ServiceResponse<BranchDTO>.ResponseSuccess($"{mappedBranch.Name} Branch Created Succesfully");
             }
             catch (Exception ex)
             {
-                return ServiceResponse<EditBranchDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
+                return ServiceResponse<BranchDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
             }
         }
-		public async Task<ServiceResponse<EditBranchDTO>> EditBranchAsync(EditBranchDTO branchDTO)
+		public async Task<ServiceResponse<BranchDTO>> EditBranchAsync(BranchDTO branchDTO)
         {
             var oldBranch = await _unitOfWork.Repository<Branch>().GetByIdAsync(branchDTO.Id);
             if(oldBranch == null)
             {
-                return ServiceResponse<EditBranchDTO>.ResponseFailure("Branch not found.");
+                return ServiceResponse<BranchDTO>.ResponseFailure("Branch not found.");
             }
             _mapper.Map(branchDTO, oldBranch);
 
@@ -76,11 +77,11 @@ namespace HotelApp.Application.Services.BranchService
             {
                 _unitOfWork.Repository<Branch>().Update(oldBranch);
                 await _unitOfWork.CommitAsync();
-				return ServiceResponse<EditBranchDTO>.ResponseSuccess("Branch Updated Successfully.");
+				return ServiceResponse<BranchDTO>.ResponseSuccess("Branch Updated Successfully.");
 			}
             catch (Exception ex)
             {
-                return ServiceResponse<EditBranchDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
+                return ServiceResponse<BranchDTO>.ResponseFailure($"Error Occurred: {ex.Message}");
             }
 		}
 		public async Task<ServiceResponse<Branch>> DeleteBranchAsync(int Id)
@@ -102,9 +103,9 @@ namespace HotelApp.Application.Services.BranchService
                 return ServiceResponse<Branch>.ResponseFailure($"Error Occurred: {ex.Message}");
             }
         }
-		public async Task<EditBranchDTO?> GetBranchToEditByIdAsync(int Id)
+		public async Task<BranchDTO?> GetBranchToEditByIdAsync(int Id)
 		{
-			var branch = await _unitOfWork.Repository<Branch>().GetByIdAsDtoAsync<EditBranchDTO>(Id);
+			var branch = await _unitOfWork.Repository<Branch>().GetByIdAsDtoAsync<BranchDTO>(Id);
             return branch;
 		}
 	}

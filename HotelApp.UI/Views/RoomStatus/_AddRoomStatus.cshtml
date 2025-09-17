@@ -1,6 +1,4 @@
-﻿@model AddRoomStatusDTO
-@{
-}
+﻿@model RoomStatusDTO
 
 <form class="form-basic ajaxForm" asp-action="AddRoomStatus" asp-controller="RoomStatus" method="post">
     <div class="panel panel-flat border-left-lg border-left-teal ">
@@ -10,7 +8,7 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <label>Status Name<span class="text-danger">*</span></label>
+                            <label>Name<span class="text-danger">*</span></label>
                             <div class="form-group">
                                 <input asp-for="Name" class="form-control" required placeholder="Branch Name">
                                 <span asp-validation-for="Name" class="text-danger validation-error-label"></span>
@@ -27,7 +25,7 @@
                         <div class="col-md-4">
                             <label for="statusColor">Pick a color:</label>
                             <div class="form-group">
-                                <input type="color" asp-for="Color" id="statusColor" value="#20BF7E" class="form-control" />
+                                <input type="color" asp-for="Color" id="statusColor" value="#ffffff" class="form-control" />
                             </div>
                         </div>
 
@@ -70,3 +68,12 @@
         <button class="btn bg-teal-400 btn-lg" type="submit"><i class="icon-plus2"></i> Add</button>
     </div>
 </form>
+
+<script>
+    var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+    elems.forEach(function (html) {
+        new Switchery(html, { color: '#4CAF50', size: 'small' });
+    });
+
+</script>
+@await Html.PartialAsync("_ValidationScriptsPartial")

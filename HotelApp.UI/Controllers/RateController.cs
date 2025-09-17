@@ -34,7 +34,7 @@ namespace HotelApp.UI.Controllers
             ViewBag.RoomTypes = await _roomTypeService.GetAllRoomTypesAsync();
 			var RoomTypes = await _roomTypeService.GetAllRoomTypesAsync();
 
-			var model = new AddRateDTO
+			var model = new RateDTO
 			{
 				RoomTypeRates = RoomTypes.Select(rt => new RoomTypeRateDTO
 				{
@@ -49,7 +49,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "Rate.Add")]
-		public async Task<IActionResult> AddRate(AddRateDTO model)
+		public async Task<IActionResult> AddRate(RateDTO model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -80,7 +80,7 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Policy = "Rate.Edit")]
-		public async Task<IActionResult> EditRate(EditRateDTO model)
+		public async Task<IActionResult> EditRate(RateDTO model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -98,8 +98,6 @@ namespace HotelApp.UI.Controllers
 			TempData["Error"] = result.Message;
 			return View(model);
 		}
-		
-		
 		
 		
 		[HttpPost]

@@ -30,7 +30,7 @@ namespace HotelApp.Infrastructure
 
 
 			services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IUnitOfWork, unitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
@@ -40,6 +40,7 @@ namespace HotelApp.Infrastructure
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IRateRepository, RateRepository>();
             services.AddScoped<ISystemSettingRepositroy, SystemSettingRepositroy>();
+            services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 			services.AddScoped<IPermissionLoader, PermissionLoader>();
 

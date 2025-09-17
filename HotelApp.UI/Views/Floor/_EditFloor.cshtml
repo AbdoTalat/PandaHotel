@@ -1,4 +1,4 @@
-﻿@model EditFloorDTO
+﻿@model FloorDTO
 
 
 <form class="form-basic ajaxEditForm" asp-action="EditFloor" asp-controller="Floor" method="post">
@@ -45,5 +45,11 @@
 	</div>
 </form>
 
+<script>
+	var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+	elems.forEach(function (html) {
+		new Switchery(html, { color: '#4CAF50', size: 'small' });
+	});
 
+</script>
 @await Html.PartialAsync("_ValidationScriptsPartial")

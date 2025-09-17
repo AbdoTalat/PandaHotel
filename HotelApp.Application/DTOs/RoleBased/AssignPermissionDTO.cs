@@ -9,15 +9,9 @@ namespace HotelApp.Application.DTOs.RoleBased
 	public class AssignPermissionDTO
 	{
 		public int Id { get; set; }
-		public string RoleName { get; set; } = string.Empty;
+		public string? RoleName { get; set; }
 		public bool IsBasic { get; set; }
 
-		public Dictionary<string, List<PermissionViewModel>> PermissionGroups { get; set; } = new();
-	}
-
-	public class PermissionViewModel
-	{
-		public string Value { get; set; } = string.Empty;
-		public bool IsAssigned { get; set; }
+		public Dictionary<string, List<PermissionDTO>> PermissionGroups { get; set; } = new();
 	}
 }

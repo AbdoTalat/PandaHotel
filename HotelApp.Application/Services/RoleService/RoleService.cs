@@ -36,7 +36,6 @@ namespace HotelApp.Application.Services.RoleService
 			_unitOfWork = unitOfWork;
 			_currentUserService = currentUserService;
 		}
-		// ✅ Get all available permissions with info about which are assigned
 		public async Task<IEnumerable<PermissionDTO>> GetAllPermissionsAsync(int roleId)
 		{
 			var assigned = await _roleRepository.GetAssignedPermissionsAsync(roleId);
@@ -48,7 +47,6 @@ namespace HotelApp.Application.Services.RoleService
 				IsAssigned = assigned.Contains(p)
 			});
 		}
-		// ✅ Get all roles
 		public async Task<IEnumerable<GetRolesDTO>> GetRolesAsync()
 		{
 			var roles = await _roleManager.Roles.Select(r => new GetRolesDTO
@@ -58,19 +56,17 @@ namespace HotelApp.Application.Services.RoleService
 				CreatedDate = r.CreatedDate,
 				LastModifiedDate = r.LastModifiedDate,
 				IsActive = r.IsActive,
-				IsBasic = r.IsBasic
+				IsBasic = r.IsSystem
 			})
 			.ToListAsync();
 			return roles;
 		}
 
-		// ✅ Get a single role
 		public async Task<Role?> GetRoleByIdAsync(int roleId)
 		{
 			return await _roleManager.FindByIdAsync(roleId.ToString());
 		}
 
-		// ✅ Add new role
 		public async Task<ServiceResponse<RoleDTO>> AddRoleAsync(RoleDTO roleDTO)
 		{
 			if (await _roleManager.RoleExistsAsync(roleDTO.Name))
@@ -103,12 +99,12 @@ namespace HotelApp.Application.Services.RoleService
 
 			var groupedPermissions = await _roleRepository.GetAllPermissionsGroupedAsync(); // New method below
 
-			var result = new Dictionary<string, List<PermissionViewModel>>();
+			var result = new Dictionary<string, List<PermissionDTO>>();
 			foreach (var group in groupedPermissions)
 			{
-				result[group.Key] = group.Value.Select(p => new PermissionViewModel
+				result[group.Key] = group.Value.Select(p => new PermissionDTO
 				{
-					Value = p,
+					Action = p,
 					IsAssigned = assignedPermissions.Contains(p)
 				}).ToList();
 			}
@@ -117,7 +113,7 @@ namespace HotelApp.Application.Services.RoleService
 			{
 				Id = roleId,
 				RoleName = role.Name,
-				IsBasic = role.IsBasic,
+				IsBasic = role.IsSystem,
 				PermissionGroups = result
 			};
 		}
@@ -132,7 +128,7 @@ namespace HotelApp.Application.Services.RoleService
             }
 
             bool IsBasic = await _unitOfWork.Repository<Role>()
-				.IsExistsAsync(r => r.Id == roleId && r.IsBasic);
+				.IsExistsAsync(r => r.Id == roleId && r.IsSystem);
 			if (IsBasic)
 			{
 				return ServiceResponse<object>.ResponseFailure("Can\'t update basic Role.");
@@ -157,14 +153,13 @@ namespace HotelApp.Application.Services.RoleService
 			}
 		}
 
-		// ✅ Edit role 
 		public async Task<ServiceResponse<RoleDTO>> EditRoleAsync(Role role)
 		{
 			var existingRole = await _roleManager.FindByIdAsync(role.Id.ToString());
 			if (existingRole == null)
 				return ServiceResponse<RoleDTO>.ResponseFailure("Role not found");
 
-			if (existingRole.IsBasic)
+			if (existingRole.IsSystem)
 				return ServiceResponse<RoleDTO>.ResponseFailure($"{role.Name} cannot be edited");
 
 			existingRole.Name = role.Name;
@@ -179,14 +174,13 @@ namespace HotelApp.Application.Services.RoleService
 			return ServiceResponse<RoleDTO>.ResponseSuccess("Role updated successfully");
 		}
 
-		// ✅ Delete role
 		public async Task<ServiceResponse<Role>> DeleteRoleAsync(int roleId)
 		{
 			var role = await _roleManager.FindByIdAsync(roleId.ToString());
 			if (role == null)
 				return ServiceResponse<Role>.ResponseFailure("Role not found");
 
-			if (role.IsBasic)
+			if (role.IsSystem)
 				return ServiceResponse<Role>.ResponseFailure($"{role.Name} cannot be deleted");
 
 			var users = await _userManager.GetUsersInRoleAsync(role.Name);

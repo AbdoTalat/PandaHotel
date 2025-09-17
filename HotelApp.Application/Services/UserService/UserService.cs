@@ -51,6 +51,13 @@ namespace HotelApp.Application.Services.UserService
 		{
 			return await _userManager.FindByIdAsync(Id.ToString());
 		}
+		public async Task<IEnumerable<DropDownDTO<string>>> GetUserBranchesByUserIdAsync(int Id)
+		{
+			var userBranches = await _unitOfWork.Repository<UserBranch>()
+				.GetAllAsDtoAsync<DropDownDTO<string>>(ub => ub.UserId == Id, SkipBranchFilter: true);
+
+			return userBranches;
+		}
 		public async Task<ServiceResponse<EditUserDTO>> GetUserToEditByIdAsync(int Id)
 		{
 			var user = await _userManager.FindByIdAsync(Id.ToString());
@@ -84,7 +91,7 @@ namespace HotelApp.Application.Services.UserService
 				UserName = userDTO.UserName,
 				Email = userDTO.Email,
 				DefaultBranchId = userDTO.DefaultBranchId,
-				isActive = userDTO.IsActive,
+				IsActive = userDTO.IsActive,
 				CreatedById = _currentUserService.UserId,
 				CreatedDate = DateTime.UtcNow
 			};			
@@ -206,13 +213,19 @@ namespace HotelApp.Application.Services.UserService
 				return ServiceResponse<string>.ResponseFailure("you are not Authenticated.");
 			}
 			user.DefaultBranchId = BranchId;
-
-			var result = await _userManager.UpdateAsync(user);
-			if (result.Succeeded)
+			try
 			{
-				return ServiceResponse<string>.ResponseSuccess("User Default branch Updated successfully.");
+				var result = await _userManager.UpdateAsync(user);
+				if (result.Succeeded)
+				{
+					return ServiceResponse<string>.ResponseSuccess("User Default branch Updated successfully.");
+				}	
+				return ServiceResponse<string>.ResponseFailure("Somthing went wrong!.");
 			}
-			return ServiceResponse<string>.ResponseFailure("Somthing went wrong!.");
+			catch (Exception ex)
+			{
+				return ServiceResponse<string>.ResponseFailure(ex.Message);
+			}
 		}
 
 	}
