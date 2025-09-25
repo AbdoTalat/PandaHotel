@@ -11,6 +11,9 @@ namespace HotelApp.Application.IRepositories
 	{
 		Task<TodayReservationsSummaryDto> GetTodayReservationsSummaryAsync();
         Task<RoomAvailabilityDto> GetAvailabilityRoomsAsync(int? roomTypeId = null);
+        Task<GuestDashboardDTO> GetGuestDashboardStatsAsync();
+		Task<RoomStatusDashboardDTO> GetRoomStatusDahsboardAsync();
+		Task<List<RoomOccupancyDashboardDTO>> GetRoomOccupancyDashboardAsync();
 
-    }
+	}
 }

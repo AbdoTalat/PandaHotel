@@ -36,29 +36,29 @@ namespace HotelApp.Infrastructure.Repositories
 			return guest;
 		}
 
-        public async Task<List<GetSearchedGuestsDTO>> SearchGuestsAsync(string term)
+        public async Task<List<GetSearchedGuestsDTO>> SearchGuestsAsync(string input)
         {
-            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 4)
+            if (string.IsNullOrWhiteSpace(input) || input.Trim().Length < 4)
                 return new List<GetSearchedGuestsDTO>();
 
-            term = term.Trim();
+			input = input.Trim();
 
             var query = _context.Guests.AsQueryable();
 
-            bool isEmail = term.Contains("@") && term.Contains(".");
-            bool isPhone = term.All(char.IsDigit) || term.StartsWith("+");
+            bool isEmail = input.Contains("@") && input.Contains(".");
+            bool isPhone = input.All(char.IsDigit) || input.StartsWith("+");
 
             if (isEmail)
             {
-                query = query.Where(g => g.Email.StartsWith(term));
+                query = query.Where(g => g.Email.StartsWith(input));
             }
             else if (isPhone)
             {
-                query = query.Where(g => g.Phone.StartsWith(term));
+                query = query.Where(g => g.Phone.StartsWith(input));
             }
             else
             {
-                query = query.Where(g => g.FullName.StartsWith(term));
+                query = query.Where(g => g.FullName.StartsWith(input));
             }
 
             var results = await query

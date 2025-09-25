@@ -49,7 +49,6 @@
 
 <!-- Content area -->
 <div class="content ">
-	<!-- Basic datatable -->
 	<div class="panel panel-flat ">
 		<div class="panel-heading">
 			<h5 class="panel-title">Room Statuses</h5>
@@ -112,7 +111,7 @@
 							{
 								<a data-title="Edit Room Status" data-url="/RoomStatus/EditRoomStatus/@item.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
 							}
-							@if (User.HasClaim("permission", "RoomStatus.Delete") && !item.IsActive)
+							@if (User.HasClaim("permission", "RoomStatus.Delete") && !item.IsActive && !item.IsSystem)
 							{
 								<a data-url="/RoomStatus/DeleteRoomStatus/@item.Id"
 								   class="text-danger-600 btn-delete">
@@ -125,7 +124,6 @@
 			</tbody>
 		</table>
 	</div>
-	<!-- /basic datatable -->
 </div>
 <!-- /content area -->
 

@@ -16,7 +16,7 @@ using HotelApp.Application.DTOs.Branches;
 
 namespace HotelApp.UI.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly IBranchService _branchService;
         private readonly IUserService _userService;
@@ -155,7 +155,7 @@ namespace HotelApp.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangeDefaultBranch([FromBody] int BranchId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = UserId;
             var user = await _userService.GetUserbyId(userId);
 
             var result = await _userService.UpdateDefaultBranchId(BranchId, userId);

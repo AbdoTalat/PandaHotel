@@ -82,7 +82,7 @@ namespace HotelApp.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetGuestJson(int id)
         {
-            var guest = await _guestService.GetGuestByIdAsync(id);
+            var guest = await _guestService.GetGuestByIdWithoutBranchFilterAsync(id);
 
             if (guest == null)
             {
@@ -108,7 +108,7 @@ namespace HotelApp.UI.Controllers
         [HttpGet]
         public IActionResult LoadGuestForm()
         {
-            return PartialView("_ManageGuestsPartial");
+            return PartialView("_GuestInformationPartial");
         }
 
 

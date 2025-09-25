@@ -12,6 +12,7 @@ namespace HotelApp.Application.Services.GuestService
 	{
 		Task<IEnumerable<GetAllGuestsDTO>> GetAllGuestsAsync();
 		Task<GetGuestByIdDTO?> GetGuestByIdAsync(int Id);
+		Task<GetGuestByIdDTO> GetGuestByIdWithoutBranchFilterAsync(int Id);
 		Task<GuestDTO?> GetGuestToEditByIdAsync(int Id);
         Task<ServiceResponse<GuestDTO>> AddGuestAsync(GuestDTO guestDTO);
 		Task<ServiceResponse<GuestDTO>> EditGuestAsync(GuestDTO guestDTO);

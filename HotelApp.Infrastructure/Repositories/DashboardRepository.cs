@@ -1,6 +1,8 @@
 ﻿using HotelApp.Application.DTOs.Dashboard;
 using HotelApp.Application.IRepositories;
+using HotelApp.Domain;
 using HotelApp.Domain.Entities;
+using HotelApp.Domain.Enums;
 using HotelApp.Helper;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -22,7 +25,8 @@ namespace HotelApp.Infrastructure.Repositories
 		}
 		public async Task<TodayReservationsSummaryDto> GetTodayReservationsSummaryAsync()
 		{
-			var today = DateTime.UtcNow.Date;
+			var today = GetEgyptDateTime();
+			var tomorrow = today.AddDays(1);
 
 			var Query = _context.Reservations
 				.AsNoTracking()
@@ -31,31 +35,34 @@ namespace HotelApp.Infrastructure.Repositories
 
 			var summary = new TodayReservationsSummaryDto
 			{
-				// Guests expected to check-in today 
 				Arrivals = await Query
-					.Where(r => r.CheckInDate.Date == today && r.IsConfirmed && !r.IsCancelled)
+					.Where(r => r.CheckInDate.Date == today && r.IsConfirmed && !r.IsCancelled && !r.IsCheckedOut && !r.IsCheckedIn)
 					.CountAsync(),
 
-				// Guests expected to check-out today
 				Departures = await Query.Where(r => r.CheckOutDate.Date == today && !r.IsCancelled)
 					.CountAsync(),
 
 				NewBookings = await Query.Where(r => r.CreatedDate.Value.Date == today && !r.IsCancelled)
 					.CountAsync(),
 
-				// Stay overs: already checked-in before today & not checking out today
 				StayOvers = await Query.Where(r => 
-					r.CheckInDate.Date < today && 
+					r.CheckInDate.Date <= today && 
 					r.CheckOutDate.Date > today &&
-					r.IsCheckedIn && !r.IsCancelled)
+					r.IsCheckedIn && !r.IsCancelled && !r.IsCheckedOut)
 					.CountAsync(),
 
-				// Cancelled reservations today
 				Cancellations = await Query.Where(r => 
 					r.IsCancelled &&
 				    r.LastModifiedDate != null &&
 					r.LastModifiedDate.Value.Date == today)
-					.CountAsync()
+					.CountAsync(),
+
+				NoShow = await Query.Where(r =>
+				!r.IsCancelled &&
+				!r.IsCheckedIn &&
+				r.IsConfirmed &&
+				r.CheckInDate.Date >= today && r.CheckInDate.Date < tomorrow)
+				.CountAsync()
 			};
 
 			return summary;
@@ -107,7 +114,7 @@ namespace HotelApp.Infrastructure.Repositories
 
 		public async Task<RoomAvailabilityDto> GetAvailabilityRoomsAsync(int? roomTypeId)
 		{
-			var today = DateTime.UtcNow.Date;
+			var today = GetEgyptDateTime();
 			var next7Days = Enumerable.Range(0, 7).Select(i => today.AddDays(i)).ToList();
 			var windowEnd = today.AddDays(7); 
 
@@ -171,6 +178,144 @@ namespace HotelApp.Infrastructure.Repositories
 				RoomTypeName = roomTypeName,
 				Availability = availability
 			};
+		}
+
+		public async Task<GuestDashboardDTO> GetGuestDashboardStatsAsync()
+		{
+			var today = GetEgyptDateTime();
+
+			var reservationsQuery = _context.Reservations
+				.AsNoTracking()
+				.BranchFilter()
+				.Where(r => !r.IsCancelled);
+
+			var reservationStats = await reservationsQuery
+				.Select(r => new
+				{
+					r.Id,
+					r.IsConfirmed,
+					r.CheckInDate,
+					r.CheckOutDate,
+					r.IsCheckedIn,
+					r.IsCheckedOut,
+					Guests = r.guestReservations.Select(gr => gr.GuestId)
+				})
+				.ToListAsync();
+
+			var checkedInGuests = reservationStats
+				.Where(r => r.IsCheckedIn && !r.IsCheckedOut
+							&& r.CheckInDate.Date <= today
+							&& r.CheckOutDate.Date >= today)
+				.SelectMany(r => r.Guests)
+				.Count();
+
+			var todayArrivals = reservationStats
+				.Where(r => r.CheckInDate.Date == today
+							&& !r.IsCheckedIn
+							&& r.IsConfirmed)
+				.SelectMany(r => r.Guests)
+				.Count();
+
+			var todayDepartures = reservationStats
+				.Where(r => r.CheckOutDate.Date == today
+							&& r.IsCheckedIn
+							&& !r.IsCheckedOut)
+				.SelectMany(r => r.Guests)
+				.Count();
+
+			var totalGuests = await _context.Guests
+				.AsNoTracking()
+				.BranchFilter()
+				.CountAsync();
+
+			var returningGuestsCount = reservationStats
+				.SelectMany(r => r.Guests)
+				.GroupBy(g => g)
+				.Count(g => g.Count() > 1);
+
+			double returningPercentage = 0;
+			if (totalGuests > 0)
+				returningPercentage = Math.Round((double)returningGuestsCount / totalGuests * 100, 2);
+
+			return new GuestDashboardDTO
+			{
+				CurrentCheckedIn = checkedInGuests,
+				TodayArrivals = todayArrivals,
+				TodayDepartures = todayDepartures,
+				ReturningGuestsPercentage = returningPercentage,
+			};
+		}
+
+		public async Task<RoomStatusDashboardDTO> GetRoomStatusDahsboardAsync()
+		{
+			var query = _context.Rooms
+				.AsNoTracking()
+				.BranchFilter();
+
+			var grouped = await query
+				.GroupBy(r => r.RoomStatus.Code)
+				.Select(g => new { Status = g.Key, Count = g.Count() })
+				.ToListAsync();
+
+			var total = grouped.Sum(x => x.Count);
+			var available = grouped.FirstOrDefault(x => x.Status == RoomStatusEnum.Available)?.Count ?? 0;
+			var occupied = grouped.FirstOrDefault(x => x.Status == RoomStatusEnum.Occupied)?.Count ?? 0;
+			var outOfService = grouped.FirstOrDefault(x => x.Status == RoomStatusEnum.Maintenance)?.Count ?? 0;
+
+			return new RoomStatusDashboardDTO
+			{
+				Total = total,
+				Available = available,
+				Occupied = occupied,
+				OutOfService = outOfService
+			};
+		}
+		public async Task<List<RoomOccupancyDashboardDTO>> GetRoomOccupancyDashboardAsync()
+		{
+			var today = GetEgyptDateTime();
+			var next7Days = Enumerable.Range(0, 7).Select(d => today.AddDays(d)).ToList();
+
+            var totalRooms = await _context.Rooms
+				.AsNoTracking()
+				.BranchFilter()
+				.CountAsync(); 
+
+            var reservedRooms = await _context.Reservations 
+				.Include(r => r.ReservationsRooms)
+				.AsNoTracking()
+				.BranchFilter()
+				.Where(r => !r.IsCancelled && r.IsConfirmed)
+				.SelectMany(r => r.ReservationsRooms)
+				.Where(rr => rr.StartDate <= next7Days.Last() && rr.EndDate > today)
+				.Select(rr => new
+				{
+					rr.RoomId,
+					rr.StartDate,
+					rr.EndDate,
+				}).ToListAsync();
+
+			var result = next7Days.Select(date => new RoomOccupancyDashboardDTO
+			{
+				Date = date,
+				Label = date.ToString("ddd dd MMM"),
+				OccupiedRooms = reservedRooms
+					.Where(rr => rr.StartDate <= date && rr.EndDate > date)
+					.Select(rr => rr.RoomId)
+					.Distinct()
+					.Count(),
+                TotalRooms = totalRooms 
+            }).ToList();
+
+			return result;
+		}
+
+
+		private DateTime GetEgyptDateTime()
+		{
+			var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+			var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone).Date;
+
+			return today;
 		}
 	}
 }

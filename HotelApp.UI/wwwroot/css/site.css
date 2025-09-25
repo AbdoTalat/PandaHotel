@@ -105,8 +105,116 @@
     opacity: 1;
 }
 
+.btn-xxs {
+    padding: 2px 4px ; /* shrink padding */
+    font-size: 12px ; /* smaller icon/text */
+    line-height: 1 ; /* tighter height */
+}
 
 
+/* Base style */
+#toast-container > .toast {
+    background: #fff !important;
+    color: #333 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 12px 15px 12px 50px; /* leave space for icon */
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+
+/* Title + message */
+#toast-container .toast-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+#toast-container .toast-message {
+    font-size: 13px;
+}
+
+/* Icon container (circle) */
+#toast-container .toast:before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Font Awesome 5 Free"; /* or your icon font */
+    font-weight: 900;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Success */
+
+#toast-container .toast-success:before {
+    content: "\f00c"; /* fa-check */
+    background: #28a745;
+}
+
+/* Error */
+
+#toast-container .toast-error:before {
+    content: "\f00d"; /* fa-times */
+    background: #dc3545;
+}
+
+/* Warning */
+
+#toast-container .toast-warning:before {
+    content: "\f071"; /* fa-exclamation-triangle */
+    background: #ffc107;
+    color: #000; /* dark icon on yellow */
+}
+
+/* Info */
+
+#toast-container .toast-info:before {
+    content: "\f129"; /* fa-info-circle */
+    background: #17a2b8;
+}
 
 
+/* Default progress bar */
+#toast-container > .toast .toast-progress {
+    height: 4px;
+    opacity: 1; /* always visible */
+    bottom: 0;
+}
 
+/* Success */
+#toast-container > .toast-success .toast-progress {
+    background-color: #28a745 !important; /* green */
+}
+
+/* Error */
+#toast-container > .toast-error .toast-progress {
+    background-color: #dc3545 !important; /* red */
+}
+
+/* Warning */
+#toast-container > .toast-warning .toast-progress {
+    background-color: #ffc107 !important; /* yellow */
+}
+
+/* Info */
+#toast-container > .toast-info .toast-progress {
+    background-color: #17a2b8 !important; /* blue */
+}
+
+/* Make all toastr notifications solid white */
+/*#toast-container > .toast {
+    opacity: 1 !important;*/ /* remove transparency */
+    /*background-color: #ffffff !important;*/ /* solid white */
+    /*color: #333 !important;*/ /* text color (dark for readability) */
+    /*border: 1px solid #ddd;*/ /* optional subtle border */
+    /*box-shadow: 0 2px 8px rgba(0,0,0,0.15);*/ /* optional shadow */
+/*}*/

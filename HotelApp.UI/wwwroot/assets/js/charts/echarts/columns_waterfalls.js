@@ -41,12 +41,12 @@ $(function () {
             // ------------------------------
 
             var basic_columns = ec.init(document.getElementById('basic_columns'), limitless);
-            var stacked_columns = ec.init(document.getElementById('stacked_columns'), limitless);
-            var stacked_clustered_columns = ec.init(document.getElementById('stacked_clustered_columns'), limitless);
-            var thermometer_columns = ec.init(document.getElementById('thermometer_columns'), limitless);
-            var compositive_waterfall = ec.init(document.getElementById('compositive_waterfall'), limitless);
-            var change_waterfall = ec.init(document.getElementById('change_waterfall'), limitless);
-            var columns_timeline = ec.init(document.getElementById('columns_timeline'), limitless);
+            //var stacked_columns = ec.init(document.getElementById('stacked_columns'), limitless);
+            //var stacked_clustered_columns = ec.init(document.getElementById('stacked_clustered_columns'), limitless);
+            //var thermometer_columns = ec.init(document.getElementById('thermometer_columns'), limitless);
+            //var compositive_waterfall = ec.init(document.getElementById('compositive_waterfall'), limitless);
+            //var change_waterfall = ec.init(document.getElementById('change_waterfall'), limitless);
+            //var columns_timeline = ec.init(document.getElementById('columns_timeline'), limitless);
 
 
 

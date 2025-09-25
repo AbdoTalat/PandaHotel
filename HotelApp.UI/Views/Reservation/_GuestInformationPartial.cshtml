@@ -142,7 +142,9 @@
                 <h6 class="panel-title text-grey-400">Primary Guest</h6>
 
                 <div class="heading-elements">
-                    <a><i class="icon-pencil"></i> Change</a>
+                    <a id="editPrimaryBtn" style="display:none;">
+                        <i class="icon-pencil"></i> Edit
+                    </a>
                 </div>
             </div>
 
@@ -165,8 +167,6 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -181,15 +181,10 @@
     </div>
 
 </div>
-<script>
-    $(document).ready(function () {
-        loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
-    });
-</script>
+
 <script>
 	$(document).ready(function () {
 
-		// Initialize Select2 for Smart Guest Search
 		$('#guestSearchSelect').select2({
 			placeholder: "Search guest by name, email, or phone",
 			minimumInputLength: 4, // ✅ Enforce 4 characters before search
@@ -216,7 +211,6 @@
 			}
 		});
 
-		// Handle guest selection from Select2
 		$('#guestSearchSelect').on('select2:select', function (e) {
 			var guestId = e.params.data.id;
 
@@ -234,7 +228,7 @@
 						$('#Address').val(guest.address);
 						$('#proofTypeSelect').val(guest.proofTypeId).trigger('change'); // ✅ FIXED
 						$('#ProofNumber').val(guest.proofNumber);
-						$('#BranchId').val(guest.branchId);
+						$('#BranchId').val('@BranchId');
 
 						if (guest.dateOfBirth) {
 							$('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
@@ -250,129 +244,112 @@
 				});
 			}
 		});
-
 	});
 </script>
 
-
-
 <script>
-    let guestList = [];                // For full guest data to show in UI
-    let reservationGuestList = [];     // For saving GuestId + IsPrimary only
-    let guestCounter = 0;
+	let guestList = [];                // Full guest data
+	let reservationGuestList = [];     // GuestId + IsPrimary only
 
-    $("#guestForm").on("submit", function (e) {
-        e.preventDefault();
+	// ✅ Handle Guest Form Submission
+	$("#guestForm").on("submit", function (e) {
+		e.preventDefault();
 
-        const formData = {
-            id: $("#guestId").val() || 0,
-            isPrimary: $("#isPrimary").is(":checked"),
-            fullName: $("#FullName").val().trim(),
-            email: $("#Email").val() || null,
-            phone: $("#Phone").val() || null,
-            proofTypeId: $("#proofTypeSelect").val() || null,
-            proofNumber: $("#ProofNumber").val() || null,
-            dateOfBirth: $("#DateOfBirth").val() || null,
-            address: $("#Address").val() || null,
-            branchId: $("#BranchId").val() || 0
-        };
+		const formData = {
+			id: $("#guestId").val() || 0,
+			isPrimary: $("#isPrimary").is(":checked"),
+			fullName: $("#FullName").val().trim(),
+			email: $("#Email").val() || null,
+			phone: $("#Phone").val() || null,
+			proofTypeId: $("#proofTypeSelect").val() || null,
+			proofNumber: $("#ProofNumber").val() || null,
+			dateOfBirth: $("#DateOfBirth").val() || null,
+			address: $("#Address").val() || null,
+			branchId: $("#BranchId").val() || 0
+		};
 
-        $.ajax({
-            url: '/Guest/AddOrEditGuest',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function (response) {
-                if (response.success) {
-                    const guestId = response.guestId;
+		$.ajax({
+			url: '/Guest/AddOrEditGuest',
+			method: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(formData),
+			success: function (response) {
+				if (response.success) {
+					const guestId = response.guestId;
 
-                    // ✅ Ensure only one primary guest
-                    if (formData.isPrimary) {
-                        // Remove old primary guest from both lists
-                        reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
-                        guestList = guestList.filter(g => !g.isPrimary);
-                    }
+					// ✅ Ensure only one primary guest
+					if (formData.isPrimary) {
+						reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
+						guestList = guestList.filter(g => !g.isPrimary);
+					}
 
-                    // ✅ Avoid duplicates in both lists
-                    reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
-                    reservationGuestList.push({ guestId: guestId, isPrimary: formData.isPrimary });
+					// ✅ Update lists (no duplicates)
+					reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
+					reservationGuestList.push({ guestId, isPrimary: formData.isPrimary });
 
-                    guestList = guestList.filter(g => g.id !== guestId);
-                    guestList.push({ ...formData, id: guestId });
+					guestList = guestList.filter(g => g.id !== guestId);
+					guestList.push({ ...formData, id: guestId });
 
-                    updateGuestTable();
-                    renderGuestList();
+					updateGuestTable();
+					renderGuestList();
 
-                    // ✅ Reset form
-                    $("#guestForm")[0].reset();
-                    $("#guestId").val(0);
-                    $("#isPrimary").prop("checked", false);
-                    $("#proofTypeSelect").val("").trigger("change");
+					resetGuestForm();
+					toastr.success("Guest saved successfully.");
+				} else {
+					$("#guestFormContainer").html(response); // validation error (partial re-render)
+				}
+			},
+			error: function () {
+				Swal.fire("Error", "Failed to save guest. Please try again.", "error");
+			}
+		});
+	});
 
-                    toastr.success("Guest added successfully.");
-                } else {
-                    // ❌ Validation or server error -> re-render partial view
-                    $("#guestFormContainer").html(response);
-                }
-            },
-            error: function () {
-                Swal.fire("Error", "Failed to save guest. Please try again.", "error");
-            }
-        });
-    });
-
-
-
-
-
-
-
-
-
-
-
-
+	// ✅ Update Guests in Add Tab
 	function updateGuestTable() {
 		const tbody = $('#normalGuestTable tbody');
 		tbody.empty();
 
 		const normalGuests = guestList.filter(g => !g.isPrimary);
-		guestCounter = normalGuests.length;
-		$('#guestCount').text(guestCounter);
+		$('#guestCount').text(normalGuests.length);
 
 		normalGuests.forEach(guest => {
 			tbody.append(`
 					<tr data-guest-id="${guest.id}">
 						<td>${guest.fullName}</td>
-						<td>${guest.email}</td>
-						<td>${guest.phone}</td>
 						<td>
-							<a type="button" class="text-teal-600 editGuestBtn"><i class="icon-pencil7"></i></a>
-							<a type="button" class="text-danger deleteGuestBtn"><i class="icon-trash"></i></a>
+							<a class="text-teal-600 editGuestBtn" data-id="${guest.id}"><i class="icon-pencil7"></i></a>
+							<a class="text-danger deleteGuestBtn" data-id="${guest.id}"><i class="icon-trash"></i></a>
+							<a class="text-primary makePrimaryBtn" data-id="${guest.id}"><i class="icon-user-check"></i></a>
 						</td>
 					</tr>
 				`);
 		});
 
+		// ✅ Primary Guest Panel
 		const primary = guestList.find(g => g.isPrimary);
 		if (primary) {
 			$('#primaryGuestContainer').html(`
-					<div class="row">
-						<div class="col-md-2">
-							<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-						</div>
-						<div class="col-md-10">
-							<h5 class="text-primary">${primary.fullName}</h5>
-							<p>Email: ${primary.email}</p>
-							<p>Phone: ${primary.phone}</p>
-						</div>
-					</div>
-				`);
+			<div class="row">
+				<div class="col-md-2">
+					<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+				</div>
+				<div class="col-md-10">
+					<h5 class="text-primary">${primary.fullName}</h5>
+					<p>Email: ${primary.email || "-"}</p>
+					<p>Phone: ${primary.phone || "-"}</p>
+				</div>
+			</div>
+		`);
+			$('#editPrimaryBtn').show();
 		} else {
 			$('#primaryGuestContainer').html(`<p class="text-muted">No primary guest selected.</p>`);
+			$('#editPrimaryBtn').hide();
 		}
+
 	}
 
+	// ✅ Confirm Tab (read-only, no edit/delete/make primary)
 	function renderGuestList() {
 		const container = $('#guestDisplayList');
 		container.empty();
@@ -381,38 +358,31 @@
 		$('#guestCount').text(guestList.filter(g => !g.isPrimary).length);
 
 		guestList.forEach(guest => {
-			const isPrimary = guest.isPrimary;
-			const badge = isPrimary ? `<span class="label label-primary">Primary Guest</span>` : '';
-
+			const badge = guest.isPrimary ? `<span class="label label-primary">Primary</span>` : '';
 			container.append(`
-					<li class="media">
-						<a href="#" class="media-left">
-							<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-						</a>
-						<div class="media-body">
-							<a href="#" class="media-heading text-default">
-								${guest.fullName} ${badge}
-							</a>
-							<span class="text-size-small text-muted display-block">
-								<span class="status-mark ${isPrimary ? 'border-primary' : 'border-success'} position-left"></span>
-								${guest.email}
-							</span>
-						</div>
-						<div class="media-right media-middle">
-							<ul class="icons-list text-nowrap">
-								<li><a href="#" class="editGuestBtn" data-id="${guest.id}"><i class="icon-pencil7"></i></a></li>
-								<li><a href="#" class="deleteGuestBtn" data-id="${guest.id}"><i class="icon-trash"></i></a></li>
-							</ul>
-						</div>
-					</li>
+						<li class="media" data-id="${guest.id}">
+		<a class="media-left">
+			<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+		</a>
+		<div class="media-body">
+			<span class="media-heading text-default">${guest.fullName} ${badge}</span>
+			<span class="text-size-small text-muted display-block">
+				${guest.email || ""}
+			</span>
+			<span class="text-size-small text-muted display-block">
+				${guest.phone || ""}
+			</span>
+		</div>
+	</li>
+
 				`);
 		});
 	}
 
-	// Edit guest
+	// ✅ Edit Guest
 	$(document).on('click', '.editGuestBtn', function () {
-		var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
-		var guest = guestList.find(g => g.id == guestId);
+		const guestId = $(this).data('id');
+		const guest = guestList.find(g => g.id == guestId);
 		if (!guest) return;
 
 		$('#guestId').val(guest.id);
@@ -420,37 +390,70 @@
 		$('#FullName').val(guest.fullName);
 		$('#Email').val(guest.email);
 		$('#Phone').val(guest.phone);
-		$('#TypeOfProof').val(guest.typeOfProof);
+		$('#proofTypeSelect').val(guest.proofTypeId).trigger('change');
 		$('#ProofNumber').val(guest.proofNumber);
 		$('#DateOfBirth').val(guest.dateOfBirth);
 		$('#Address').val(guest.address);
 	});
 
-	// Delete guest
+	// ✅ Delete Guest
 	$(document).on('click', '.deleteGuestBtn', function () {
-		var guestId = $(this).data('id') || $(this).closest('tr').data('guest-id');
+		const guestId = $(this).data('id');
 
 		guestList = guestList.filter(g => g.id != guestId);
 		reservationGuestList = reservationGuestList.filter(g => g.guestId != guestId);
 
-		updateGuestTable(); // remove from AddGuest tab
-		renderGuestList();  // remove from Confirm tab
+		updateGuestTable();
+		renderGuestList();
 	});
 
-	// Clear guest form manually
-	$('#clearGuestForm').click(function () {
-		$('#guestForm')[0].reset(); // Reset native form
+	// ✅ Make Primary Guest
+	$(document).on('click', '.makePrimaryBtn', function () {
+		const guestId = $(this).data('id');
+		if (!guestId) return;
 
-		// Clear select2 fields
-		$('#proofTypeSelect').val(null).trigger('change');
+		guestList = guestList.map(g => ({ ...g, isPrimary: g.id == guestId }));
+		reservationGuestList = guestList.map(g => ({ guestId: g.id, isPrimary: g.id == guestId }));
 
-		// Reset hidden and checkbox fields
-		$('#guestId').val('');
+		updateGuestTable();
+		renderGuestList();
+
+		toastr.success("Primary guest updated.");
+	});
+
+	$('#editPrimaryBtn').click(function () {
+		const primary = guestList.find(g => g.isPrimary);
+		if (!primary) {
+			Swal.fire("Info", "No primary guest selected yet.", "info");
+			return;
+		}
+
+		// Fill form with primary guest details
+		$('#guestId').val(primary.id);
+		$('#isPrimary').prop('checked', primary.isPrimary);
+		$('#FullName').val(primary.fullName);
+		$('#Email').val(primary.email);
+		$('#Phone').val(primary.phone);
+		$('#proofTypeSelect').val(primary.proofTypeId).trigger('change');
+		$('#ProofNumber').val(primary.proofNumber);
+		$('#DateOfBirth').val(primary.dateOfBirth);
+		$('#Address').val(primary.address);
+
+	});
+
+	// ✅ Reset Guest Form
+	function resetGuestForm() {
+		$('#guestForm')[0].reset();
+		$('#guestId').val(0);
 		$('#isPrimary').prop('checked', false);
+		$('#proofTypeSelect').val("").trigger("change");
+		if ($('#guestForm').data('validator')) {
+			$('#guestForm').validate().resetForm();
+		}
+	}
 
-		// Clear client-side validation
-		$('#guestForm').validate().resetForm();
+	// ✅ Clear button
+	$('#clearGuestForm').click(function () {
+		resetGuestForm();
 	});
 </script>
-
-

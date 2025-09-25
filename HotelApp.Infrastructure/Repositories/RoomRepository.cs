@@ -113,8 +113,6 @@ namespace HotelApp.Infrastructure.Repositories
             if (roomTypeToBookDTOs == null || !roomTypeToBookDTOs.Any())
                 return ServiceResponse<object>.ResponseFailure("No room types selected.");
 
-            //if (selectedRoomIds == null || !selectedRoomIds.Any())
-            //    return ServiceResponse<object>.ResponseFailure("No rooms selected.");
             if (selectedRoomIds == null || !selectedRoomIds.Any())
             {
                 return ServiceResponse<object>.ResponseSuccess("Reservation saved without assigning rooms. Rooms will be assigned later.");

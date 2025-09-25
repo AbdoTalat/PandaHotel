@@ -7,19 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace HotelApp.UI.Controllers
 {
 	[Authorize]
-	public class DashboardController : Controller
+	public class DashboardController : BaseController
 	{
 		private readonly IDashboardService _dashboardService;
+		private readonly IDashboardRepository _dashboardRepository;
 
-		public DashboardController(IDashboardService dashboardService)
+		public DashboardController(IDashboardService dashboardService, IDashboardRepository dashboardRepository)
         {
 			_dashboardService = dashboardService;
+			_dashboardRepository = dashboardRepository;
 		}
         public IActionResult Index()
 		{
 			return View();
 		}
-
 
 		[HttpGet]
 		public async Task<IActionResult> GetTodayReservations()
@@ -45,5 +46,35 @@ namespace HotelApp.UI.Controllers
 
 			return Ok(result);
 		}
-    }
+
+		[HttpGet]
+		public async Task<IActionResult> GetGuestDashboardStats()
+		{
+			var data = await _dashboardRepository.GetGuestDashboardStatsAsync();
+			return Ok(data);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetRoomStatusDahsboard()
+		{
+			var data = await _dashboardRepository.GetRoomStatusDahsboardAsync();
+
+			return Json(data);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetRoomOccupancyDashboard()
+		{
+			var data = await _dashboardRepository.GetRoomOccupancyDashboardAsync();
+			var result = data.Select(d => new
+			{
+				date = d.Date.ToString("o"),
+				label = d.Label,
+				occupiedRooms = d.OccupiedRooms,
+				totalRooms = d.TotalRooms
+			});
+
+			return Json(result);
+		}
+	}
 }

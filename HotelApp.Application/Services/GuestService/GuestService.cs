@@ -39,6 +39,14 @@ namespace HotelApp.Application.Services.GuestService
 
 			return guest;
 		}
+
+		public async Task<GetGuestByIdDTO> GetGuestByIdWithoutBranchFilterAsync(int Id)
+		{
+			var guest = await _unitOfWork.Repository<Guest>()
+				.GetByIdAsDtoAsync<GetGuestByIdDTO>(Id, SkipBranchFilter: true);
+
+			return guest;
+		}
 		public async Task<ServiceResponse<GuestDTO>> AddGuestAsync(GuestDTO guestDTO)
 		{
 			var checkGuestPhoneExist = await _unitOfWork.Repository<Guest>().IsExistsAsync(g => g.Phone.Contains(guestDTO.Phone));
@@ -126,14 +134,14 @@ namespace HotelApp.Application.Services.GuestService
 				}
 				else
 				{
-					var oldGuest = await _unitOfWork.Repository<Guest>().GetByIdAsync(guestDTO.Id);
+					var oldGuest = await _unitOfWork.Repository<Guest>().GetByIdAsync(guestDTO.Id, SkipBranchFilter: true);
 					_mapper.Map(guestDTO, oldGuest);
 					_unitOfWork.Repository<Guest>().Update(oldGuest);
 				}
 				await _unitOfWork.CommitAsync();
 
 				var addedGuest = await _unitOfWork.Repository<Guest>()
-					.GetByIdAsDtoAsync<ReservationGuestDTO>(guest.Id);
+					.GetByIdAsDtoAsync<ReservationGuestDTO>(guest.Id, SkipBranchFilter: true);
 
 				if (addedGuest == null)
 				{

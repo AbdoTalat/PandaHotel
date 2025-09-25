@@ -77,6 +77,12 @@ namespace HotelApp.UI.Controllers
 		}
 
 
+		[HttpGet]
+		public async Task<IActionResult> GetReservationSourcesDropDown()
+		{
+			var result = await _reservationSourceService.GetReservationSourcesDropDownAsync();
 
+			return Json(result);
+		}
 	}
 }

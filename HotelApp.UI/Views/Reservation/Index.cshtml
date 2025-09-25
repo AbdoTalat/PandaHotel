@@ -56,23 +56,23 @@
 <!-- Content area -->
 <div class="content ">
 
-	<!-- Basic datatable -->
 	<div class="panel panel-flat ">
 		<div class="panel-heading">
 			<h5 class="panel-title">Reservations</h5>
+
 			@if (User.HasClaim("permission", "Reservation.Add"))
             {
 			<div class="heading-elements" style=" margin-right:0px">
 				<a asp-action="AddReservation" asp-controller="Reservation" type="button" class="btn bg-teal-400 btn-lg">
-					<i class="icon-plus-circle2" style="font-size:21px; margin-right:5px; margin-top:3px"></i>
+					<i class="icon-plus-circle2" style="font-size:21px;"></i>
 					Add Reservation
 				</a>
 			</div>
 			}
 		</div>
-		<hr class="my-3" style="margin-top:5px">
+		<hr class="my-3" style="margin-top:1px; margin-bottom:2px">
 
-		<div class="panel-heading" style="margin-bottom:40px">
+		<div class="panel-heading" style="margin-bottom:30px">
 			<div class="heading-elements">
 				<ul class="icons-list">
 					<li>
@@ -84,7 +84,7 @@
 			</div>
 		</div>
 
-		<div class="row " style="padding-left:50px; padding-right:50px">
+		<div class="row" style="padding-left:50px; padding-right:50px">
 			<div class="col-md-12">
 				<div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
 					<div class="panel panel-flat">
@@ -132,9 +132,10 @@
 			</div>
 		</div>
 
-		<table class="table datatable-button-html5-basic dataTable" id="MyTable">
+        <table class="table dataTable datatable-button-html5-basic" id="MyTable">
 			<thead>
-				<tr class="border-double">
+                <tr class="border-double active">
+					<th></th>
 					<th>ID#</th>
 					<th>Primary Guest</th>
 					<th>Check In Date</th>
@@ -143,7 +144,7 @@
                     <th>People</th>
                     <th>Source</th>
 					<th>Status</th>
-					<th>Created By</th>
+					@* <th>Created By</th> *@
 					<th>Actions</th>
 				</tr>
 			</thead>
@@ -151,6 +152,7 @@
 				@foreach (var item in Model)
 				{
 					<tr id="item-@item.Id">
+                        <td><input type="checkbox" class="styled" /></td>
 						<td><a>@item.Id</a></td>
 						<td>@item.PrimaryGuestName</td>
 						<td>@item.CheckInDate.ToShortDateString()</td>
@@ -159,130 +161,118 @@
                         <td>@item.NumberOfPeople</td>
                         <td>@item.ReservationSource</td>
 						<td>@item.Status</td>
-						<td>@item.CreatedBy</td>
-						<td>
-							@if (User.HasClaim("permission", "Reservation.View"))
-							{
-								<a><i class="icon-info22" style="font-size:20px; margin-right:8px"></i>  </a>
-							}
-							@if (User.HasClaim("permission", "Reservation.Edit"))
-							{
-								<a data-title="Edit Resrvation" data-url="" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
-							}
-							@if (User.HasClaim("permission", "Reservation.Delete"))
-							{
-                                <a data-url="/Reservation/DeleteReservation/@item.Id"
-                                   class="text-danger-600 btn-delete">
-                                    <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
-                                </a>
-                            }
-							
+
+					@* 	<td>@item.CreatedBy</td> *@
+						<td class="text-center">
+							<ul class="icons-list">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="icon-menu9"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										@if (User.HasClaim("permission", "Reservation.View"))
+										{
+                                            <li><a href="#" class="btnEditOpenModal"><i class="icon-info22"></i> View</a></li>
+                                        }
+										@if (User.HasClaim("permission", "Reservation.Edit"))
+										{
+                                            <li><a href="#"><i class="icon-pencil7"></i> Edit</a></li>
+                                        }
+										@if (User.HasClaim("permission", "Reservation.Delete"))
+										{
+                                            <li><a href="#" class="btn-delete"><i class="icon-trash"></i> Delete</a></li>
+                                        }
+									</ul>
+								</li>
+							</ul>
 						</td>
 					</tr>
 				}
 			</tbody>
 		</table>
 	</div>
-	<!-- /basic datatable -->
 </div>
 <!-- /content area -->
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
+        $(function () {
+            // Init DataTable (keep already-rendered rows from Razor)
             let dataTable = $("#MyTable").DataTable();
 
-            function loadReservations(checkInDate = "", checkOutDate = "", primaryGuestName = "", isRefresh = false) {
-                $.ajax({
-                    url: '/Reservation/GetReservationJson',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        checkInDate: checkInDate,
-                        checkOutDate: checkOutDate,
-                        primaryGuestName: primaryGuestName
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            let reservations = response.data;
-                            dataTable.clear();
+            // Load Reservations via Ajax (used for filters/refresh)
+            function loadReservations(filters = {}, isRefresh = false) {
+                $.getJSON("/Reservation/GetReservationJson", filters, function (response) {
+                    if (response.success) {
+                        let items = response.data;
+                        dataTable.clear();
 
-                            $.each(reservations, function (index, item) {
-                                let actionButtons = getActionButtons(item);
+                        $.each(items, function (index, item) {
+                            dataTable.row.add([
+                                '<input type="checkbox" class="styled"/>',
+                                `<a>${item.id}</a>`,
+                                item.primaryGuestName,
+                                formatDate(item.checkInDate),
+                                formatDate(item.checkOutDate),
+                                item.numberOfNights,
+                                item.numberOfPeople,
+                                item.reservationSource,
+                                item.status,
+                                getActionButtons(item)
+                            ]);
+                        });
 
-                                dataTable.row.add([
-                                    item.id,
-                                    item.primaryGuestName,
-                                    formatDate(item.checkInDate),
-                                    formatDate(item.checkOutDate),
-                                    item.numberOfNights,
-                                    item.numberOfPeople,
-                                    item.reservationSource,
-                                    item.status,
-                                    item.createdBy,
-                                    actionButtons
-                                ]);
-                            });
-
-                            dataTable.draw();
-                        } else {
-                            console.error("Failed to load reservations.");
-                        }
-                    },
-                    error: function () {
-                        console.error("Error while fetching reservations.");
+                        dataTable.draw();
+                    } else {
+                        console.error("Failed to load reservations");
                     }
+                }).fail(function () {
+                    console.error("Error fetching reservations");
                 });
             }
 
-            // Filter submit
-            $("#reservationFilterForm").submit(function (e) {
-                e.preventDefault();
-                let checkInDate = $("input[name='checkInDate']").val();
-                let checkOutDate = $("input[name='checkOutDate']").val();
-                let primaryGuestName = $("input[name='primaryGuestName']").val();
-
-                loadReservations(checkInDate, checkOutDate, primaryGuestName, false);
-            });
-
-            // Reset button
-            $("#refreshReservationsBtn").click(function () {
-                $("#reservationFilterForm")[0].reset();
-                loadReservations("", "", "", true);
-            });
-
-            // Helpers
+            // Format date
             function formatDate(dateStr) {
                 if (!dateStr) return "";
                 let date = new Date(dateStr);
                 return date.toLocaleDateString();
             }
 
+            // Action buttons per row
             function getActionButtons(item) {
                 let canView = @canView.ToString().ToLower();
                 let canEdit = @canEdit.ToString().ToLower();
                 let canDelete = @canDelete.ToString().ToLower();
 
-                return (canView ? `<a data-title="Reservation Details" data-url="/Reservation/Details/${item.id}" class="btnEditOpenModal"><i class="icon-info22" style="font-size:20px; margin-right:8px"></i></a>` : '') +
-                    (canEdit ? `<a href="/Reservation/Edit/${item.id}" class="text-teal-600"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i></a>` : '') +
-                    (canDelete ? `<a data-id="${item.id}" class="text-danger-600 btn-delete"><i class="icon-trash" style="font-size:20px;margin-right:8px"></i></a>` : '');
+                return `
+                    <ul class="icons-list">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="icon-menu9"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                ${canView ? `<li><a data-title="Reservation Details" data-url="/Reservation/Details/${item.id}" class="btnEditOpenModal"><i class="icon-info22"></i> View</a></li>` : ''}
+                                ${canEdit ? `<li><a href="/Reservation/Edit/${item.id}"><i class="icon-pencil7"></i> Edit</a></li>` : ''}
+                                ${canDelete ? `<li><a data-id="${item.id}" class="btn-delete"><i class="icon-trash"></i> Delete</a></li>` : ''}
+                            </ul>
+                        </li>
+                    </ul>`;
             }
+
+            // Filters (Ajax refresh)
+            $("#reservationFilterForm").submit(function (e) {
+                e.preventDefault();
+                let filters = {};
+                $(this).serializeArray().forEach(x => filters[x.name] = x.value);
+                loadReservations(filters, false);
+            });
+
+            // Refresh (Ajax reload)
+            $("#refreshReservationsBtn").click(function () {
+                $("#reservationFilterForm")[0].reset();
+                loadReservations({}, true);
+            });
         });
     </script>
-    @if (TempData["RoomsPercent"] != null)
-    {
-        <script>
-            $(function () {
-                toastr.warning("@TempData["RoomsPercent"]");
-            });
-        </script>
-    }
-   @*  @if (TempData["Success"] != null)
-    {
-        <script>
-            $(function () {
-                toastr.success("@TempData["Success"]");
-            });
-        </script>
-    } *@
 }

@@ -13,5 +13,6 @@ namespace HotelApp.Application.DTOs.RoomStatus
 		public string Description { get; set; }
 		public string Color { get; set; }
 		public bool IsActive { get; set; }
+		public bool IsSystem { get; set; }
 	}
 }

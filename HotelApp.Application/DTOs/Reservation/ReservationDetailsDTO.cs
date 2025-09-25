@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.DTOs.Reservation
 {
-	public class BookRoomDTO
+	public class ReservationDetailsDTO
 	{
 		[RequiredEx]
 		public DateTime CheckInDate { get; set; }

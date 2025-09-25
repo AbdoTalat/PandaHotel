@@ -6,6 +6,7 @@ using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
+using HotelApp.Domain.Enums;
 
 namespace HotelApp.Application.Services.ReservationService
 {
@@ -99,7 +100,7 @@ namespace HotelApp.Application.Services.ReservationService
 					}
 					else if(dto.confirmDTO.IsConfirmed || dto.confirmDTO.IsPending && !dto.confirmDTO.IsCheckedIn)
 					{
-						var roomStatus = await _unitOfWork.Repository<RoomStatus>().FirstOrDefaultAsDtoAsync<DropDownDTO<string>>(rs => rs.Name == "Reserved");
+						var roomStatus = await _unitOfWork.Repository<RoomStatus>().FirstOrDefaultAsync(rs => rs.Code == RoomStatusEnum.Reserved, SkipBranchFilter: true);
 						foreach (var room in rooms)
 						{
 							room.RoomStatusId = roomStatus.Id;

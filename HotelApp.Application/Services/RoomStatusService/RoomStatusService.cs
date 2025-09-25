@@ -80,8 +80,7 @@ namespace HotelApp.Application.Services.RoomStatusService
 			int? branchId = BranchContext.CurrentBranchId;
 
 			var OldRoomStatus = await _unitOfWork.Repository<RoomStatus>()
-			.GetByIdAsync(dto.Id,
-				rs => rs.IsSystem || rs.BranchId == branchId,SkipBranchFilter: true);
+			.GetByIdAsync(dto.Id, rs => rs.IsSystem || rs.BranchId == branchId, SkipBranchFilter: true);
 
             if(OldRoomStatus == null)
             {
@@ -90,6 +89,12 @@ namespace HotelApp.Application.Services.RoomStatusService
 
             try
             {
+                if (OldRoomStatus.IsSystem)
+                {
+                    dto.IsActive = OldRoomStatus.IsActive;
+                    dto.IsReservable = OldRoomStatus.IsReservable;
+                    dto.IsSystem = OldRoomStatus.IsSystem;
+                }
                 _mapper.Map(dto, OldRoomStatus);
 
                 _unitOfWork.Repository<RoomStatus>().Update(OldRoomStatus);

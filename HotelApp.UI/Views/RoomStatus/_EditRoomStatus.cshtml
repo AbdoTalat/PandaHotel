@@ -6,7 +6,6 @@
         <div class="panel-body">
             <div class="content">
                 <fieldset>
-
                     <div class="row">
                         <div class="col-md-12">
                             <label>Name<span class="text-danger">*</span></label>
@@ -42,14 +41,28 @@
 
                                         <div class="checkbox">
                                             <label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-                                                <input type="checkbox" asp-for="IsActive" class="switchery">
-                                                Is Active
+                                                @if (Model.IsSystem)
+                                                {
+                                                    <input type="checkbox" asp-for="IsActive" class="switchery" disabled />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" asp-for="IsActive" class="switchery" />
+                                                }
+                                                Active
                                             </label>
                                         </div>
                                         <div class="checkbox">
                                             <label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-                                                <input type="checkbox" asp-for="IsReservable" class="switchery">
-                                                Is Reservable
+                                                @if (Model.IsSystem)
+                                                {
+                                                    <input type="checkbox" asp-for="IsReservable" class="switchery" disabled="disabled">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" asp-for="IsReservable" class="switchery">
+                                                }
+                                                Reservable
                                             </label>
                                         </div>
 
@@ -69,3 +82,11 @@
         <button type="submit" class="btn bg-teal-400 btn-lg"><i class="icon-checkmark4"></i> Save</button>
     </div>
 </form>
+
+<script>
+    var elems = Array.prototype.slice.call(document.querySelectorAll('.switchery'));
+    elems.forEach(function (html) {
+        new Switchery(html, { color: '#4CAF50', size: 'small' });
+    });
+</script>
+@await Html.PartialAsync("_ValidationScriptsPartial")

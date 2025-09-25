@@ -40,14 +40,12 @@ namespace HotelApp.Application.Services.RateService
 
 			return rate;
 		}
-
 		public async Task<IEnumerable<GetRatesForReservationResponseDTO>> GetRatesForReservationAsync(RatesForReservationRequestDTO model)
 		{
 			var rates = await _rateRepository.GetRatesForReservationAsync(model);
 
 			return rates;
 		}
-
         public async Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId, int BranchId)
 		{
 			var rateDetails = await _unitOfWork.Repository<RoomTypeRate>()
@@ -60,6 +58,7 @@ namespace HotelApp.Application.Services.RateService
         {
             try
             {
+				await _unitOfWork.BeginTransactionAsync();
                 var rate = _mapper.Map<Rate>(rateDTO);
                 await _unitOfWork.Repository<Rate>().AddNewAsync(rate);
 				await _unitOfWork.CommitAsync();
@@ -68,7 +67,7 @@ namespace HotelApp.Application.Services.RateService
 				if (rateDTO.RoomTypeRates?.Any(r => r.IsSelected) == true)
 				{
 					var roomTypeRates = rateDTO.RoomTypeRates
-						.Where(rtr => rtr.IsSelected) // ✅ only selected ones
+						.Where(rtr => rtr.IsSelected)
 						.Select(rtr => new RoomTypeRate
 						{
 							RateId = rate.Id,
@@ -81,18 +80,18 @@ namespace HotelApp.Application.Services.RateService
 						});
 
 					await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(roomTypeRates);
-					await _unitOfWork.CommitAsync();
+					//await _unitOfWork.CommitAsync();
 				}
-
+				await _unitOfWork.CommitTransactionAsync();
 
 				return ServiceResponse<RateDTO>.ResponseSuccess("Rate added successfully.");
 			}
             catch (Exception ex)
             {
+				await _unitOfWork.RollbackTransactionAsync();
                 return ServiceResponse<RateDTO>.ResponseFailure(ex.Message);
             }
         }
-
 		public async Task<ServiceResponse<RateDTO>> EditRateAsync(RateDTO rateDTO)
 		{
 			var OldRate = await _unitOfWork.Repository<Rate>().GetByIdAsync(rateDTO.Id);
@@ -153,7 +152,6 @@ namespace HotelApp.Application.Services.RateService
 					}
 				}
 
-				// Perform database operations
 				if (newRoomTypeRates.Any())
 				{
 					await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(newRoomTypeRates);

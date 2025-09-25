@@ -13,6 +13,7 @@ namespace HotelApp.Application.DTOs.Dashboard
 		public int NewBookings { get; set; } = 0;
 		public int StayOvers { get; set; } = 0;
 		public int Cancellations { get; set; } = 0;
+		public int NoShow { get; set; } = 0;
 	}
 
 }

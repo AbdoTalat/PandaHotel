@@ -4,14 +4,68 @@
 // Write your JavaScript code.
 
 function showAlert(type, title, text) {
-    Swal.fire({
-        icon: type, // 'success', 'error', 'warning', 'info', 'question'
-        title: title || '',
-        text: text || '',
-        position: 'top',
-        showConfirmButton: true
-    });
+    let iconClass = 'icon-info3';
+    let btnClass = 'btn-info';
+    let barClass = 'border-info';
+    let bgClass = 'bg-info';
+
+    switch (type) {
+        case 'success':
+            iconClass = 'icon-checkmark3';
+            btnClass = 'btn-success';
+            barClass = 'border-success';
+            bgClass = 'bg-success';
+            break;
+        case 'error':
+            iconClass = 'icon-cross2';
+            btnClass = 'btn-danger';
+            barClass = 'border-danger';
+            bgClass = 'bg-danger';
+            break;
+        case 'warning':
+            iconClass = 'icon-warning22';
+            btnClass = 'btn-warning';
+            barClass = 'border-warning';
+            bgClass = 'bg-warning';
+            break;
+        case 'info':
+        default:
+            iconClass = 'icon-info3';
+            btnClass = 'btn-info';
+            barClass = 'border-info';
+            bgClass = 'bg-info';
+            break;
+    }
+
+    // Update icon
+    $('#alertIcon')
+        .removeClass()
+        .addClass(iconClass + ' text-white');
+
+    // Update icon wrapper background
+    $('#alertIconWrapper')
+        .removeClass('bg-info bg-success bg-danger bg-warning')
+        .addClass(bgClass);
+
+    // Update text
+    $('#alertTitle').text(title || '');
+    $('#alertText').text(text || '');
+
+    // Update button
+    $('#alertOkBtn')
+        .removeClass()
+        .addClass('btn ' + btnClass)
+        .text('OK');
+
+    // Update left bar color
+    $('#alertContainer')
+        .removeClass('border-info border-success border-danger border-warning')
+        .addClass(barClass);
+
+    // Show modal
+    $('#customAlertModal').modal('show');
 }
+
 
 
 // Global toastr config (shared for all calls)
@@ -20,7 +74,7 @@ toastr.options = {
     progressBar: true,
     positionClass: "toast-top-right",
     timeOut: 5000,
-    extendedTimeOut: 2000,
+    extendedTimeOut: 3000,
     preventDuplicates: true
 };
 
@@ -160,4 +214,70 @@ $(document).ready(function () {
             }
         });
     });
+});
+
+
+
+$(document).ready(function () {
+
+    // Generic DataTable loader
+    function initEntityTable(config) {
+        let dataTable = $(config.tableSelector).DataTable();
+
+        function loadData(filters = {}, isRefresh = false) {
+            $.ajax({
+                url: config.url,
+                type: 'GET',
+                dataType: 'json',
+                data: filters,
+                success: function (response) {
+                    if (response.success) {
+                        let items = response.data;
+                        dataTable.clear();
+
+                        $.each(items, function (index, item) {
+                            let rowData = config.mapRow(item);
+                            dataTable.row.add(rowData);
+                        });
+
+                        dataTable.draw();
+                    } else {
+                        console.error("Failed to load data from: " + config.url);
+                    }
+                },
+                error: function () {
+                    console.error("Error while fetching data from: " + config.url);
+                }
+            });
+        }
+
+        // Filter submit
+        $(config.filterFormSelector).submit(function (e) {
+            e.preventDefault();
+            let filters = {};
+
+            // collect filters dynamically from inputs inside the form
+            $(this).serializeArray().forEach(x => filters[x.name] = x.value);
+
+            loadData(filters, false);
+        });
+
+        // Reset button
+        if (config.refreshBtnSelector) {
+            $(config.refreshBtnSelector).click(function () {
+                $(config.filterFormSelector)[0].reset();
+                loadData({}, true);
+            });
+        }
+
+        // Initial load
+        //loadData(config.defaultFilters || {}, true);
+
+        return {
+            reload: loadData
+        };
+    }
+
+    // Expose globally
+    window.initEntityTable = initEntityTable;
 });

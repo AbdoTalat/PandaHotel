@@ -7,8 +7,10 @@ using HotelApp.Application.Services.ReservationService;
 using HotelApp.Application.Services.ReservationSourceService;
 using HotelApp.Application.Services.RoomService;
 using HotelApp.Application.Services.RoomTypeService;
+using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -22,17 +24,16 @@ namespace HotelApp.UI.Controllers
 		private readonly IRoomService _roomService;
 		private readonly IGuestService _guestService;
 		private readonly IRoomTypeService _roomTypeService;
-        private readonly IReservationSourceService _reservationSourceService;
 
-        public ReservationController(IReservationService reservationService, IRoomService roomService,
-			IGuestService guestService, IRoomTypeService roomTypeService, IReservationSourceService reservationSourceService)
+		public ReservationController(IReservationService reservationService, IRoomService roomService,
+			IGuestService guestService, IRoomTypeService roomTypeService
+			)
 		{
 			_reservationService = reservationService;
 			_roomService = roomService;
 			_guestService = guestService;
 			_roomTypeService = roomTypeService;
-            _reservationSourceService = reservationSourceService;
-        }
+		}
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
@@ -78,12 +79,11 @@ namespace HotelApp.UI.Controllers
 		public async Task<IActionResult> AddReservation()
 		{
 			ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
-			ViewBag.ReservationSource = await _reservationSourceService.GetReservationSourcesDropDownAsync();
 			return View();
 		}
 
         [HttpPost]
-        public async Task<IActionResult> SaveRoomToBook([FromBody] BookRoomDTO model)
+        public async Task<IActionResult> SaveRoomToBook([FromBody] ReservationDetailsDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -96,7 +96,7 @@ namespace HotelApp.UI.Controllers
 				return Json(new { success = false, message = ValidateSelectedRooms.Message });
             }
 
-            HttpContext.Session.SetString("BookRoomData", JsonConvert.SerializeObject(model));
+            HttpContext.Session.SetString("ReservationDetailsData", JsonConvert.SerializeObject(model));
 
             return Json(new
             {
@@ -110,10 +110,10 @@ namespace HotelApp.UI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
 		{
-            var roomDataJson = HttpContext.Session.GetString("BookRoomData");
+            var roomDataJson = HttpContext.Session.GetString("ReservationDetailsData");
 			var guestsDataJson = HttpContext.Session.GetString("ReservationGuests");
 
-			var roomData = JsonConvert.DeserializeObject<BookRoomDTO>(roomDataJson);
+			var roomData = JsonConvert.DeserializeObject<ReservationDetailsDTO>(roomDataJson);
 			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO?>>(guestsDataJson);
 
 			var reservationDTO = new ReservationDTO
@@ -126,7 +126,7 @@ namespace HotelApp.UI.Controllers
 			var result = await _reservationService.AddReservation(reservationDTO);
             if (result.Success)
             {
-                HttpContext.Session.Remove("BookRoomData");
+                HttpContext.Session.Remove("ReservationDetailsData");
                 HttpContext.Session.Remove("ReservationGuests");
 
 				TempData["Success"] = result.Message;
@@ -148,7 +148,6 @@ namespace HotelApp.UI.Controllers
 			//ViewBag.ReservationComment = yourCommentText; // Optional
 			return PartialView("_ConfirmReservationPartial");
 		}
-
 
 	}
 }

@@ -40,15 +40,16 @@ namespace HotelApp.Infrastructure.Repositories
         {
 			var roomTypes = await _context.RoomTypes
 				.BranchFilter()
-			   .Select(rt => new GetRoomTypesForReservationDTO
-			   {
-				   Id = rt.Id,
-				   Name = rt.Name,
-				   NumOfAvailableRooms = rt.Rooms.Count(r => r.RoomStatusId == (int)RoomStatusEnum.Available),
-				   MaxNumOfAdults = rt.MaxNumOfAdults,
-				   MaxNumOfChildrens = rt.MaxNumOfChildrens
-			   })
-			   .ToListAsync();
+				.Where(rt => rt.IsActive)
+				.Select(rt => new GetRoomTypesForReservationDTO
+				   {
+					   Id = rt.Id,
+					   Name = rt.Name,
+					   NumOfAvailableRooms = rt.Rooms.Count(r => r.RoomStatusId == (int)RoomStatusEnum.Available && r.IsActive),
+					   MaxNumOfAdults = rt.MaxNumOfAdults,
+					   MaxNumOfChildrens = rt.MaxNumOfChildrens
+				   })
+				   .ToListAsync();
 
 			return roomTypes;
         }
