@@ -113,6 +113,10 @@ namespace HotelApp.Infrastructure.DbContext
                 new ReservationSource { Id = 5, Name = "Mobile App", IsActive = true }
                 );
 
+            builder.Entity<CalculationType>().HasData(
+                new CalculationType { Id = 1, Name = "By Alert" }
+                );
+
             builder.Entity<User>().ToTable("Users");
 			builder.Entity<Role>().ToTable("Roles");
 			builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
