@@ -119,14 +119,14 @@ namespace HotelApp.Application.Services.RoleService
 		public async Task<ServiceResponse<object>> AssignPermissionsAsync(int roleId, List<string> newPermissions)
 		{
             bool IsExist = await _unitOfWork.RoleRepository
-                .IsExistsAsync(r => r.Id == roleId);
+                .AnyAsync(r => r.Id == roleId);
             if (!IsExist)
             {
                 return ServiceResponse<object>.ResponseFailure("Role not exist!");
             }
 
             bool IsBasic = await _unitOfWork.RoleRepository
-				.IsExistsAsync(r => r.Id == roleId && r.IsSystem);
+				.AnyAsync(r => r.Id == roleId && r.IsSystem);
 			if (IsBasic)
 			{
 				return ServiceResponse<object>.ResponseFailure("Can\'t update basic Role.");

@@ -2,10 +2,12 @@ using HotelApp.Infrastructure;
 using HotelApp.Helper;
 using System;
 using HotelApp.Infrastructure.Seed;
-using HotelApp.UI.DependencyInjectionExtentions;
 using HotelApp.Infrastructure.Repositories;
 using HotelApp.Application;
 using HotelApp.Application.Validators;
+using HotelApp.UI.Controllers;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HotelApp.PL
 {
@@ -23,10 +25,10 @@ namespace HotelApp.PL
 			builder.Services.AddInfrastructureDI(builder.Configuration);
 			builder.Services.AddApplicationDI(builder.Configuration);
 			builder.Services.AddAuthenticationAndSessionDI();
-			builder.Services.AddAuthorizationPoliciesDIAsync(new PermissionLoader(builder.Environment));
-
+			builder.Services.AddAuthorizationPoliciesDI();
 
 			var app = builder.Build();
+
 
 			using (var scope = app.Services.CreateScope())
 			{
@@ -52,6 +54,7 @@ namespace HotelApp.PL
 
 			app.UseAuthentication();
 			app.UseAuthorization();
+
 
 			app.UseStatusCodePagesWithRedirects("/Home/ErrorPage?statusCode={0}");
 

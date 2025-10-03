@@ -88,7 +88,7 @@ namespace HotelApp.Application.Services.ProofTypeService
 		public async Task<ServiceResponse<object>> DeleteProofTypeAsync(int Id)
         {
             bool IsExist = await _unitOfWork.ProofTypeRepository
-                .IsExistsAsync(pt => pt.Id == Id);
+                .AnyAsync(pt => pt.Id == Id);
             if (!IsExist)
             {
 				return ServiceResponse<object>.ResponseFailure($"No Proof Type with this ID {Id}");

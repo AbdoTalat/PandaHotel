@@ -63,7 +63,7 @@ namespace HotelApp.Application.Services.RoomService
             try
             {
                 bool IsRoomNumberUnique = await _unitOfWork.RoomRepository
-                    .IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower());
+                    .AnyAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower());
                 if (IsRoomNumberUnique)
                 {
                     return ServiceResponse<AddRoomDTO>.ResponseFailure("Cannot enter duplicate room number.");
@@ -113,7 +113,7 @@ namespace HotelApp.Application.Services.RoomService
 				        : $"{dto.RoomNumberText}{i}";
 
 					bool isRoomNumberExist = await _unitOfWork.RoomRepository
-						.IsExistsAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower());
+						.AnyAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower());
 
 					if (isRoomNumberExist)
 					{
@@ -168,7 +168,7 @@ namespace HotelApp.Application.Services.RoomService
             try
             {
 				bool IsRoomNumberExist = await _unitOfWork.RoomRepository
-                    .IsExistsAsync(r => r.RoomNumber.ToLower() ==  room.RoomNumber.ToLower() && r.Id !=room.Id && r.BranchId == oldRoom.BranchId);
+                    .AnyAsync(r => r.RoomNumber.ToLower() ==  room.RoomNumber.ToLower() && r.Id !=room.Id && r.BranchId == oldRoom.BranchId);
 				if (IsRoomNumberExist)
 				{
 					return ServiceResponse<EditRoomDTO>.ResponseFailure("Cannot enter duplicate room number.");
@@ -211,7 +211,7 @@ namespace HotelApp.Application.Services.RoomService
                 return ServiceResponse<Room>.ResponseFailure($"There is no room with this ID: {Id}");
             }
 
-            bool isRoomReserved = await _unitOfWork.ReservationRoomRepository.IsExistsAsync(r => r.RoomId == Id);
+            bool isRoomReserved = await _unitOfWork.ReservationRoomRepository.AnyAsync(r => r.RoomId == Id);
             if (isRoomReserved)
             {
                 return ServiceResponse<Room>.ResponseFailure("Cannot delete room that is already reserved before.");

@@ -40,7 +40,7 @@ namespace HotelApp.Application.Services.ReservationService
 			try
 			{
 				await _unitOfWork.BeginTransactionAsync();
-				var roomTypeIds = dto.bookRoomDTO.RoomTypeToBookDTOs.Select(rt => rt.RoomTypeId).ToList();
+				var roomTypeIds = dto.reservationInfoDto.RoomTypeToBookDTOs.Select(rt => rt.RoomTypeId).ToList();
 				var roomTypes = await _unitOfWork.RoomTypeRepository.GetAllAsync(rt => roomTypeIds.Contains(rt.Id));
 
 				decimal totalPrice = 0;
@@ -48,11 +48,11 @@ namespace HotelApp.Application.Services.ReservationService
 
 				foreach (var roomType in roomTypes)
 				{
-					var roomTypeDto = dto.bookRoomDTO.RoomTypeToBookDTOs.FirstOrDefault(dto => dto.RoomTypeId == roomType.Id);
+					var roomTypeDto = dto.reservationInfoDto.RoomTypeToBookDTOs.FirstOrDefault(dto => dto.RoomTypeId == roomType.Id);
 					if (roomTypeDto != null)
 					{
 						totalRatePerNight += roomType.PricePerNight * roomTypeDto.NumOfRooms;
-						totalPrice += roomType.PricePerNight * roomTypeDto.NumOfRooms * dto.bookRoomDTO.NumOfNights;
+						totalPrice += roomType.PricePerNight * roomTypeDto.NumOfRooms * dto.reservationInfoDto.NumOfNights;
 					}
 				}
 
@@ -65,7 +65,7 @@ namespace HotelApp.Application.Services.ReservationService
 				await _unitOfWork.CommitAsync();
 
 				// Add RoomType
-				var reservationRoomTypes = dto.bookRoomDTO.RoomTypeToBookDTOs.Select(rt => new ReservationRoomType
+				var reservationRoomTypes = dto.reservationInfoDto.RoomTypeToBookDTOs.Select(rt => new ReservationRoomType
 				{
 					RoomTypeId = rt.RoomTypeId,
 					ReservationId = reservation.Id,
@@ -77,9 +77,9 @@ namespace HotelApp.Application.Services.ReservationService
 				await _unitOfWork.ReservationRoomTypeRepository.AddRangeAsync(reservationRoomTypes);
 
 				// Add Rooms
-				if (dto.bookRoomDTO.RoomsIDs.Any())
+				if (dto.reservationInfoDto.RoomsIDs.Any())
 				{
-					var reservationRooms = dto.bookRoomDTO.RoomsIDs.Select(rr => new ReservationRoom
+					var reservationRooms = dto.reservationInfoDto.RoomsIDs.Select(rr => new ReservationRoom
 					{
 						ReservationId = reservation.Id,
 						RoomId = rr,
@@ -89,9 +89,9 @@ namespace HotelApp.Application.Services.ReservationService
 					await _unitOfWork.ReservationRoomRepository.AddRangeAsync(reservationRooms);
 
 					var rooms = await _unitOfWork.RoomRepository
-						.GetAllAsync(r => dto.bookRoomDTO.RoomsIDs.Contains(r.Id));
+						.GetAllAsync(r => dto.reservationInfoDto.RoomsIDs.Contains(r.Id));
 
-					if (dto.confirmDTO.IsCheckedIn)
+					if (dto.confirmDto.IsCheckedIn)
 					{
 						var systemSettings = await _unitOfWork.SystemSettingRepository.FirstOrDefaultAsync();
 						foreach (var room in rooms)
@@ -99,7 +99,7 @@ namespace HotelApp.Application.Services.ReservationService
 							room.RoomStatusId = systemSettings.CheckInStatusId;
 						}
 					}
-					else if(dto.confirmDTO.IsConfirmed || dto.confirmDTO.IsPending && !dto.confirmDTO.IsCheckedIn)
+					else if(dto.confirmDto.IsConfirmed || dto.confirmDto.IsPending && !dto.confirmDto.IsCheckedIn)
 					{
 						var roomStatus = await _unitOfWork.RoomStatusRepository.FirstOrDefaultAsync(rs => rs.Code == RoomStatusEnum.Reserved, SkipBranchFilter: true);
 						foreach (var room in rooms)
@@ -112,11 +112,11 @@ namespace HotelApp.Application.Services.ReservationService
 
 
 				// Link Guests to Reservation
-				var guestReservations = dto.GuestDTOs.Select((guest, index) => new GuestReservation
+				var guestReservations = dto.GuestDtos.Select((guest, index) => new GuestReservation
 				{
 					GuestId = guest.GuestId,
 					ReservationId = reservation.Id,
-					IsPrimaryGuest = dto.GuestDTOs[index].IsPrimary
+					IsPrimaryGuest = dto.GuestDtos[index].IsPrimary
 				}).ToList();
 
 				await _unitOfWork.GuestReservationRepository.AddRangeAsync(guestReservations);

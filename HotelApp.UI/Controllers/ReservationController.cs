@@ -97,7 +97,7 @@ namespace HotelApp.UI.Controllers
 		}
 
         [HttpPost]
-        public async Task<IActionResult> SaveRoomToBook([FromBody] ReservationDetailsDTO model)
+        public async Task<IActionResult> SaveRoomToBook([FromBody] ReservationInfoDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -127,14 +127,14 @@ namespace HotelApp.UI.Controllers
             var roomDataJson = HttpContext.Session.GetString("ReservationDetailsData");
 			var guestsDataJson = HttpContext.Session.GetString("ReservationGuests");
 
-			var roomData = JsonConvert.DeserializeObject<ReservationDetailsDTO>(roomDataJson);
+			var roomData = JsonConvert.DeserializeObject<ReservationInfoDTO>(roomDataJson);
 			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO?>>(guestsDataJson);
 
 			var reservationDTO = new ReservationDTO
 			{
-				GuestDTOs = guestsData,
-				bookRoomDTO = roomData,
-				confirmDTO = confirmReservationDTO
+				GuestDtos = guestsData,
+				reservationInfoDto = roomData,
+				confirmDto = confirmReservationDTO
 			};
 
 			var result = await _reservationService.AddReservation(reservationDTO);

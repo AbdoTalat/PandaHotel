@@ -43,7 +43,7 @@ namespace HotelApp.Application.Services.FloorService
         }
 		public async Task<ServiceResponse<FloorDTO>> AddFloorAsync(FloorDTO floor)
         {
-            bool IsFloorNumberExist = await _unitOfWork.FloorRepository.IsExistsAsync(f => f.Number == floor.Number);
+            bool IsFloorNumberExist = await _unitOfWork.FloorRepository.AnyAsync(f => f.Number == floor.Number);
             if (IsFloorNumberExist)
             {
                 return ServiceResponse<FloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
@@ -71,7 +71,7 @@ namespace HotelApp.Application.Services.FloorService
             var OldFloor = await _unitOfWork.FloorRepository.GetByIdAsync(floorDTO.Id);
 
             bool IsFloorNumberExist = await _unitOfWork.FloorRepository
-                .IsExistsAsync(f => f.Number == floorDTO.Number && f.Id != floorDTO.Id && f.BranchId == OldFloor.BranchId);
+                .AnyAsync(f => f.Number == floorDTO.Number && f.Id != floorDTO.Id && f.BranchId == OldFloor.BranchId);
             if (IsFloorNumberExist)
             {
                 return ServiceResponse<FloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
@@ -96,7 +96,7 @@ namespace HotelApp.Application.Services.FloorService
             {
                 return ServiceResponse<Floor>.ResponseFailure("Floor not found.");
             }
-            bool IsAnyRoomAssignedToFloor = await _unitOfWork.RoomRepository.IsExistsAsync(r => r.FloorId == Id);
+            bool IsAnyRoomAssignedToFloor = await _unitOfWork.RoomRepository.AnyAsync(r => r.FloorId == Id);
             if (IsAnyRoomAssignedToFloor)
             {
                 return ServiceResponse<Floor>.ResponseFailure("Can not delete a floor that assigned to a room.");

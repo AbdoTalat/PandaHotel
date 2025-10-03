@@ -92,7 +92,7 @@ namespace HotelApp.Application.Services.OptionService
 				return ServiceResponse<Option>.ResponseFailure("Option not found.");
 			}
 
-			var isUsed = await _unitOfWork.RoomOptionRepository.IsExistsAsync(ro => ro.OptionId == Id);
+			var isUsed = await _unitOfWork.RoomOptionRepository.AnyAsync(ro => ro.OptionId == Id);
 
 			if (isUsed)
 			{

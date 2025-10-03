@@ -2,6 +2,7 @@
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
+using HotelApp.Infrastructure.UnitOfWorks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.Validators.Reservations
 {
-    public class ReservationDTOValidator : AbstractValidator<ReservationDetailsDTO>
+    public class ReservationDTOValidator : AbstractValidator<ReservationInfoDTO>
     {
         public ReservationDTOValidator()
         {

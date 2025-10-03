@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using HotelApp.Helper;
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure.Repositories
 {

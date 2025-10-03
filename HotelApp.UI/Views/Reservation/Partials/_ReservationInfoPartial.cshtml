@@ -1,14 +1,8 @@
-﻿@model ReservationDetailsDTO
+﻿@model ReservationInfoDTO
 
 
 <div class="row">
     <form id="bookRoomForm">
-
-        <input asp-for="CheckInDate" />
-        <span asp-validation-for="CheckInDate"></span>
-
-        <input asp-for="CheckOutDate" />
-        <span asp-validation-for="CheckOutDate"></span>
         <fieldset>
             <div class="row">                
 
@@ -709,12 +703,14 @@
                             </thead>
                             <tbody>`;
                     summary.forEach(item => {
-                        html += `<tr>
-                            <td>${item.charge}</td>
-                            <td>${item.unit}</td>
-                            <td>${item.rate}</td>
-                            <td>${item.total}</td>
-                         </tr>`;
+                        if (item.charge) { // only if charge exists
+                            html += `<tr>
+                <td>${item.charge}</td>
+                <td>${item.unit}</td>
+                <td>${item.rate}</td>
+                <td>${item.total}</td>
+             </tr>`;
+                        }
                     });
                     html += `</tbody></table>
                      <h4 class="text-success">Total Price: ${res.data.totalPrice}</h4>`;

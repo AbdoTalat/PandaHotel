@@ -88,7 +88,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 		public async Task<ServiceResponse<object>> DeleteReservationSourceAsync(int Id)
 		{
 			bool IsExist = await _unitOfWork.ReservationSourceRepository
-				.IsExistsAsync(pt => pt.Id == Id);
+				.AnyAsync(pt => pt.Id == Id);
 			if (!IsExist)
 			{
 				return ServiceResponse<object>.ResponseFailure($"No Reservation Source with this ID {Id}");

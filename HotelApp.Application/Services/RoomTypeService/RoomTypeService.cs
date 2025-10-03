@@ -61,7 +61,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 			try
 			{
 				var isTypeNameExist = await _unitOfWork.RoomTypeRepository
-					.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
+					.AnyAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
 				if (isTypeNameExist)
 				{
 					return ServiceResponse<RoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
@@ -86,7 +86,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 				return ServiceResponse<RoomTypeDTO>.ResponseFailure($"Room Type not found.");
 			}
 			var isTypeNameExist = await _unitOfWork.RoomTypeRepository
-				.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower() && rt.Id != roomTypeDTO.Id);
+				.AnyAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower() && rt.Id != roomTypeDTO.Id);
 			if (isTypeNameExist)
 			{
 				return ServiceResponse<RoomTypeDTO>.ResponseFailure("cannot enter duplicate room type name.");
@@ -130,7 +130,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 			}
 			try
 			{
-				var IsRoomTypeAssigned = await _unitOfWork.RoomRepository.IsExistsAsync(r => r.RoomTypeId == Id);
+				var IsRoomTypeAssigned = await _unitOfWork.RoomRepository.AnyAsync(r => r.RoomTypeId == Id);
 				if (IsRoomTypeAssigned)
 				{
 					return ServiceResponse<RoomType>.ResponseFailure("This Room type is in use and cannot be deleted.");

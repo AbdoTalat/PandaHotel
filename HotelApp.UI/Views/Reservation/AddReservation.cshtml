@@ -67,17 +67,17 @@
             <div class="tab-content">
                 
                 <div class="tab-pane active has-padding" id="tab1">
-					@await Html.PartialAsync("_ReservationDetailsPartial")
+					@await Html.PartialAsync("Partials/_ReservationInfoPartial")
                 </div>
 
                 <div class="tab-pane  has-padding" id="tab2">
 						<div id="guestTab">
-						@await Html.PartialAsync("_GuestInformationPartial")
+						@await Html.PartialAsync("Partials/_GuestInformationPartial")
                         </div>
                     </div>
 
 				<div class="tab-pane has-padding" id="tab3">
-					@await Html.PartialAsync("_ConfirmReservationPartial")
+					@await Html.PartialAsync("Partials/_ConfirmReservationPartial")
 				</div>
 
             </div>

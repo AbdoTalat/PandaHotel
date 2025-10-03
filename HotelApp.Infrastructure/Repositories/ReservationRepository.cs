@@ -6,6 +6,7 @@ using HotelApp.Domain.Entities;
 using HotelApp.Domain.Enums;
 using HotelApp.Helper;
 using HotelApp.Infrastructure.DbContext;
+using HotelApp.Infrastructure.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

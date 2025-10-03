@@ -2,6 +2,7 @@
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Guests;
 using HotelApp.Application.DTOs.ProofType;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;

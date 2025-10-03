@@ -13,11 +13,12 @@ using System.Collections;
 using HotelApp.Application.Interfaces;
 using HotelApp.Application.Interfaces.IRepositories;
 using Microsoft.AspNetCore.Identity;
+using HotelApp.Domain.Common;
 
-namespace HotelApp.Infrastructure
+namespace HotelApp.Infrastructure.UnitOfWorks
 {
     public class UnitOfWork : IUnitOfWork, IAsyncDisposable
-	{
+    {
 
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
@@ -64,7 +65,7 @@ namespace HotelApp.Infrastructure
         }
 
 
-        // Repository properties
+        #region Repos
         public IGuestRepository GuestRepository { get; private set; }
         public IBranchRepository BranchRepository { get; private set; }
         public IUserBranchRepository UserBranchRepository { get; private set; }
@@ -89,74 +90,91 @@ namespace HotelApp.Infrastructure
         public IRoomRepository RoomRepository { get; private set; }
         public IOptionRepository OptionRepository { get; private set; }
         public IRoomTypeRateRepository RoomTypeRateRepository { get; private set; }
+        #endregion
 
 
-        //public IGenericRepository<T> Repository<T>() where T : class
-        //{
-        //	if (_repositories.TryGetValue(typeof(T), out var repo))
-        //		return (IGenericRepository<T>)repo;
+        public async Task<int> CommitAsync(bool skipAuditFields = false, CancellationToken cancellationToken = default)
+        {
+            if (!skipAuditFields)
+                ApplyAuditInformation();
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
 
-        //	var newRepo = new GenericRepository<T>(_context, _mapperConfig);
-        //	_repositories[typeof(T)] = newRepo;
-        //	return newRepo;
-        //}
 
-        public Task<int> CommitAsync(CancellationToken cancellationToken = default)
-			=> _context.SaveChangesAsync(cancellationToken);
+        #region Audit Logic
+        private void ApplyAuditInformation()
+        {
+            var entries = _context.ChangeTracker
+                .Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-		public Task<int> CommitAsync(bool skipAuditFields, CancellationToken cancellationToken = default)
-			=> _context.SaveChangesAsync(skipAuditFields, cancellationToken);
+            var now = DateTime.UtcNow;
+            var userId = _currentUserService.UserId;
 
-		public async Task BeginTransactionAsync()
-		{
-			if (_transaction == null)
-				_transaction = await _context.Database.BeginTransactionAsync();
-		}
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedDate = now;
+                    if (userId.HasValue)
+                        entry.Entity.CreatedById = userId.Value;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.LastModifiedDate = now;
+                    if (userId.HasValue)
+                        entry.Entity.LastModifiedById = userId.Value;
+                }
+            }
+        }
+        #endregion
 
-		public async Task CommitTransactionAsync()
-		{
-			if (_transaction == null)
-				throw new InvalidOperationException("No active transaction to commit.");
+        public async Task BeginTransactionAsync()
+        {
+            if (_transaction == null)
+                _transaction = await _context.Database.BeginTransactionAsync();
+        }
+        public async Task CommitTransactionAsync()
+        {
+            if (_transaction == null)
+                throw new InvalidOperationException("No active transaction to commit.");
 
-			try
-			{
-				await CommitAsync();
-				await _transaction.CommitAsync();
-			}
-			catch
-			{
-				await RollbackTransactionAsync();
-				throw;
-			}
-			finally
-			{
-				await DisposeTransactionAsync();
-			}
-		}
-
-		public async Task RollbackTransactionAsync()
-		{
-			if (_transaction != null)
-			{
-				await _transaction.RollbackAsync();
-				await DisposeTransactionAsync();
-			}
-		}
-
-		private async Task DisposeTransactionAsync()
-		{
-			if (_transaction != null)
-			{
-				await _transaction.DisposeAsync();
-				_transaction = null;
-			}
-		}
-
-		public async ValueTask DisposeAsync()
-		{
-			if (_transaction != null)
-				await _transaction.DisposeAsync();
-			await _context.DisposeAsync();
-		}
-	}
+            try
+            {
+                await CommitAsync();
+                await _transaction.CommitAsync();
+            }
+            catch
+            {
+                await RollbackTransactionAsync();
+                throw;
+            }
+            finally
+            {
+                await DisposeTransactionAsync();
+            }
+        }
+        public async Task RollbackTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await DisposeTransactionAsync();
+            }
+        }
+        private async Task DisposeTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+        public async ValueTask DisposeAsync()
+        {
+            if (_transaction != null)
+                await _transaction.DisposeAsync();
+            await _context.DisposeAsync();
+        }
+    }
 }

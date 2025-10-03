@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure.Repositories
 {

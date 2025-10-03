@@ -6,6 +6,7 @@ using HotelApp.Domain.Common;
 using HotelApp.Domain.Entities;
 using HotelApp.Application.Interfaces.IRepositories;
 using AutoMapper;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure.Repositories
 {

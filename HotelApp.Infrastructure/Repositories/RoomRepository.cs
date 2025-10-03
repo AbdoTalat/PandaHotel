@@ -15,6 +15,7 @@ using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure.Repositories
 {

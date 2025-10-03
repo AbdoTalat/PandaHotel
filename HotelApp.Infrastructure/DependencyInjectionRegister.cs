@@ -13,6 +13,13 @@ using HotelApp.Domain.Entities;
 using HotelApp.Helper;
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Application.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
+using HotelApp.Application.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure
 {
@@ -43,11 +50,76 @@ namespace HotelApp.Infrastructure
             services.AddScoped<ISystemSettingRepositroy, SystemSettingRepositroy>();
             services.AddScoped<IDashboardRepository, DashboardRepository>();
 
-			services.AddScoped<IPermissionLoader, PermissionLoader>();
-
             services.AddHttpContextAccessor();
 
             return services;
         }
+        public static IServiceCollection AddAuthenticationAndSessionDI(this IServiceCollection services)
+        {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
+
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
+
+            services.AddDistributedMemoryCache();
+
+            // Claims refresh every 1 hour
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.FromHours(1);
+            });
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(1);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.SlidingExpiration = true;
+
+                // Security
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Only over HTTPS
+            });
+
+            services.AddScoped<IUserClaimsPrincipalFactory<User>, CustomClaimsPrincipalFactory>();
+
+            return services;
+        }
+        public static IServiceCollection AddAuthorizationPoliciesDI(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+            services.AddScoped<IPermissionLoader, PermissionLoader>();
+
+            services.AddAuthorization(options =>
+            {
+                using var serviceProvider = services.BuildServiceProvider();
+                var permissionLoader = serviceProvider.GetRequiredService<IPermissionLoader>();
+
+                var allPermissions = permissionLoader.LoadAllPermissions()
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Distinct();
+
+                foreach (var permission in allPermissions)
+                {
+                    options.AddPolicy(permission!, policy =>
+                        policy.Requirements.Add(new PermissionRequirement(permission!)));
+                }
+            });
+
+            return services;
+        }
+
+
     }
 }

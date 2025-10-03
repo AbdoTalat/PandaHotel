@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs.Guests;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.Interfaces;
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
@@ -51,11 +52,11 @@ namespace HotelApp.Application.Services.GuestService
 		}
 		public async Task<ServiceResponse<GuestDTO>> AddGuestAsync(GuestDTO guestDTO)
 		{
-			var checkGuestPhoneExist = await _unitOfWork.GuestRepository.IsExistsAsync(g => g.Phone.Contains(guestDTO.Phone));
+			var checkGuestPhoneExist = await _unitOfWork.GuestRepository.AnyAsync(g => g.Phone.Contains(guestDTO.Phone));
 			if (checkGuestPhoneExist)
 				return ServiceResponse<GuestDTO>.ResponseFailure($"There is already guest with phone number: {guestDTO.Phone}");
 			
-			var checkGuestEmailExist = await _unitOfWork.GuestRepository.IsExistsAsync(g => g.Email.Contains(guestDTO.Email));
+			var checkGuestEmailExist = await _unitOfWork.GuestRepository.AnyAsync(g => g.Email.Contains(guestDTO.Email));
 			if (checkGuestEmailExist)
 				return ServiceResponse<GuestDTO>.ResponseFailure($"There is already guest with Email Address: {guestDTO.Phone}");
 			
@@ -123,7 +124,7 @@ namespace HotelApp.Application.Services.GuestService
 				if (guest.Id == 0)
 				{
 					var IsGuestExists = await _unitOfWork.GuestRepository
-					.IsExistsAsync(g =>
+					.AnyAsync(g =>
 					   g.FullName.Contains(guestDTO.FullName)
 					|| g.Email.Contains(guestDTO.Email) 
 					|| g.Phone.Contains(guestDTO.Phone));

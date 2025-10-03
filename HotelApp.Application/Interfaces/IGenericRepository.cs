@@ -27,7 +27,7 @@ namespace HotelApp.Application.Interfaces
         void DeleteRange(IEnumerable<T> entities);
         Task DeleteByIdAsync(int id);
 
-		Task<bool> IsExistsAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
+		Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
 
     }
 }

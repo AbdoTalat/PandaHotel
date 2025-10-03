@@ -14,6 +14,7 @@ using HotelApp.Domain.Entities;
 using HotelApp.Application.Services.CurrentUserService;
 using HotelApp.Domain;
 using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Infrastructure.UnitOfWorks;
 
 namespace HotelApp.Infrastructure.Repositories
 {

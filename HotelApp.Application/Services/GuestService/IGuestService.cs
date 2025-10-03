@@ -1,4 +1,5 @@
 ﻿using HotelApp.Application.DTOs.Guests;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Domain.Entities;
 using System;
 using System.Collections.Generic;

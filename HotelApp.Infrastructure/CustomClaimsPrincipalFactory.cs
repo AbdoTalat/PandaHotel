@@ -35,16 +35,13 @@ namespace HotelApp.Infrastructure
 		{
 			var identity = await base.GenerateClaimsAsync(user);
 
-			var roleIds = await _context.UserRoles
-				.Where(ur => ur.UserId == user.Id)
-				.Select(ur => ur.RoleId)
-				.ToListAsync();
+            var roleClaims = await (from ur in _context.UserRoles
+                                    join rc in _context.RoleClaims on ur.RoleId equals rc.RoleId
+                                    where ur.UserId == user.Id && rc.ClaimType == "Permission"
+                                    select rc).ToListAsync();
 
-			var roleClaims = await _context.RoleClaims
-				.Where(rc => roleIds.Contains(rc.RoleId) && rc.ClaimType == "Permission")
-				.ToListAsync();
 
-			foreach (var claim in roleClaims)
+            foreach (var claim in roleClaims)
 			{
 				if (!string.IsNullOrEmpty(claim.ClaimType) && !string.IsNullOrEmpty(claim.ClaimValue))
 				{

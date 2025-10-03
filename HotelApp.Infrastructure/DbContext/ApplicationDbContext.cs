@@ -1,70 +1,20 @@
 ﻿using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.Configurations;
 using HotelApp.Infrastructure.Configurations.Locations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Security.Claims;
-using HotelApp.Domain.Common;
-using HotelApp.Application.Services.CurrentUserService;
-using HotelApp.Domain.Enums;
-
+using HotelApp.Infrastructure.Seed;
 
 namespace HotelApp.Infrastructure.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<User, Role, int>
     {
-		private readonly ICurrentUserService _currentUserService;
-
-		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, 
-			ICurrentUserService currentUserService)
+		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
-			_currentUserService = currentUserService;
 		}
-
-		#region Overrided SaveChangesAsync Method
-		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-		{
-			return await SaveChangesAsync(skipAuditFields: false, cancellationToken);
-		}
-
-		public async Task<int> SaveChangesAsync(bool skipAuditFields = false, CancellationToken cancellationToken = default)
-		{
-			if (!skipAuditFields)
-			{
-				var entries = ChangeTracker
-					.Entries<BaseEntity>()
-					.Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
-
-				var now = DateTime.UtcNow;
-
-				int? userId = _currentUserService.UserId;
-
-				foreach (var entry in entries)
-				{
-					if (entry.State == EntityState.Added)
-					{
-						entry.Entity.CreatedDate = now;
-						if (userId.HasValue)
-							entry.Entity.CreatedById = userId.Value;
-					}
-					else if (entry.State == EntityState.Modified)
-					{
-						entry.Entity.LastModifiedDate = now;
-						if (userId.HasValue)
-							entry.Entity.LastModifiedById = userId.Value;
-					}
-				}
-			}
-
-			return await base.SaveChangesAsync(cancellationToken);
-		}
-		#endregion
 
 		#region DbSets
 		public DbSet<Branch> Branches { get; set; }
@@ -97,34 +47,9 @@ namespace HotelApp.Infrastructure.DbContext
 		{
 			base.OnModelCreating(builder);
 
-            builder.Entity<RoomStatus>().HasData(
-				new RoomStatus { Id = 1, Name = "Available", Code = RoomStatusEnum.Available, IsSystem = true, Description = "Room is ready to be booked", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 2, Name = "Reserved", Code = RoomStatusEnum.Reserved, IsSystem = true, Description = "Room is reserved by a guest", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 3, Name = "Occupied", Code = RoomStatusEnum.Occupied, IsSystem = true, Description = "Room is currently occupied", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 4, Name = "Maintenance", Code = RoomStatusEnum.Maintenance, IsSystem = true, Description = "Room is under maintenance", BranchId = 2, Color = "#20BF7E" },
-				new RoomStatus { Id = 5, Name = "Cleaning", Code = RoomStatusEnum.Cleaning, IsSystem = true, Description = "Room is being cleaned", BranchId = 2, Color = "#20BF7E" }
-				);
-
-            builder.Entity<ReservationSource>().HasData(
-                new ReservationSource { Id = 1, Name = "Walk In", IsActive = true },
-                new ReservationSource { Id = 2, Name = "Hotel website", IsActive = true },
-                new ReservationSource { Id = 3, Name = "Admin panel", IsActive = true },
-                new ReservationSource { Id = 4, Name = "Government", IsActive = true },
-                new ReservationSource { Id = 5, Name = "Mobile App", IsActive = true }
-                );
-
-			//builder.Entity<CalculationType>().HasData(
-			//	new CalculationType { Id = 2, Name = "By Alert" }
-			//	);
-
 			builder.Entity<User>().ToTable("Users");
 			builder.Entity<Role>().ToTable("Roles");
 			builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
-
-			//builder.Ignore<IdentityUserClaim<int>>();
-			//builder.Ignore<IdentityUserLogin<int>>();
-			//builder.Ignore<IdentityRoleClaim<int>>();
-			//builder.Ignore<IdentityUserToken<int>>();
 
 			#region Configurations
 			builder.ApplyConfiguration(new UserConfiguration());
@@ -154,12 +79,12 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new ReservationRoomConfiguration());
 
 			builder.ApplyConfiguration(new CalculationTypeConfiguration());
-			#endregion
+            #endregion
 
-		}
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-            base.OnConfiguring(optionsBuilder);
-		}
+            #region Seed Data
+            builder.SeedRoomStatuses();
+            builder.SeedReservationSources();
+            #endregion
+        }
 	}
 }
