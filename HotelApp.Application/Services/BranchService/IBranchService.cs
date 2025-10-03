@@ -1,6 +1,5 @@
 ﻿using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Branches;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;

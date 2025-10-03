@@ -2,7 +2,7 @@
 using AutoMapper.Configuration.Annotations;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Floor;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -28,22 +28,22 @@ namespace HotelApp.Application.Services.FloorService
          
         public async Task<IEnumerable<DropDownDTO<Int16>>> GetFloorsDropDownAsync()
         {
-			var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<DropDownDTO<Int16>>();
+			var floors = await _unitOfWork.FloorRepository.GetAllAsDtoAsync<DropDownDTO<Int16>>();
             return floors;
         }
 		public async Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync()
         {
-            var floors = await _unitOfWork.Repository<Floor>().GetAllAsDtoAsync<GetAllFloorsDTO>();
+            var floors = await _unitOfWork.FloorRepository.GetAllAsDtoAsync<GetAllFloorsDTO>();
             return floors;
         }
 		public async Task<GetFloorByIdDTO?> GetFloorByIdAsync(int Id)
         {
-            var floor = await _unitOfWork.Repository<Floor>().GetByIdAsDtoAsync<GetFloorByIdDTO>(Id);
+            var floor = await _unitOfWork.FloorRepository.GetByIdAsDtoAsync<GetFloorByIdDTO>(Id);
             return floor;
         }
 		public async Task<ServiceResponse<FloorDTO>> AddFloorAsync(FloorDTO floor)
         {
-            bool IsFloorNumberExist = await _unitOfWork.Repository<Floor>().IsExistsAsync(f => f.Number == floor.Number);
+            bool IsFloorNumberExist = await _unitOfWork.FloorRepository.IsExistsAsync(f => f.Number == floor.Number);
             if (IsFloorNumberExist)
             {
                 return ServiceResponse<FloorDTO>.ResponseFailure("Can not enter duplicate Floor number.");
@@ -51,7 +51,7 @@ namespace HotelApp.Application.Services.FloorService
             try
             {
                 var mappedFloor = _mapper.Map<Floor>(floor);
-                await _unitOfWork.Repository<Floor>().AddNewAsync(mappedFloor);
+                await _unitOfWork.FloorRepository.AddNewAsync(mappedFloor);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<FloorDTO>.ResponseSuccess();
@@ -63,14 +63,14 @@ namespace HotelApp.Application.Services.FloorService
 		}
 		public async Task<FloorDTO?> GetFloorToEditByIdAsync(int Id)
         {
-			var floor = await _unitOfWork.Repository<Floor>().GetByIdAsDtoAsync<FloorDTO>(Id);
+			var floor = await _unitOfWork.FloorRepository.GetByIdAsDtoAsync<FloorDTO>(Id);
 			return floor;
 		}
 		public async Task<ServiceResponse<FloorDTO>> EditFloorAsync(FloorDTO floorDTO)
         {
-            var OldFloor = await _unitOfWork.Repository<Floor>().GetByIdAsync(floorDTO.Id);
+            var OldFloor = await _unitOfWork.FloorRepository.GetByIdAsync(floorDTO.Id);
 
-            bool IsFloorNumberExist = await _unitOfWork.Repository<Floor>()
+            bool IsFloorNumberExist = await _unitOfWork.FloorRepository
                 .IsExistsAsync(f => f.Number == floorDTO.Number && f.Id != floorDTO.Id && f.BranchId == OldFloor.BranchId);
             if (IsFloorNumberExist)
             {
@@ -79,7 +79,7 @@ namespace HotelApp.Application.Services.FloorService
             try
             {
                 _mapper.Map(floorDTO, OldFloor);
-                _unitOfWork.Repository<Floor>().Update(OldFloor);
+                _unitOfWork.FloorRepository.Update(OldFloor);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<FloorDTO>.ResponseSuccess("Floor updated successfully.");
@@ -91,19 +91,19 @@ namespace HotelApp.Application.Services.FloorService
         }
         public async Task<ServiceResponse<Floor>> DeleteFloorAsync(int Id)
         {
-            var floor = await _unitOfWork.Repository<Floor>().GetByIdAsync(Id);
+            var floor = await _unitOfWork.FloorRepository.GetByIdAsync(Id);
             if (floor == null)
             {
                 return ServiceResponse<Floor>.ResponseFailure("Floor not found.");
             }
-            bool IsAnyRoomAssignedToFloor = await _unitOfWork.Repository<Room>().IsExistsAsync(r => r.FloorId == Id);
+            bool IsAnyRoomAssignedToFloor = await _unitOfWork.RoomRepository.IsExistsAsync(r => r.FloorId == Id);
             if (IsAnyRoomAssignedToFloor)
             {
                 return ServiceResponse<Floor>.ResponseFailure("Can not delete a floor that assigned to a room.");
             }
             try
             {
-                _unitOfWork.Repository<Floor>().Delete(floor);
+                _unitOfWork.FloorRepository.Delete(floor);
                 await _unitOfWork.CommitAsync();
                 return ServiceResponse<Floor>.ResponseSuccess("Floor Deleted Successfully.");
             }

@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using HotelApp.Helper;
 using HotelApp.Application.DTOs;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Identity;
@@ -12,15 +11,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HotelApp.Application.Interfaces.IRepositories;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GenericRepository<User>, IUserRepository
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly IConfigurationProvider _mapConfig;
 
 		public UserRepository(ApplicationDbContext context, IConfigurationProvider mapConfig)
+			: base(context, mapConfig)
         {
 			_context = context;
 			_mapConfig = mapConfig;

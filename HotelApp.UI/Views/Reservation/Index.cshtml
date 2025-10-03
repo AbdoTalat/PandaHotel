@@ -27,7 +27,8 @@
         <ul class="breadcrumb">
             <li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
             @* <li><a asp-action="Index" asp-controller="Reservation">Reseravation Managment</a></li> *@
-            <li class="active">Reservations (@Model.Count())</li>
+            <li class="active">Reservations (<span id="reservationCount">@Model.Count()</span>)</li>
+
         </ul>
 
         <ul class="breadcrumb-elements">
@@ -83,59 +84,79 @@
 				</ul>
 			</div>
 		</div>
+            
+        <div class="row" style="padding-left: 40px; padding-right: 40px">
+                <div class="col-md-12">
+                    <div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">
+                                <h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                        <li><a data-action="reload"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
 
-		<div class="row" style="padding-left:50px; padding-right:50px">
-			<div class="col-md-12">
-				<div class="mt-10 collapse" id="filterForm" aria-expanded="false" style="height: 0px;">
-					<div class="panel panel-flat">
-						<div class="panel-heading">
-							<h6 class="panel-title"><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-							<div class="heading-elements">
-								<ul class="icons-list">
-									<li><a data-action="collapse"></a></li>
-									<li><a data-action="reload"></a></li>
-								</ul>
-							</div>
-						</div>
+                            <div class="panel-body">
+                                <form id="reservationFilterForm">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Check In Date</label>
+                                                <input type="date" class="form-control" name="checkInDate">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Check Out Date</label>
+                                                <input type="date" class="form-control" name="checkOutDate">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Primary Guest</label>
+                                                <input type="text" class="form-control" name="primaryGuestName" placeholder="Primary Guest Name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Reservation Category</label>
+                                                <select class="form-control select" name="ReservationCategory" id="filterType" data-placeholder="Select Reservation Category">
+                                                    <option value="0">All</option>
+                                                    <option value="1">New Bookings</option>
+                                                    <option value="2">Arrivals</option>
+                                                    <option value="3">Departures</option>
+                                                    <option value="4">Stay Overs</option>
+                                                    <option value="5">Cancellations</option>
+                                                    <option value="6">No Show</option>
+                                                </select>
 
-						<div class="panel-body">
-							<form id="reservationFilterForm">
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-                                            <label>Check In Date</label>
-											<input type="date" class="form-control" name="checkInDate" placeholder="Check In Date">
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-                                            <label>Check Out Date</label>
-											<input type="date" class="form-control" name="checkOutDate" placeholder="Check Out Date">
-										</div>
-									</div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Primary Guest</label>
-                                            <input type="text" class="form-control" name="primaryGuestName" placeholder="Guest Name">
+                                                <input type="hidden" id="currentReservationCategory" value="@ViewBag.CurrentReservationCategory" />
+
+
+                                            </div>
                                         </div>
                                     </div>
-								</div>
+                                    <div class="text-right">
+                                    <button type="submit" class="btn btn-primary btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-spinner-size="20" data-style="expand-right">
+                                            <i class="icon-search4"></i> Search
+                                        </button>
 
-								<div class="text-right">
-									<button type="submit" class="btn btn-primary"> <i class="icon-search4"></i> Search</button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
-			</div>
-		</div>
+                </div>
+            </div>
 
-        <table class="table dataTable datatable-button-html5-basic" id="MyTable">
+
+        <table class="table datatable-button-html5-basic dataTable" id="MyTable">
 			<thead>
                 <tr class="border-double active">
-					<th></th>
 					<th>ID#</th>
 					<th>Primary Guest</th>
 					<th>Check In Date</th>
@@ -144,36 +165,33 @@
                     <th>People</th>
                     <th>Source</th>
 					<th>Status</th>
-					@* <th>Created By</th> *@
 					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var item in Model)
+                @foreach (var item in Model) 
 				{
 					<tr id="item-@item.Id">
-                        <td><input type="checkbox" class="styled" /></td>
-						<td><a>@item.Id</a></td>
+                        <td><a asp-action="Details" asp-controller="Reservation" asp-route-Id="@item.Id">@item.Id</a></td>
 						<td>@item.PrimaryGuestName</td>
 						<td>@item.CheckInDate.ToShortDateString()</td>
 						<td>@item.CheckOutDate.ToShortDateString()</td>
                         <td>@item.NumberOfNights</td>
                         <td>@item.NumberOfPeople</td>
                         <td>@item.ReservationSource</td>
-						<td>@item.Status</td>
+                        <td>@item.Status</td>
 
-					@* 	<td>@item.CreatedBy</td> *@
 						<td class="text-center">
+
 							<ul class="icons-list">
 								<li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 										<i class="icon-menu9"></i>
 									</a>
-
 									<ul class="dropdown-menu dropdown-menu-right">
 										@if (User.HasClaim("permission", "Reservation.View"))
 										{
-                                            <li><a href="#" class="btnEditOpenModal"><i class="icon-info22"></i> View</a></li>
+                                            <li><a href="#"><i class="icon-info22"></i> View</a></li>
                                         }
 										@if (User.HasClaim("permission", "Reservation.Edit"))
 										{
@@ -194,15 +212,23 @@
 	</div>
 </div>
 <!-- /content area -->
-
 @section Scripts {
     <script>
         $(function () {
-            // Init DataTable (keep already-rendered rows from Razor)
             let dataTable = $("#MyTable").DataTable();
 
-            // Load Reservations via Ajax (used for filters/refresh)
-            function loadReservations(filters = {}, isRefresh = false) {
+            let currentReservationCategory = $("#currentReservationCategory").val() || "0";
+
+            $("#filterType").val(currentReservationCategory.toString()).trigger("change");
+
+            // -------------------------
+            // Load Reservations via Ajax
+            // -------------------------
+            function loadReservations(filters = {}) {
+                if (currentReservationCategory && currentReservationCategory !== "0") {
+                    filters.ReservationCategory = currentReservationCategory;
+                }
+
                 $.getJSON("/Reservation/GetReservationJson", filters, function (response) {
                     if (response.success) {
                         let items = response.data;
@@ -210,7 +236,6 @@
 
                         $.each(items, function (index, item) {
                             dataTable.row.add([
-                                '<input type="checkbox" class="styled"/>',
                                 `<a>${item.id}</a>`,
                                 item.primaryGuestName,
                                 formatDate(item.checkInDate),
@@ -224,55 +249,79 @@
                         });
 
                         dataTable.draw();
-                    } else {
-                        console.error("Failed to load reservations");
+                        $("#reservationCount").text(items.length);
                     }
                 }).fail(function () {
                     console.error("Error fetching reservations");
                 });
             }
 
-            // Format date
             function formatDate(dateStr) {
                 if (!dateStr) return "";
                 let date = new Date(dateStr);
                 return date.toLocaleDateString();
             }
 
-            // Action buttons per row
             function getActionButtons(item) {
                 let canView = @canView.ToString().ToLower();
                 let canEdit = @canEdit.ToString().ToLower();
                 let canDelete = @canDelete.ToString().ToLower();
 
                 return `
-                    <ul class="icons-list">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="icon-menu9"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                ${canView ? `<li><a data-title="Reservation Details" data-url="/Reservation/Details/${item.id}" class="btnEditOpenModal"><i class="icon-info22"></i> View</a></li>` : ''}
-                                ${canEdit ? `<li><a href="/Reservation/Edit/${item.id}"><i class="icon-pencil7"></i> Edit</a></li>` : ''}
-                                ${canDelete ? `<li><a data-id="${item.id}" class="btn-delete"><i class="icon-trash"></i> Delete</a></li>` : ''}
-                            </ul>
-                        </li>
-                    </ul>`;
+                                <ul class="icons-list">
+                                    <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="icon-menu9"></i></a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            ${canView ? `<li><a data-url="/Reservation/Details/${item.id}" class="btnEditOpenModal"><i class="icon-info22"></i> View</a></li>` : ''}
+                                            ${canEdit ? `<li><a href="/Reservation/Edit/${item.id}"><i class="icon-pencil7"></i> Edit</a></li>` : ''}
+                                            ${canDelete ? `<li><a data-id="${item.id}" class="btn-delete"><i class="icon-trash"></i> Delete</a></li>` : ''}
+                                        </ul>
+                                    </li>
+                                </ul>`;
             }
 
-            // Filters (Ajax refresh)
+            // -------------------------
+            // Filter form submit
+            // -------------------------
             $("#reservationFilterForm").submit(function (e) {
                 e.preventDefault();
                 let filters = {};
                 $(this).serializeArray().forEach(x => filters[x.name] = x.value);
-                loadReservations(filters, false);
+
+                // ✅ Always store as string
+                currentReservationCategory = (filters.ReservationCategory || "0").toString();
+
+                loadReservations(filters);
             });
 
-            // Refresh (Ajax reload)
+            // -------------------------
+            // Refresh button
+            // -------------------------
             $("#refreshReservationsBtn").click(function () {
-                $("#reservationFilterForm")[0].reset();
-                loadReservations({}, true);
+                $("#reservationFilterForm")[0].reset();   // clear form inputs
+                currentReservationCategory = "0";         // reset dashboard category
+                $("#filterType").val("0").trigger("change"); // reset dropdown
+                loadReservations();                       // load all reservations
             });
+
+            // -------------------------
+            // Dashboard quick filters
+            // -------------------------
+            $(".dashboard-filter").click(function (e) {
+                e.preventDefault();
+                currentReservationCategory = ($(this).data("filter") || 0).toString();
+
+                $("#reservationFilterForm")[0].reset(); // clear manual filters
+                $("#filterType").val(currentReservationCategory).trigger("change"); // ✅ update dropdown
+
+                loadReservations();
+            });
+
+            // -------------------------
+            // Initial load
+            // -------------------------
+            //loadReservations();
         });
     </script>
 }
+

@@ -1,8 +1,6 @@
 ﻿@{
 	TempData["Title"] = "Dashboard";
 }
-
-
 <!-- Page header -->
 <div class="page-header page-header-default">
 	<div class="page-header-content">
@@ -46,15 +44,13 @@
 	</div>
 </div>
 
-
-
-
 <!-- Content area -->
 <div class="content">
 
-	<!-- Today's Reservations -->
-	<div class="row">
-		<div class="col-lg-7">
+	<!-- First Section -->
+    <div class="row">
+        <!-- Today's Reservations -->
+		<div class="col-lg-6">
 			<div class="panel panel-flat">
 				<div class="panel-heading">
 					<h5><i class="icon-calendar"></i>  Today's Reservations</h5>
@@ -74,18 +70,20 @@
 							<ul class="media-list">
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-info text-info btn-flat btn-rounded btn-icon btn-xs">
-											<i class="icon-plus3"></i>
+										<a href="/Reservation/Index?ReservationCategory=1"
+										   class="btn border-info text-info btn-flat btn-rounded btn-icon btn-xs">
+											<i class="icon-plus3"></i> 
 										</a>
 									</div>
 									<div class="media-body">
 										<div class="text-semibold text-size-large" id="newBookings"></div>
 										<div class="media-annotation">New Bookings</div>
+
 									</div>
 								</li>
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-teal text-teal btn-flat btn-rounded btn-icon btn-xs">
+										<a href ="/Reservation/Index?ReservationCategory=4" class="btn border-teal text-teal btn-flat btn-rounded btn-icon btn-xs">
 											<i class="icon-watch2"></i>
 										</a>
 									</div>
@@ -102,7 +100,7 @@
 							<ul class="media-list">
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-success text-success btn-flat btn-rounded btn-icon btn-xs">
+										<a href="/Reservation/Index?ReservationCategory=2" class="btn border-success text-success btn-flat btn-rounded btn-icon btn-xs">
 											<i class="icon-enter3"></i>
 										</a>
 									</div>
@@ -113,7 +111,7 @@
 								</li>
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-danger text-danger btn-flat btn-rounded btn-icon btn-xs">
+										<a href="/Reservation/Index?ReservationCategory=5" class="btn border-danger text-danger btn-flat btn-rounded btn-icon btn-xs">
 											<i class="icon-cancel-circle2"></i>
 										</a>
 									</div>
@@ -126,11 +124,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<!-- Second List -->
+							<!-- Third List -->
 							<ul class="media-list">
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-orange text-orange btn-flat btn-rounded btn-icon btn-xs">
+										<a href="/Reservation/Index?ReservationCategory=3" class="btn border-orange text-orange btn-flat btn-rounded btn-icon btn-xs">
 											<i class="icon-exit3"></i>
 										</a>
 									</div>
@@ -141,7 +139,7 @@
 								</li>
 								<li class="media">
 									<div class="media-left">
-										<a href="#" class="btn border-slate-800 text-slate-800 btn-flat btn-rounded btn-icon btn-xs">
+										<a href="/Reservation/Index?ReservationCategory=6" class="btn border-slate-800 text-slate-800 btn-flat btn-rounded btn-icon btn-xs">
 											<i class="icon-exit3"></i>
 										</a>
 									</div>
@@ -158,7 +156,8 @@
 			</div>
 		</div>
 
-		<div class="col-lg-5">
+		<!-- Guest Information-->
+		<div class="col-lg-6">
 			<!-- Guests -->
 			<div class="panel panel-flat">
 				<div class="panel-heading">
@@ -205,134 +204,222 @@
 		</div>
 	</div>
 
-
-	<!-- Rooms Statuses-->
-@* 	<div class="row">
-		<div class="col-sm-6 col-md-3">
-			<div class="panel panel-body bg-blue-400 has-bg-image">
-				<div class="media no-margin">
-					<div class="media-left media-middle">
-						<i class="icon-office icon-3x opacity-75"></i>
-					</div>
-					<div class="media-body text-right">
-						<h3 class="no-margin" id="total"></h3>
-						<span class="text-uppercase text-size-mini">Total Rooms</span>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-sm-6 col-md-3">
-			<div class="panel panel-body bg-success-400 has-bg-image">
-				<div class="media no-margin">
-					<div class="media-left media-middle">
-						<i class="icon-enter3 icon-3x opacity-75"></i>
-					</div>
-					<div class="media-body text-right">
-						<h3 class="no-margin" id="available"></h3>
-						<span class="text-uppercase text-size-mini">Available Rooms</span>
-					</div>
-
-				</div>
-			</div>
-		</div>
-
-		<div class="col-sm-6 col-md-3">
-			<div class="panel panel-body bg-orange-400 has-bg-image">
-				<div class="media no-margin">
-					<div class="media-left media-middle">
-						<i class="icon-bed2 icon-3x opacity-75"></i>
-					</div>
-
-					<div class="media-body text-right">
-						<h3 class="no-margin" id="occupied"></h3>
-						<span class="text-uppercase text-size-mini">Occupied Rooms</span>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-sm-6 col-md-3">
-			<div class="panel panel-body bg-danger-400 has-bg-image">
-				<div class="media no-margin">
-					<div class="media-left media-middle">
-						<i class="icon-hammer-wrench icon-3x opacity-75"></i>
-					</div>
-
-					<div class="media-body text-right">
-						<h3 class="no-margin" id="outOfService"></h3>
-						<span class="text-uppercase text-size-mini">Out Of Service Rooms</span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> *@
-
+	<!-- Second Section -->
     <div class="row">
-        <!-- Basic pie chart -->
-		<div class="col-md-4">
-			<div class="panel panel-flat">
-				<div class="panel-heading">
-					<h5 class="panel-title">Rooms Status</h5>
+
+        <!-- Rooms Status chart -->
+        <div class="col-md-4">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Rooms Status</h5>
                     <hr style="margin:0px" />
 
-				</div>
-				<div class="panel-body">
-					<div class="chart-container">
-						<div class="chart has-fixed-height has-minimum-width" id="basic_pie" style="height:200px"></div>
-					</div>
-				</div>
-			</div>
-        </div>				
-		<!-- /bacis pie chart -->
-        <!-- Basic column chart -->
-		<div class="col-md-8">
+                </div>
+                <div class="panel-body">
+                    <div class="chart-container ">
+                        <div class="chart has-fixed-height has-minimum-width" id="basic_pie" style="height:175px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Rooms Availablity-->
+        <div class="col-md-8">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title" style="margin-bottom:20px"> Available Room Types</h5>
+                    <div class="heading-elements">
+                        <select class="form-group select" id="roomTypeSelect" data-placeholder="Choose Room Type">
+                            <option value="">All Room Types</option>
+                        </select>
+                    </div>
+                    <hr style="margin:0px;" />
+                </div>
+
+                <div class="panel-body" style="height:175px">
+                    <div class="row text-center" id="availabilityRow" style="display:flex; justify-content:space-around; flex-wrap:nowrap;">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	</div>
+
+	<!-- Third Section -->
+    <div class="row">
+
+        <!-- Rooms Occupancy -->
+        <div class="col-md-8">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Room Occupancy</h5>
+                    <hr style="margin:0px" />
+                </div>
+
+                <div class="panel-body">
+                    <div class="chart-container">
+                        <div class="chart has-fixed-height" id="basic_columns" style="height:170px"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+		<!-- Statistics And Sales-->
+		<div class="col-md-4">
+			<!-- Sales stats -->
 			<div class="panel panel-flat">
 				<div class="panel-heading">
-					<h5 class="panel-title">Room Occupancy</h5>
-					<hr style="margin:0px" />
-				</div>
-
-				<div class="panel-body">
-					<div class="chart-container">
-						<div class="chart has-fixed-height" id="basic_columns" style="height:200px"></div>
-					</div>
-				</div>
-			</div>
-
-		</div>
-		<!-- /basic column chart -->
-
-	</div>
-
-	<!-- Available Room Types -->
-	<div class="row">
-		<div class="col-lg-12">
-			<div class="panel panel-flat">
-				<div class="panel-heading" >
-                    <h5 class="panel-title" style="margin-bottom:20px"> Available Room Types</h5>
+					<h6 class="panel-title">Sales statistics</h6>
 					<div class="heading-elements">
-						<select class="form-group select" id="roomTypeSelect" data-placeholder="Choose Room Type">
-							<option value="">All Room Types</option>
-						</select>
-                    </div>
-					<hr style="margin:0px;" />
-				</div>
-
-				<div class="panel-body">
-					<div class="row text-center" id="availabilityRow" style="display:flex; justify-content:space-around; flex-wrap:nowrap;">
-						<!-- Injected via JS -->
+						<form class="heading-form" action="#">
+							<div class="form-group">
+								<select class="change-date select-sm" id="select_date">
+									<optgroup label="<i class='icon-watch pull-right'></i> Time period">
+										<option value="val1">June, 29 - July, 5</option>
+										<option value="val2">June, 22 - June 28</option>
+										<option value="val3" selected="selected">June, 15 - June, 21</option>
+										<option value="val4">June, 8 - June, 14</option>
+									</optgroup>
+								</select>
+							</div>
+						</form>
 					</div>
 				</div>
 
+				<div class="container-fluid">
+					<div class="row text-center">
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar5 position-left text-slate"></i> 5,689</h5>
+								<span class="text-muted text-size-small">orders weekly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar52 position-left text-slate"></i> 32,568</h5>
+								<span class="text-muted text-size-small">orders monthly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-cash3 position-left text-slate"></i> $23,464</h5>
+								<span class="text-muted text-size-small">average revenue</span>
+							</div>
+						</div>
+					</div>
+					<div class="row text-center">
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar5 position-left text-slate"></i> 5,689</h5>
+								<span class="text-muted text-size-small">orders weekly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar52 position-left text-slate"></i> 32,568</h5>
+								<span class="text-muted text-size-small">orders monthly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-cash3 position-left text-slate"></i> $23,464</h5>
+								<span class="text-muted text-size-small">average revenue</span>
+							</div>
+						</div>
+					</div>
+					<div class="row text-center">
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar5 position-left text-slate"></i> 5,689</h5>
+								<span class="text-muted text-size-small">orders weekly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-calendar52 position-left text-slate"></i> 32,568</h5>
+								<span class="text-muted text-size-small">orders monthly</span>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="content-group">
+								<h5 class="text-semibold no-margin"><i class="icon-cash3 position-left text-slate"></i> $23,464</h5>
+								<span class="text-muted text-size-small">average revenue</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
 			</div>
-
+			<!-- /sales stats -->
 		</div>
-
 
 	</div>
 
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h6 class="panel-title">App Status<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
 
+					<div class="heading-elements">
+						<div class="heading-text">
+							<span class="status-mark border-success position-left"></span>
+							Operational
+						</div>
+					</div>
+				</div>
+
+				<div class="panel-body">
+					<ul class="progress-list">
+						<li>
+							<label>CPU usage <span>50%</span></label>
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-info" style="width: 50%">
+									<span class="sr-only">50% Complete</span>
+								</div>
+							</div>
+						</li>
+
+						<li>
+							<label>RAM usage <span>70%</span></label>
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-danger" style="width: 70%">
+									<span class="sr-only">70% Complete</span>
+								</div>
+							</div>
+						</li>
+
+						<li>
+							<label>Disc space <span>80%</span></label>
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-success" style="width: 80%">
+									<span class="sr-only">80% Complete</span>
+								</div>
+							</div>
+						</li>
+
+						<li>
+							<label>Bandwidth <span>60%</span></label>
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-primary" style="width: 60%">
+									<span class="sr-only">60% Complete</span>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+	</div>
 
 	<!-- Dashboard content -->
 	<div class="row">
@@ -1988,7 +2075,6 @@
 
 		loadRoomOccupancyDashboard();
 	</script>
-
 	<script>
 		$(document).ready(function () {
 
@@ -2035,8 +2121,8 @@
 							series: [{
 								name: 'Rooms',
 								type: 'pie',
-								radius: '45%',
-								center: ['30%', '55%'],
+								radius: '55%',
+								center: ['30%', '65%'],
 								data: [
 									{ value: response.available, name: 'Available' },
 									{ value: response.occupied, name: 'Occupied' },
@@ -2051,7 +2137,6 @@
 			);
 		});
 	</script>
-
 
 	<script>
 		document.addEventListener("DOMContentLoaded", function () {
@@ -2121,19 +2206,18 @@
 							label = d.toLocaleDateString('en-GB', { weekday: 'short' });
 						}
 						html += `
-							<div class="col-md-2 ">
-								<ul class="media-list">
-									<li class="media">
-										<div class="media-body">
-											<h3 class="text-semibold ${available === 0 ? 'text-danger' : 'text-success'}">
-												${available}
-											</h3>
-											<div class="text-bold text-size-large">${label}</div>
-											<div class="media-annotation">(${formatShortDate(dateIso)})</div>
-										</div>
-									</li>
-								</ul>
-							</div>`;
+			<div class="col-md-2">
+				<div class="card shadow-sm mb-3">
+					<div class="card-body text-center">
+						<h3 class="text-semibold ${available === 0 ? 'text-danger' : 'text-success'}">
+							${available}
+						</h3>
+						<div class="text-bold text-size-large">${label}</div>
+						<div class="media-annotation">(${formatShortDate(dateIso)})</div>
+					</div>
+				</div>
+			</div>`;
+
 					});
 
 					$("#availabilityRow").html(html);
@@ -2145,24 +2229,6 @@
 			}
 		})();
 	</script>
-
-@* 	<script>
-		async function loadRoomStatus() {
-			try {
-				const response = await fetch('@Url.Action("GetRoomStatusDahsboard", "Dashboard")');
-				const data = await response.json();
-
-				document.getElementById('total').textContent = data.total;
-				document.getElementById('available').textContent = data.available;
-				document.getElementById('occupied').textContent = data.occupied;
-				document.getElementById('outOfService').textContent = data.outOfService;
-			} catch (err) {
-				console.error('Error getting room statuses:', err);
-			}
-		}
-
-		loadRoomStatus();
-	</script> *@
 
 	<script>
 		async function loadTodayReservations() {
@@ -2183,9 +2249,11 @@
 
 		loadTodayReservations();
     </script>
+
 }
 
 @section Themes{
 	<script type="text/javascript" src="/assets/js/plugins/visualization/echarts/echarts.js?v=1.10"></script>
 	<script type="text/javascript" src="/assets/js/plugins/visualization/echarts/echarts.js"></script>
+
 }

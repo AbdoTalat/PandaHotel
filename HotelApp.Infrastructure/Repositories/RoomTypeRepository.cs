@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using HotelApp.Helper;
 using HotelApp.Application.DTOs.RoomTypes;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using HotelApp.Domain.Enums;
@@ -13,18 +12,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HotelApp.Application.Interfaces.IRepositories;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class RoomTypeRepository : IRoomTypeRepository
+    public class RoomTypeRepository : GenericRepository<RoomType>, IRoomTypeRepository
     {
         private readonly ApplicationDbContext _context;
-		private readonly IConfigurationProvider _mapper;
+		private readonly IConfigurationProvider _mapperConfig;
 
-		public RoomTypeRepository(ApplicationDbContext context, IConfigurationProvider mapper)
+		public RoomTypeRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+			: base(context, mapperConfig)
         {
             _context = context;
-			_mapper = mapper;
+            _mapperConfig = mapperConfig;
 		}
 
 		public async Task<IEnumerable<RoomType>> GetRoomTypesByIDsAsync(List<int> roomTypeIds)

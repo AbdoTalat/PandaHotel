@@ -11,13 +11,12 @@ namespace HotelApp.Application.DTOs.Reservation
 	{
 		[MaxLength(200)]
 		public string? Comment { get; set; }
-		public bool IsConfirmed { get; set; } = false;
-		public bool IsPending { get; set; } = false;
-		public bool IsStarted { get; set; } = false;
-		public bool IsCheckedIn { get; set; } = false;
-		public bool IsCheckedOut { get; set; } = false;
-		public bool IsClosed { get; set; } = false;
-		public bool IsCancelled { get; set; } = false;
-		public string? CancellationReason { get; set; }
+        public bool IsPending { get; set; }
+        public bool IsConfirmed { get; set; }
+        public bool IsCheckedIn { get; set; }
+        public bool IsCheckedOut { get; set; }
+        public bool IsCancelled { get; set; }
+        public bool IsNoShow { get; set; }
+        public string? CancellationReason { get; set; } = null;
 	}
 }

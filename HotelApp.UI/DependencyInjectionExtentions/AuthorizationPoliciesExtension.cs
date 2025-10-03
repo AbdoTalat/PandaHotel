@@ -1,5 +1,5 @@
 ﻿using HotelApp.Application.Authorization;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain.Common;
 using HotelApp.Infrastructure.Repositories;
 

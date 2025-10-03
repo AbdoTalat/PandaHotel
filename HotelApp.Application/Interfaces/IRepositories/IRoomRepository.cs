@@ -8,14 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelApp.Application.IRepositories
+namespace HotelApp.Application.Interfaces.IRepositories
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IGenericRepository<Room>
     {
         GetRoomsReview GetRoomsReview();
-		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
+        Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
         Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
         Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
-		Task<int> GetOccupancyPercentAsync();
-	}
+        Task<int> GetOccupancyPercentAsync();
+    }
 }

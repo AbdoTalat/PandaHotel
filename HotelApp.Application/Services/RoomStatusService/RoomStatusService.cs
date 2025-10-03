@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.RoomStatus;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using HotelApp.Helper;
@@ -27,7 +27,7 @@ namespace HotelApp.Application.Services.RoomStatusService
         public async Task<IEnumerable<GetAllRoomStatusDTO>> GetAllRoomStatusAsync()
         {
             int? branchId = BranchContext.CurrentBranchId;
-            var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+            var roomStatus = await _unitOfWork.RoomStatusRepository
                 .GetAllAsDtoAsync<GetAllRoomStatusDTO>(rs => rs.IsSystem || rs.BranchId == branchId, 
                     SkipBranchFilter:true);
 
@@ -36,7 +36,7 @@ namespace HotelApp.Application.Services.RoomStatusService
 		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownAsync()
 		{
 			int? branchId = BranchContext.CurrentBranchId;
-			var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+			var roomStatus = await _unitOfWork.RoomStatusRepository
 	        .GetAllAsDtoAsync<DropDownDTO<string>>(
 		        rs => rs.IsSystem || rs.BranchId == branchId, SkipBranchFilter: true );
 
@@ -44,7 +44,7 @@ namespace HotelApp.Application.Services.RoomStatusService
         }
 		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownWithoutBranchFilterAsync()
         {
-            var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+            var roomStatus = await _unitOfWork.RoomStatusRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
 
             return roomStatus;
@@ -52,7 +52,7 @@ namespace HotelApp.Application.Services.RoomStatusService
 		public async Task<RoomStatusDTO?> GetRoomStatusToEditByIdAsync(int Id)
         {
 			int? branchId = BranchContext.CurrentBranchId;
-			var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+			var roomStatus = await _unitOfWork.RoomStatusRepository
 			.GetByIdAsDtoAsync<RoomStatusDTO>(Id,
 				rs => rs.IsSystem || rs.BranchId == branchId,
 				SkipBranchFilter: true);
@@ -65,7 +65,7 @@ namespace HotelApp.Application.Services.RoomStatusService
             {
                 var roomStatusToAdd = _mapper.Map<RoomStatus>(roomStatusDTO);
 
-                await _unitOfWork.Repository<RoomStatus>().AddNewAsync(roomStatusToAdd);
+                await _unitOfWork.RoomStatusRepository.AddNewAsync(roomStatusToAdd);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<RoomStatusDTO>.ResponseSuccess("New Room Status Created successfully.");
@@ -79,7 +79,7 @@ namespace HotelApp.Application.Services.RoomStatusService
         {
 			int? branchId = BranchContext.CurrentBranchId;
 
-			var OldRoomStatus = await _unitOfWork.Repository<RoomStatus>()
+			var OldRoomStatus = await _unitOfWork.RoomStatusRepository
 			.GetByIdAsync(dto.Id, rs => rs.IsSystem || rs.BranchId == branchId, SkipBranchFilter: true);
 
             if(OldRoomStatus == null)
@@ -97,7 +97,7 @@ namespace HotelApp.Application.Services.RoomStatusService
                 }
                 _mapper.Map(dto, OldRoomStatus);
 
-                _unitOfWork.Repository<RoomStatus>().Update(OldRoomStatus);
+                _unitOfWork.RoomStatusRepository.Update(OldRoomStatus);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<RoomStatusDTO>.ResponseSuccess("Room Status updated successfully.");
@@ -112,7 +112,7 @@ namespace HotelApp.Application.Services.RoomStatusService
         {
             int? branchId = BranchContext.CurrentBranchId;
 
-			var roomStatus = await _unitOfWork.Repository<RoomStatus>()
+			var roomStatus = await _unitOfWork.RoomStatusRepository
 			    .GetByIdAsync(Id, rs => rs.IsSystem || rs.BranchId == branchId, SkipBranchFilter: true);
 			if (roomStatus == null)
             {
@@ -126,7 +126,7 @@ namespace HotelApp.Application.Services.RoomStatusService
 
 			try
             {
-                _unitOfWork.Repository<RoomStatus>().Delete(roomStatus);
+                _unitOfWork.RoomStatusRepository.Delete(roomStatus);
                 await _unitOfWork.CommitAsync();
                 return ServiceResponse<object>.ResponseSuccess("Room status deleted successfully.");
             }

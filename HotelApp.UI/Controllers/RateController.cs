@@ -1,4 +1,6 @@
-﻿using HotelApp.Application.DTOs.Rates;
+﻿using HotelApp.Application.DTOs.RateCalculation;
+using HotelApp.Application.DTOs.Rates;
+using HotelApp.Application.Services.RateCalculationService;
 using HotelApp.Application.Services.RateService;
 using HotelApp.Application.Services.RoomTypeService;
 using HotelApp.Domain.Entities;
@@ -13,12 +15,14 @@ namespace HotelApp.UI.Controllers
     {
         private readonly IRateService _rateService;
 		private readonly IRoomTypeService _roomTypeService;
+        private readonly IRateCalculationService _rateCalculationService;
 
-		public RateController(IRateService rateService, IRoomTypeService roomTypeService)
+        public RateController(IRateService rateService, IRoomTypeService roomTypeService, IRateCalculationService rateCalculationService)
         {
             _rateService = rateService;
 			_roomTypeService = roomTypeService;
-		}
+            _rateCalculationService = rateCalculationService;
+        }
 
         [Authorize(Policy = "Rate.View")]
         public async Task<IActionResult> Index()
@@ -115,5 +119,13 @@ namespace HotelApp.UI.Controllers
 
 			return Json(rateDetails);
 		}
-	}
+
+        [HttpPost]
+        public async Task<IActionResult> GetReservationChargesSummary([FromBody] GetRateCalculationDTORequest model)
+        {
+            var result = await _rateCalculationService.GetRateCalculation(model);
+            return Json(new { success = result.Success, message = result.Message, data = result.Data });
+        }
+
+    }
 }

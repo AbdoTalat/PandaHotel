@@ -1,23 +1,27 @@
 ﻿using HotelApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
-using HotelApp.Application.IRepositories;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using HotelApp.Domain.Common;
 using HotelApp.Domain.Entities;
+using HotelApp.Application.Interfaces.IRepositories;
+using AutoMapper;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class RoleRepository : IRoleRepository
+    public class RoleRepository : GenericRepository<Role>,  IRoleRepository
 	{
 		private readonly RoleManager<Role> _roleManager;
 		private readonly ApplicationDbContext _context;
+        private readonly IConfigurationProvider _mapperConfig;
 
-		public RoleRepository(RoleManager<Role> roleManager, ApplicationDbContext context)
-		{
+        public RoleRepository(RoleManager<Role> roleManager, ApplicationDbContext context, IConfigurationProvider mapperConfig)
+            : base(context, mapperConfig)
+        {
 			_roleManager = roleManager;
 			_context = context;
-		}
+            _mapperConfig = mapperConfig;
+        }
 
 		// ✅ Get Role by Id
 		public async Task<Role?> GetRoleByIdAsync(int roleId)

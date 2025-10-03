@@ -13,7 +13,8 @@ namespace HotelApp.Application.DTOs.Reservation
 		public DateTime CheckOutDate { get; set; }
 		public string Status { get; set; }
 
-		public int NumberOfNights { get; set; }
+
+        public int NumberOfNights { get; set; }
 		public int NumberOfPeople { get; set; }
 		public decimal PricePerNight { get; set; }
 		public decimal TotalPrice { get; set; }

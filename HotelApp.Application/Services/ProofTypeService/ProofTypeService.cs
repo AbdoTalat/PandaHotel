@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.ProofType;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -25,7 +26,7 @@ namespace HotelApp.Application.Services.ProofTypeService
 
         public async Task<IEnumerable<DropDownDTO<string>>> GetProofTypesDropDownAsync()
         {
-            var proofTypes = await _unitOfWork.Repository<ProofType>()
+            var proofTypes = await _unitOfWork.ProofTypeRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>();
 
             return proofTypes;
@@ -33,7 +34,7 @@ namespace HotelApp.Application.Services.ProofTypeService
 
         public async Task<IEnumerable<ProofTypeDTO>> GetAllProofTypesAsync()
         {
-            var ProofTypes = await _unitOfWork.Repository<ProofType>()
+            var ProofTypes = await _unitOfWork.ProofTypeRepository
                 .GetAllAsDtoAsync<ProofTypeDTO>();
 
             return ProofTypes;
@@ -44,7 +45,7 @@ namespace HotelApp.Application.Services.ProofTypeService
             try
             {
                 var ProofType = _mapper.Map<ProofType>(dto);
-                await _unitOfWork.Repository<ProofType>().AddNewAsync(ProofType);
+                await _unitOfWork.ProofTypeRepository.AddNewAsync(ProofType);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<ProofTypeDTO>.ResponseSuccess("New Proof Type added successfully.");
@@ -56,14 +57,14 @@ namespace HotelApp.Application.Services.ProofTypeService
         }
         public async Task<ProofTypeDTO?> GetProofTypeToEditByIdAsync(int Id)
         {
-            var ProofType = await _unitOfWork.Repository<ProofType>()
+            var ProofType = await _unitOfWork.ProofTypeRepository
                 .GetByIdAsDtoAsync<ProofTypeDTO>(Id);
 
             return ProofType;
         }
 		public async Task<ServiceResponse<ProofTypeDTO>> EditProofTypeAsync(ProofTypeDTO dto)
         {
-            var OldProofType = await _unitOfWork.Repository<ProofType>()
+            var OldProofType = await _unitOfWork.ProofTypeRepository
                 .GetByIdAsync(dto.Id);
             if (OldProofType == null)
             {
@@ -73,7 +74,7 @@ namespace HotelApp.Application.Services.ProofTypeService
             {
                 _mapper.Map(dto, OldProofType);
 
-                _unitOfWork.Repository<ProofType>().Update(OldProofType);
+                _unitOfWork.ProofTypeRepository.Update(OldProofType);
                 await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<ProofTypeDTO>.ResponseSuccess("Proof Type Updated Successfully.");
@@ -86,7 +87,7 @@ namespace HotelApp.Application.Services.ProofTypeService
         }
 		public async Task<ServiceResponse<object>> DeleteProofTypeAsync(int Id)
         {
-            bool IsExist = await _unitOfWork.Repository<ProofType>()
+            bool IsExist = await _unitOfWork.ProofTypeRepository
                 .IsExistsAsync(pt => pt.Id == Id);
             if (!IsExist)
             {
@@ -94,7 +95,7 @@ namespace HotelApp.Application.Services.ProofTypeService
 			}
             try
             {
-                await _unitOfWork.Repository<ProofType>().DeleteByIdAsync(Id);
+                await _unitOfWork.ProofTypeRepository.DeleteByIdAsync(Id);
                 await _unitOfWork.CommitAsync();
                 return ServiceResponse<object>.ResponseSuccess("Proof Type Deleted Successfully.");
             }

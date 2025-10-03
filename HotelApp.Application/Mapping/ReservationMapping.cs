@@ -20,7 +20,7 @@ namespace HotelApp.Application.Mapping
 			   .ForMember(dest => dest.CheckInDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckInDate))
 			   .ForMember(dest => dest.CheckOutDate, opt => opt.MapFrom(src => src.bookRoomDTO.CheckOutDate))
 			   .ForMember(dest => dest.NumberOfPeople, opt => opt.MapFrom(src =>
-					src.bookRoomDTO.roomTypeToBookDTOs.Sum(r => r.NumOfAdults + r.NumOfChildren)
+					src.bookRoomDTO.RoomTypeToBookDTOs.Sum(r => r.NumOfAdults + r.NumOfChildrens)
 				))               
 			   .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.bookRoomDTO.CompanyId))
 			   .ForMember(dest => dest.NumberOfNights, opt => opt.MapFrom(src => src.bookRoomDTO.NumOfNights))
@@ -31,12 +31,12 @@ namespace HotelApp.Application.Mapping
 			   .ForMember(dest => dest.IsPending, opt => opt.MapFrom(src => src.confirmDTO.IsPending))
 			   .ForMember(dest => dest.IsCheckedIn, opt => opt.MapFrom(src => src.confirmDTO.IsCheckedIn))
 			   .ForMember(dest => dest.IsCheckedOut, opt => opt.MapFrom(src => src.confirmDTO.IsCheckedOut))
-			   .ForMember(dest => dest.IsClosed, opt => opt.MapFrom(src => src.confirmDTO.IsClosed))
+			   .ForMember(dest => dest.IsNoShow, opt => opt.MapFrom(src => src.confirmDTO.IsNoShow))
 			   .ForMember(dest => dest.IsCancelled, opt => opt.MapFrom(src => src.confirmDTO.IsCancelled))
 			   .ForMember(dest => dest.CancellationReason, opt => opt.MapFrom(src => src.confirmDTO.CancellationReason));
 
 			CreateMap<RoomTypeToBookDTO, ReservationRoomType>()
-				.ForMember(dest => dest.RoomTypeId, opt => opt.MapFrom(src => src.Id))
+				.ForMember(dest => dest.RoomTypeId, opt => opt.MapFrom(src => src.RoomTypeId))
 				.ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.NumOfRooms))
 				.ForMember(dest => dest.ReservationId, opt => opt.Ignore()); 
 
@@ -47,7 +47,7 @@ namespace HotelApp.Application.Mapping
 			CreateMap<Reservation, GetAllReservationsDTO>()
 				.ForMember(dest => dest.Status, opt => opt.MapFrom(src =>
 					src.IsCancelled ? "Cancelled" :
-					src.IsClosed ? "Closed" :
+					src.IsNoShow ? "No Show" :
 					src.IsCheckedOut ? "Checked Out" :
 					src.IsCheckedIn ? "Checked In" :
 					src.IsPending ? "Pending" :

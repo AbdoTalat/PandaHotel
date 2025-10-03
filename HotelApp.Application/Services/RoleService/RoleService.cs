@@ -6,17 +6,17 @@ using System.Data;
 using HotelApp.Domain;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Application.Interfaces;
 
 namespace HotelApp.Application.Services.RoleService
 {
-	public class RoleService : IRoleService
+    public class RoleService : IRoleService
 	{
 		private readonly RoleManager<Role> _roleManager;
 		private readonly IMapper _mapper;
-		private readonly IRoleRepository _roleRepository;
 		private readonly UserManager<User> _userManager;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly ICurrentUserService _currentUserService;
@@ -24,22 +24,20 @@ namespace HotelApp.Application.Services.RoleService
 		public RoleService(
 			RoleManager<Role> roleManager,
 			IMapper mapper,
-			IRoleRepository roleRepository,
 			UserManager<User> userManager,
 			IUnitOfWork unitOfWork,
 			ICurrentUserService currentUserService)
 		{
 			_roleManager = roleManager;
 			_mapper = mapper;
-			_roleRepository = roleRepository;
 			_userManager = userManager;
 			_unitOfWork = unitOfWork;
 			_currentUserService = currentUserService;
 		}
 		public async Task<IEnumerable<PermissionDTO>> GetAllPermissionsAsync(int roleId)
 		{
-			var assigned = await _roleRepository.GetAssignedPermissionsAsync(roleId);
-			var all = await _roleRepository.GetAllPermissionsAsync();
+			var assigned = await _unitOfWork.RoleRepository.GetAssignedPermissionsAsync(roleId);
+			var all = await _unitOfWork.RoleRepository.GetAllPermissionsAsync();
 
 			return all.Select(p => new PermissionDTO
 			{
@@ -95,9 +93,9 @@ namespace HotelApp.Application.Services.RoleService
 		public async Task<AssignPermissionDTO> GetAssignPermissionsDTOAsync(int roleId)
 		{
 			var role = await GetRoleByIdAsync(roleId);
-			var assignedPermissions = await _roleRepository.GetAssignedPermissionsAsync(roleId);
+			var assignedPermissions = await _unitOfWork.RoleRepository.GetAssignedPermissionsAsync(roleId);
 
-			var groupedPermissions = await _roleRepository.GetAllPermissionsGroupedAsync(); // New method below
+			var groupedPermissions = await _unitOfWork.RoleRepository.GetAllPermissionsGroupedAsync(); // New method below
 
 			var result = new Dictionary<string, List<PermissionDTO>>();
 			foreach (var group in groupedPermissions)
@@ -120,14 +118,14 @@ namespace HotelApp.Application.Services.RoleService
 
 		public async Task<ServiceResponse<object>> AssignPermissionsAsync(int roleId, List<string> newPermissions)
 		{
-            bool IsExist = await _unitOfWork.Repository<Role>()
+            bool IsExist = await _unitOfWork.RoleRepository
                 .IsExistsAsync(r => r.Id == roleId);
             if (!IsExist)
             {
                 return ServiceResponse<object>.ResponseFailure("Role not exist!");
             }
 
-            bool IsBasic = await _unitOfWork.Repository<Role>()
+            bool IsBasic = await _unitOfWork.RoleRepository
 				.IsExistsAsync(r => r.Id == roleId && r.IsSystem);
 			if (IsBasic)
 			{
@@ -136,8 +134,8 @@ namespace HotelApp.Application.Services.RoleService
 
 			try
 			{
-				await _roleRepository.RemoveAllRolePermissionsAsync(roleId);
-				await _roleRepository.AddRolePermissionsAsync(roleId, newPermissions);
+				await _unitOfWork.RoleRepository.RemoveAllRolePermissionsAsync(roleId);
+				await _unitOfWork.RoleRepository.AddRolePermissionsAsync(roleId, newPermissions);
 
                 var role = await _roleManager.FindByIdAsync(roleId.ToString());
                 role.LastModifiedById = _currentUserService.UserId;

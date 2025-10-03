@@ -8,26 +8,25 @@ namespace HotelApp.Application.DTOs.Reservation
 {
     public class GetAllReservationsDTO
     {
-        public int Id {  get; set; }
+        public int Id { get; set; }
         public string PrimaryGuestName { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-		public string CreatedBy { get; set; }
-		public string Status { get; set; }
-		public string ReservationSource { get; set; }
+        public string CreatedBy { get; set; }
+        public string Status { get; set; }
+
+        public string CurrentStatus { get; set; }
+        public IEnumerable<string> AvailableStatuses { get; set; }
+        public string ReservationSource { get; set; }
         public int NumberOfNights { get; set; }
         public int NumberOfPeople { get; set; }
         public decimal TotalPrice { get; set; }
 
-
+        public bool IsPending { get; set; }
         public bool IsConfirmed { get; set; }
-		public bool IsPending { get; set; }
-		public bool IsStarted { get; set; }
-		public bool IsCheckedIn { get; set; }
-		public bool IsCheckedOut { get; set; }
-		public bool IsClosed { get; set; }
-		public bool IsCancelled { get; set; }
-        
-	
-	}
+        public bool IsCheckedIn { get; set; }
+        public bool IsCheckedOut { get; set; }
+        public bool IsCancelled { get; set; }
+        public bool IsNoShow { get; set; }
+    }
 }

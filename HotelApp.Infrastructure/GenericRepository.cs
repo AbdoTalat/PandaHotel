@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq;
-using HotelApp.Domain;
+using HotelApp.Application;
 using HotelApp.Infrastructure.DbContext;
 using AutoMapper.QueryableExtensions;
 using AutoMapper;
@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Query;
 using HotelApp.Domain.Common;
 using System.Security.Claims;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Domain;
+using HotelApp.Application.Interfaces;
 
 namespace HotelApp.Infrastructure
 {
@@ -18,15 +20,15 @@ namespace HotelApp.Infrastructure
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
-		private readonly ICurrentUserService _currentUserService;
+		//private readonly ICurrentUserService _currentUserService;
 		private readonly DbSet<T> _dbSet;
 
 		public GenericRepository(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig, ICurrentUserService currentUserService)
+            IConfigurationProvider mapperConfig/*, ICurrentUserService currentUserService*/)
         {
             _context = context;
             _mapperConfig = mapperConfig;
-			_currentUserService = currentUserService;
+			//_currentUserService = currentUserService;
 			_dbSet = _context.Set<T>();
         }
 
@@ -139,27 +141,27 @@ namespace HotelApp.Infrastructure
         public void UpdateRange(IEnumerable<T> entities)
             => _dbSet.UpdateRange(entities);
 
-		public async Task BulkUpdateAsync(
-			Expression<Func<T, bool>> predicate,
-			Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
-			bool skipBranchFilter = false,
-			bool skipAuditFields = false)
-		{
-			IQueryable<T> query = _dbSet.BranchFilter(skipBranchFilter);
+		//public async Task BulkUpdateAsync(
+		//	Expression<Func<T, bool>> predicate,
+		//	Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
+		//	bool skipBranchFilter = false,
+		//	bool skipAuditFields = false)
+		//{
+		//	IQueryable<T> query = _dbSet.BranchFilter(skipBranchFilter);
 
-			if (predicate != null)
-				query = query.Where(predicate);
+		//	if (predicate != null)
+		//		query = query.Where(predicate);
 
-			if (!skipAuditFields)
-			{
-				setProperties = CombineSetProperties(setProperties, s =>
-					s.SetProperty(e => EF.Property<int>(e, "LastModifiedById"), _currentUserService.UserId)
-					 .SetProperty(e => EF.Property<DateTime>(e, "LastModifiedDate"), DateTime.UtcNow)
-				);
-			}
+		//	if (!skipAuditFields)
+		//	{
+		//		setProperties = CombineSetProperties(setProperties, s =>
+		//			s.SetProperty(e => EF.Property<int>(e, "LastModifiedById"), _currentUserService.UserId)
+		//			 .SetProperty(e => EF.Property<DateTime>(e, "LastModifiedDate"), DateTime.UtcNow)
+		//		);
+		//	}
 
-			await query.ExecuteUpdateAsync(setProperties);
-		}
+		//	await query.ExecuteUpdateAsync(setProperties);
+		//}
 
 		public void Delete(T entity)
             => _dbSet.Remove(entity);

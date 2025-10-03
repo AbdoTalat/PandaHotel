@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250926125335_CalculationTypeInsert")]
-    partial class CalculationTypeInsert
+    [Migration("20250930231106_AlterReservationUpdateStatus")]
+    partial class AlterReservationUpdateStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,13 +108,6 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CalculationTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "By Alert"
-                        });
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Company", b =>
@@ -533,10 +526,10 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Property<bool>("IsCheckedOut")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsClosed")
+                    b.Property<bool>("IsConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsConfirmed")
+                    b.Property<bool>("IsNoShow")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsPending")
@@ -1098,7 +1091,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CalculationTypeId")
+                    b.Property<int?>("CalculationTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("CheckInStatusId")
@@ -1825,8 +1818,7 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasOne("HotelApp.Domain.Entities.CalculationType", "CalculationType")
                         .WithMany()
                         .HasForeignKey("CalculationTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HotelApp.Domain.Entities.RoomStatus", "CheckInStatus")
                         .WithMany()

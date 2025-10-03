@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.RoomTypes;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -19,45 +19,40 @@ namespace HotelApp.Application.Services.RoomTypeService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-		private readonly IRoomRepository _roomRepository;
-		private readonly IRoomTypeRepository _roomTypeRepository;
 
-		public RoomTypeService(IUnitOfWork unitOfWork, IMapper mapper, IRoomRepository roomRepository,
-			IRoomTypeRepository roomTypeRepository, IHttpContextAccessor httpContextAccessor)
+		public RoomTypeService(IUnitOfWork unitOfWork, IMapper mapper)
         {
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_roomRepository = roomRepository;
-			_roomTypeRepository = roomTypeRepository;
 		}
 
 		public async Task<IEnumerable<GetAllRoomTypesDTO>> GetAllRoomTypesAsync()
 		{
-			var roomTypes = await _unitOfWork.Repository<RoomType>()
+			var roomTypes = await _unitOfWork.RoomTypeRepository
 				.GetAllAsDtoAsync<GetAllRoomTypesDTO>();
 
 			return roomTypes;
 		}
 		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomTypesDropDownAsync()
 		{
-			var roomTypes = await _unitOfWork.Repository<RoomType>()
+			var roomTypes = await _unitOfWork.RoomTypeRepository
 				.GetAllAsDtoAsync<DropDownDTO<string>>();
 
 			return roomTypes;
 		}
 		public async Task<GetRoomTypeByIdDTO?> GetRoomTypeByIdAsync(int Id)
 		{
-			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsDtoAsync<GetRoomTypeByIdDTO>(Id);
+			var roomType = await _unitOfWork.RoomTypeRepository.GetByIdAsDtoAsync<GetRoomTypeByIdDTO>(Id);
 			return roomType;
 		}
         public async Task<RoomTypeDTO?> GetRoomTypeToEditByIdAsync(int Id)
 		{
-			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsDtoAsync<RoomTypeDTO>(Id);
+			var roomType = await _unitOfWork.RoomTypeRepository.GetByIdAsDtoAsync<RoomTypeDTO>(Id);
 			return roomType;
 		}
         public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync()
 		{
-			var roomTypes = await _roomTypeRepository.GetRoomTypesForReservation();
+			var roomTypes = await _unitOfWork.RoomTypeRepository.GetRoomTypesForReservation();
 			
 			return roomTypes;
         }
@@ -65,7 +60,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 		{
 			try
 			{
-				var isTypeNameExist = await _unitOfWork.Repository<RoomType>()
+				var isTypeNameExist = await _unitOfWork.RoomTypeRepository
 					.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower());
 				if (isTypeNameExist)
 				{
@@ -73,7 +68,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 				}
 
 				var mappedRoomType = _mapper.Map<RoomType>(roomTypeDTO);
-				await _unitOfWork.Repository<RoomType>().AddNewAsync(mappedRoomType);
+				await _unitOfWork.RoomTypeRepository.AddNewAsync(mappedRoomType);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<RoomTypeDTO>.ResponseSuccess("New Roomtype added successfully.");
@@ -85,12 +80,12 @@ namespace HotelApp.Application.Services.RoomTypeService
 		}
         public async Task<ServiceResponse<RoomTypeDTO>> EditRoomTypeAsync(RoomTypeDTO roomTypeDTO)
 		{
-			var oldRoomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(roomTypeDTO.Id);
+			var oldRoomType = await _unitOfWork.RoomTypeRepository.GetByIdAsync(roomTypeDTO.Id);
 			if (oldRoomType == null)
 			{
 				return ServiceResponse<RoomTypeDTO>.ResponseFailure($"Room Type not found.");
 			}
-			var isTypeNameExist = await _unitOfWork.Repository<RoomType>()
+			var isTypeNameExist = await _unitOfWork.RoomTypeRepository
 				.IsExistsAsync(rt => rt.Name.ToLower() == roomTypeDTO.Name.ToLower() && rt.Id != roomTypeDTO.Id);
 			if (isTypeNameExist)
 			{
@@ -100,18 +95,18 @@ namespace HotelApp.Application.Services.RoomTypeService
 			{
 				_mapper.Map(roomTypeDTO, oldRoomType);
 
-				_unitOfWork.Repository<RoomType>().Update(oldRoomType);
+				_unitOfWork.RoomTypeRepository.Update(oldRoomType);
 				await _unitOfWork.CommitAsync();
 
 
-				await _unitOfWork.Repository<Room>().BulkUpdateAsync(
-					 r => r.RoomTypeId == roomTypeDTO.Id && r.IsAffectedByRoomType,
-					 setters => setters
-						 .SetProperty(r => r.PricePerNight, roomTypeDTO.PricePerNight)
-						 .SetProperty(r => r.MaxNumOfAdults, roomTypeDTO.MaxNumOfAdults)
-						 .SetProperty(r => r.MaxNumOfChildrens, roomTypeDTO.MaxNumOfChildrens),
-					 skipAuditFields:true
-				 );
+				//await _unitOfWork.RoomRepository.BulkUpdateAsync(
+				//	 r => r.RoomTypeId == roomTypeDTO.Id && r.IsAffectedByRoomType,
+				//	 setters => setters
+				//		 .SetProperty(r => r.PricePerNight, roomTypeDTO.PricePerNight)
+				//		 .SetProperty(r => r.MaxNumOfAdults, roomTypeDTO.MaxNumOfAdults)
+				//		 .SetProperty(r => r.MaxNumOfChildrens, roomTypeDTO.MaxNumOfChildrens),
+				//	 skipAuditFields:true
+				// );
 
 
 
@@ -124,7 +119,7 @@ namespace HotelApp.Application.Services.RoomTypeService
 		}
 		public async Task<ServiceResponse<RoomType>> DeleteRoomTypeAsync(int Id)
 		{
-			var roomType = await _unitOfWork.Repository<RoomType>().GetByIdAsync(Id);
+			var roomType = await _unitOfWork.RoomTypeRepository.GetByIdAsync(Id);
 			if (roomType == null)
 			{
 				return ServiceResponse<RoomType>.ResponseFailure($"Room Type With ID: {Id} not found");
@@ -135,13 +130,13 @@ namespace HotelApp.Application.Services.RoomTypeService
 			}
 			try
 			{
-				var IsRoomTypeAssigned = await _unitOfWork.Repository<Room>().IsExistsAsync(r => r.RoomTypeId == Id);
+				var IsRoomTypeAssigned = await _unitOfWork.RoomRepository.IsExistsAsync(r => r.RoomTypeId == Id);
 				if (IsRoomTypeAssigned)
 				{
 					return ServiceResponse<RoomType>.ResponseFailure("This Room type is in use and cannot be deleted.");
 				}
 
-				_unitOfWork.Repository<RoomType>().Delete(roomType);
+				_unitOfWork.RoomTypeRepository.Delete(roomType);
 				await _unitOfWork.CommitAsync();
 				return ServiceResponse<RoomType>.ResponseSuccess($"Room Type {roomType.Name} Deleted Successfully.");
 			}

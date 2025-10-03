@@ -8,6 +8,7 @@ namespace HotelApp.Application.DTOs.RoomTypes
 {
     public class GetRoomTypesForReservationDTO
     {
+
         public int Id { get; set; }
         public string Name { get; set; }
         public int NumOfAvailableRooms { get; set; }

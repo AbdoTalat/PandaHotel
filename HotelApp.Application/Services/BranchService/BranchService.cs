@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Branches;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -28,24 +29,24 @@ namespace HotelApp.Application.Services.BranchService
 		
 		public async Task<GetBranchByIdDTO?> GetBranchByIdAsync(int Id)
         {
-            var branch = await _unitOfWork.Repository<Branch>()
+            var branch = await _unitOfWork.BranchRepository
                 .GetByIdAsDtoAsync<GetBranchByIdDTO>(Id, SkipBranchFilter:true);
 
             return branch;
 		}
 		public async Task<IEnumerable<DropDownDTO<string>>> GetBranchsDropDownAsync()
         {
-            var branches = await _unitOfWork.Repository<Branch>().GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
+            var branches = await _unitOfWork.BranchRepository.GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
             return branches;
         }
 		public async Task<IEnumerable<GetAllBranches>> GetAllBranchesAsync()
         {
-            var branches = await _unitOfWork.Repository<Branch>().GetAllAsDtoAsync<GetAllBranches>();
+            var branches = await _unitOfWork.BranchRepository.GetAllAsDtoAsync<GetAllBranches>();
             return branches;
         }
         public async Task<IEnumerable<GetBranchesByUserIdDTO>> GetBranchesByUserId(int userId)
         {
-            var branches = await _unitOfWork.Repository<UserBranch>()
+            var branches = await _unitOfWork.UserBranchRepository
                 .GetAllAsDtoAsync<GetBranchesByUserIdDTO>(ub => ub.UserId == userId, SkipBranchFilter:true);
             return branches;
         }
@@ -54,7 +55,7 @@ namespace HotelApp.Application.Services.BranchService
             try
             {
                 var mappedBranch = _mapper.Map<Branch>(branchDTO);
-                await _unitOfWork.Repository<Branch>().AddNewAsync(mappedBranch);
+                await _unitOfWork.BranchRepository.AddNewAsync(mappedBranch);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<BranchDTO>.ResponseSuccess($"{mappedBranch.Name} Branch Created Succesfully");
@@ -66,7 +67,7 @@ namespace HotelApp.Application.Services.BranchService
         }
 		public async Task<ServiceResponse<BranchDTO>> EditBranchAsync(BranchDTO branchDTO)
         {
-            var oldBranch = await _unitOfWork.Repository<Branch>().GetByIdAsync(branchDTO.Id);
+            var oldBranch = await _unitOfWork.BranchRepository.GetByIdAsync(branchDTO.Id);
             if(oldBranch == null)
             {
                 return ServiceResponse<BranchDTO>.ResponseFailure("Branch not found.");
@@ -75,7 +76,7 @@ namespace HotelApp.Application.Services.BranchService
 
             try
             {
-                _unitOfWork.Repository<Branch>().Update(oldBranch);
+                _unitOfWork.BranchRepository.Update(oldBranch);
                 await _unitOfWork.CommitAsync();
 				return ServiceResponse<BranchDTO>.ResponseSuccess("Branch Updated Successfully.");
 			}
@@ -88,13 +89,13 @@ namespace HotelApp.Application.Services.BranchService
         {
             try
             {
-                var branch = await _unitOfWork.Repository<Branch>().GetByIdAsync(Id);
+                var branch = await _unitOfWork.BranchRepository.GetByIdAsync(Id);
                 if (branch == null)
                 {
                     return ServiceResponse<Branch>.ResponseFailure("Branch not found");
 
                 }
-                _unitOfWork.Repository<Branch>().Delete(branch);
+                _unitOfWork.BranchRepository.Delete(branch);
                 await _unitOfWork.CommitAsync();
                 return ServiceResponse<Branch>.ResponseSuccess("Branch Deleted Successfully");
             }
@@ -105,7 +106,7 @@ namespace HotelApp.Application.Services.BranchService
         }
 		public async Task<BranchDTO?> GetBranchToEditByIdAsync(int Id)
 		{
-			var branch = await _unitOfWork.Repository<Branch>().GetByIdAsDtoAsync<BranchDTO>(Id);
+			var branch = await _unitOfWork.BranchRepository.GetByIdAsDtoAsync<BranchDTO>(Id);
             return branch;
 		}
 	}

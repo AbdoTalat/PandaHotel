@@ -34,6 +34,8 @@ using System.Threading.Tasks;
 using FluentValidation.AspNetCore;
 using HotelApp.Application.Services.CalculationTypeService;
 using HotelApp.Application.Services.DashboardService;
+using HotelApp.Application.Services.RateCalculationService;
+using HotelApp.Application.DTOs.Reservation;
 
 namespace HotelApp.Application
 {
@@ -61,15 +63,18 @@ namespace HotelApp.Application
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ICalculationTypeService, CalculationTypeService>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IRateCalculationService, RateCalculationService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
-			services.AddControllersWithViews()
+
+            services.AddControllersWithViews()
 	        .AddFluentValidation(fv =>
 	        {
 		        fv.RegisterValidatorsFromAssemblyContaining<GuestValidator>();
-	        });
+                fv.RegisterValidatorsFromAssemblyContaining<ReservationDTO>();
+            });
 
 			services.AddFluentValidationAutoValidation();
 			services.AddFluentValidationClientsideAdapters();

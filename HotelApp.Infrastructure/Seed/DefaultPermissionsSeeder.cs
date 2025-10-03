@@ -8,9 +8,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using HotelApp.Application.IRepositories;
 using HotelApp.Infrastructure.Repositories;
 using HotelApp.Domain.Entities;
+using HotelApp.Application.Interfaces.IRepositories;
 
 
 namespace HotelApp.Infrastructure.Seed

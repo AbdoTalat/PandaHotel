@@ -1,5 +1,6 @@
 ﻿using HotelApp.Application.DTOs.Dashboard;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.Services.DashboardService
 {
-	public class DashboardService : IDashboardService
+    public class DashboardService : IDashboardService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IDashboardRepository _dashboardRepository;

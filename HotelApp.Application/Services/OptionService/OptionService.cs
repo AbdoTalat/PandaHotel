@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Options;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -25,19 +26,19 @@ namespace HotelApp.Application.Services.OptionService
 
 		public async Task<IEnumerable<DropDownDTO<string>>> GetOptionsDropDownAsync()
 		{
-			var options = await _unitOfWork.Repository<Option>().GetAllAsDtoAsync<DropDownDTO<string>>();
+			var options = await _unitOfWork.OptionRepository.GetAllAsDtoAsync<DropDownDTO<string>>();
 			return options;
 		}
 
 		public async Task<IEnumerable<GetAllOptionsDTO>> GetAllOptionsAsync()
 		{
-			var options = await _unitOfWork.Repository<Option>().GetAllAsDtoAsync<GetAllOptionsDTO>();
+			var options = await _unitOfWork.OptionRepository.GetAllAsDtoAsync<GetAllOptionsDTO>();
 
 			return options;
 		}
 		public async Task<OptionDTO?> GetOptionToEditByIdAsync(int Id)
 		{
-			var option = await _unitOfWork.Repository<Option>().GetByIdAsDtoAsync<OptionDTO>(Id);
+			var option = await _unitOfWork.OptionRepository.GetByIdAsDtoAsync<OptionDTO>(Id);
 
 			return option;
 		}
@@ -47,7 +48,7 @@ namespace HotelApp.Application.Services.OptionService
 			{
 				var option = _mapper.Map<Option>(optionDTO);
 
-				await _unitOfWork.Repository<Option>().AddNewAsync(option);
+				await _unitOfWork.OptionRepository.AddNewAsync(option);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<OptionDTO>.ResponseSuccess("New Option added successfully.");
@@ -60,7 +61,7 @@ namespace HotelApp.Application.Services.OptionService
 
 		public async Task<ServiceResponse<OptionDTO>> EditOptionAsync(OptionDTO optionDTO)
 		{
-			var oldOption = await _unitOfWork.Repository<Option>().GetByIdAsync(optionDTO.Id);
+			var oldOption = await _unitOfWork.OptionRepository.GetByIdAsync(optionDTO.Id);
 
 			if (oldOption == null)
 			{
@@ -71,7 +72,7 @@ namespace HotelApp.Application.Services.OptionService
 			{
 				_mapper.Map(optionDTO, oldOption);
 
-				_unitOfWork.Repository<Option>().Update(oldOption);
+				_unitOfWork.OptionRepository.Update(oldOption);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<OptionDTO>.ResponseSuccess("Option updated successfully");
@@ -84,14 +85,14 @@ namespace HotelApp.Application.Services.OptionService
 
 		public async Task<ServiceResponse<Option>> DeleteOptionAsync(int Id)
 		{
-			var option = await _unitOfWork.Repository<Option>().GetByIdAsync(Id);
+			var option = await _unitOfWork.OptionRepository.GetByIdAsync(Id);
 
 			if (option == null)
 			{
 				return ServiceResponse<Option>.ResponseFailure("Option not found.");
 			}
 
-			var isUsed = await _unitOfWork.Repository<RoomOption>().IsExistsAsync(ro => ro.OptionId == Id);
+			var isUsed = await _unitOfWork.RoomOptionRepository.IsExistsAsync(ro => ro.OptionId == Id);
 
 			if (isUsed)
 			{
@@ -99,7 +100,7 @@ namespace HotelApp.Application.Services.OptionService
 			}
 			try
 			{
-				_unitOfWork.Repository<Option>().Delete(option);
+				_unitOfWork.OptionRepository.Delete(option);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<Option>.ResponseSuccess("Option deleted successfully");

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelApp.Application.IRepositories
+namespace HotelApp.Application.Interfaces.IRepositories
 {
-    public interface IUserRepository
+    public interface IUserRepository : IGenericRepository<User>
     {
         Task<IEnumerable<UsersDTO>> GetAllUsersAsync();
         Task<IEnumerable<int>> GetUserBranchesIDsByUserIdAsync(int Id);

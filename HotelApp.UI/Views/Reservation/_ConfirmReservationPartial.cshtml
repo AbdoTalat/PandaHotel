@@ -92,43 +92,30 @@
             <div class="panel-body">
                 <div class="form-group">
                     <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isConfirmed"> Confirmed
-                        </label>
+                        <label><input type="checkbox" id="isPending" checked> Pending</label>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isPending"> Pending
-                        </label>
+					<div class="checkbox">
+						<label><input type="checkbox" id="isConfirmed"> Confirmed</label>
+					</div>
+					<div class="checkbox">
+						<label><input type="checkbox" id="isCheckedIn"> Checked In</label>
+					</div>
+					<div class="checkbox">
+						<label><input type="checkbox" id="isCheckedOut"> Checked Out</label>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isCheckedIn"> Checked In
-                        </label>
+					<div class="checkbox">
+                        <label><input type="checkbox" id="isNoShow"> No Show</label>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isCheckedOut"> Checked Out
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isClosed"> Closed
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="isCancelled"> Cancelled
-                        </label>
-                    </div>
+					<div class="checkbox">
+						<label><input type="checkbox" id="isCancelled"> Cancelled</label>
+					</div>
 
-                    <!-- Cancellation Reason (conditionally shown) -->
-                    <div class="form-group" id="cancelReasonGroup" style="display:none;">
-                        <label for="cancellationReason">Cancellation Reason</label>
-                        <textarea class="form-control" id="cancellationReason" rows="2"></textarea>
-                    </div>
-
-                </div>
+					<!-- Cancellation Reason -->
+					<div class="form-group" id="cancelReasonGroup" style="display:none;">
+						<label for="cancellationReason">Cancellation Reason</label>
+						<textarea class="form-control" id="cancellationReason" rows="2"></textarea>
+					</div>
+				</div>
 
             </div>
         </div>
@@ -139,57 +126,45 @@
 
 <script>
 	$(document).ready(function () {
-		const checkboxes = [
-			"#isConfirmed",
-			"#isPending",
-			"#isCheckedIn",
-			"#isCheckedOut",
-			"#isClosed",
-			"#isCancelled"
-		];
+		// Always-enabled statuses
+		const alwaysEnabled = ["#isConfirmed", "#isPending", "#isCancelled", "#isNoShow"];
 
-		// Initial state
-		$(checkboxes[0]).prop("checked", true).prop("disabled", false); // isConfirmed checked & enabled
-		$(checkboxes[1]).prop("disabled", false); // isPending enabled only
-		$(checkboxes[2]).prop("disabled", false); // isStarted enabled only
-		$(checkboxes[6]).prop("disabled", false); // isCancelled enabled only
+		// Chain statuses
+		const chain = ["#isConfirmed", "#isCheckedIn", "#isCheckedOut", "#isClosed"];
 
-		// Disable others
-		for (let i = 3; i < checkboxes.length; i++) {
-			if (![1, 2, 6].includes(i)) {
-				$(checkboxes[i]).prop("disabled", true);
-			}
-		}
+		// Initial setup
+		alwaysEnabled.forEach(sel => $(sel).prop("disabled", false));
+		chain.forEach((sel, i) => {
+			if (i > 0) $(sel).prop("disabled", true); // disable all except Confirmed
+		});
 
-		// Handle enabling/disabling chain
-		checkboxes.forEach((selector, index) => {
+		// Handle changes
+		chain.forEach((selector, index) => {
 			$(selector).change(function () {
-				// Enable next if current is checked
 				if ($(this).is(":checked")) {
-					if (checkboxes[index + 1]) {
-						$(checkboxes[index + 1]).prop("disabled", false);
+					if (chain[index + 1]) {
+						$(chain[index + 1]).prop("disabled", false);
 					}
 				} else {
-					// Uncheck and disable all next ones (if not in always-enabled list)
-					for (let i = index + 1; i < checkboxes.length; i++) {
-						if (![1, 2, 6].includes(i)) {
-							$(checkboxes[i]).prop("checked", false).prop("disabled", true);
-						}
+					// Uncheck & disable everything after it
+					for (let i = index + 1; i < chain.length; i++) {
+						$(chain[i]).prop("checked", false).prop("disabled", true);
 					}
-				}
-
-				// Cancellation reason toggle
-				if ($("#isCancelled").is(":checked")) {
-					$("#cancelReasonGroup").slideDown();
-				} else {
-					$("#cancelReasonGroup").slideUp();
-					$("#cancellationReason").val('');
 				}
 			});
 		});
+
+		// Cancel reason toggle
+		$("#isCancelled").change(function () {
+			if ($(this).is(":checked")) {
+				$("#cancelReasonGroup").slideDown();
+			} else {
+				$("#cancelReasonGroup").slideUp();
+				$("#cancellationReason").val('');
+			}
+		});
 	});
 </script>
-
 <script>
 	function updateCharCount() {
 		const textarea = document.getElementById('comment');

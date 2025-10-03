@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Company;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -24,7 +25,7 @@ namespace HotelApp.Application.Services.CompanyService
 
         public async Task<IEnumerable<GetAllCompaniesDTO>> GetAllCompaniesAsync()
         {
-            var companies = await _unitOfWork.Repository<Company>()
+            var companies = await _unitOfWork.CompanyRepository
                 .GetAllAsDtoAsync<GetAllCompaniesDTO>();
 
             return companies;
@@ -32,7 +33,7 @@ namespace HotelApp.Application.Services.CompanyService
 
         public async Task<IEnumerable<DropDownDTO<string>>> GetCompaniesDropDownAsync()
         {
-            var companies = await _unitOfWork.Repository<Company>()
+            var companies = await _unitOfWork.CompanyRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>();
 
             return companies;
@@ -44,7 +45,7 @@ namespace HotelApp.Application.Services.CompanyService
             {
                 var company = _mapper.Map<Company>(companyDTO);
 
-                await _unitOfWork.Repository<Company>().AddNewAsync(company);
+                await _unitOfWork.CompanyRepository.AddNewAsync(company);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<CompanyDTO>.ResponseSuccess("new company added successfully.");
@@ -57,14 +58,14 @@ namespace HotelApp.Application.Services.CompanyService
 
         public async Task<CompanyDTO?> GetCompanyToEditByIdAsync(int Id)
         {
-            var company = await _unitOfWork.Repository<Company>()
+            var company = await _unitOfWork.CompanyRepository
                 .GetByIdAsDtoAsync<CompanyDTO>(Id);
 
             return company;
         }
         public async Task<ServiceResponse<CompanyDTO>> EditCompanyAsync(CompanyDTO companyDTO)
         {
-            var OldCompany = await _unitOfWork.Repository<Company>().GetByIdAsync(companyDTO.Id);
+            var OldCompany = await _unitOfWork.CompanyRepository.GetByIdAsync(companyDTO.Id);
             if (OldCompany == null)
             {
                 return ServiceResponse<CompanyDTO>.ResponseFailure("Company not found.");
@@ -72,7 +73,7 @@ namespace HotelApp.Application.Services.CompanyService
             try
             {
                 _mapper.Map(companyDTO, OldCompany);
-                _unitOfWork.Repository<Company>().Update(OldCompany);
+                _unitOfWork.CompanyRepository.Update(OldCompany);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<CompanyDTO>.ResponseSuccess("Company uodated successfully.");
@@ -90,7 +91,7 @@ namespace HotelApp.Application.Services.CompanyService
 
         public async Task<IEnumerable<DropDownDTO<string>>> SerachCompanyByNameAsync(string Name)
         {
-            var companies = await _unitOfWork.Repository<Company>()
+            var companies = await _unitOfWork.CompanyRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>
                 (c => c.Name.ToLower().Contains(Name.ToLower()) && c.IsActive);
 
@@ -99,7 +100,7 @@ namespace HotelApp.Application.Services.CompanyService
 
         public async Task<GetSearchedCompanyDTO?> GetSearchedCompanyDataAsync(int Id)
         {
-            var company = await _unitOfWork.Repository<Company>()
+            var company = await _unitOfWork.CompanyRepository
                 .GetByIdAsDtoAsync<GetSearchedCompanyDTO>(Id);
 
             return company;
@@ -113,14 +114,14 @@ namespace HotelApp.Application.Services.CompanyService
                 if (companyDTO.Id == 0)
                 {
                     company = _mapper.Map<Company>(companyDTO);
-                    await _unitOfWork.Repository<Company>().AddNewAsync(company);
+                    await _unitOfWork.CompanyRepository.AddNewAsync(company);
                 }
                 else
                 {
-                    company = await _unitOfWork.Repository<Company>().GetByIdAsync(companyDTO.Id);
+                    company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyDTO.Id);
 
                     _mapper.Map(companyDTO, company);
-                    _unitOfWork.Repository<Company>().Update(company);
+                    _unitOfWork.CompanyRepository.Update(company);
                 }
 
                 await _unitOfWork.CommitAsync();

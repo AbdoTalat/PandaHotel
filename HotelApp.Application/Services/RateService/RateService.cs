@@ -2,7 +2,8 @@
 using AutoMapper.Configuration.Annotations;
 using HotelApp.Application.DTOs.Rates;
 using HotelApp.Application.DTOs.RoleBased;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ namespace HotelApp.Application.Services.RateService
 
 		public async Task<IEnumerable<GetAllRatesDTO>> GetAllRatesAsync()
 		{
-			var rates = await _unitOfWork.Repository<Rate>().GetAllAsDtoAsync<GetAllRatesDTO>();
+			var rates = await _unitOfWork.RateRepository.GetAllAsDtoAsync<GetAllRatesDTO>();
 
 			return rates;
 		}
@@ -48,7 +49,7 @@ namespace HotelApp.Application.Services.RateService
 		}
         public async Task<IEnumerable<GetRateDetailsForReservationDTO>> GetRateDetailsForReservation(int rateId, int BranchId)
 		{
-			var rateDetails = await _unitOfWork.Repository<RoomTypeRate>()
+			var rateDetails = await _unitOfWork.RoomTypeRateRepository
 				.GetAllAsDtoAsync<GetRateDetailsForReservationDTO>(rtr => rtr.RateId == rateId && rtr.RoomType.BranchId == BranchId);
 
 			return rateDetails;
@@ -60,7 +61,7 @@ namespace HotelApp.Application.Services.RateService
             {
 				await _unitOfWork.BeginTransactionAsync();
                 var rate = _mapper.Map<Rate>(rateDTO);
-                await _unitOfWork.Repository<Rate>().AddNewAsync(rate);
+                await _unitOfWork.RateRepository.AddNewAsync(rate);
 				await _unitOfWork.CommitAsync();
 
 
@@ -79,7 +80,7 @@ namespace HotelApp.Application.Services.RateService
 							MonthlyPrice = rtr.MonthlyPrice
 						});
 
-					await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(roomTypeRates);
+					await _unitOfWork.RoomTypeRateRepository.AddRangeAsync(roomTypeRates);
 					//await _unitOfWork.CommitAsync();
 				}
 				await _unitOfWork.CommitTransactionAsync();
@@ -94,7 +95,7 @@ namespace HotelApp.Application.Services.RateService
         }
 		public async Task<ServiceResponse<RateDTO>> EditRateAsync(RateDTO rateDTO)
 		{
-			var OldRate = await _unitOfWork.Repository<Rate>().GetByIdAsync(rateDTO.Id);
+			var OldRate = await _unitOfWork.RateRepository.GetByIdAsync(rateDTO.Id);
 			if (OldRate == null)
 			{
 				return ServiceResponse<RateDTO>.ResponseFailure("Rate not found.");
@@ -103,9 +104,9 @@ namespace HotelApp.Application.Services.RateService
 			try
 			{
 				_mapper.Map(rateDTO, OldRate);
-				_unitOfWork.Repository<Rate>().Update(OldRate);
+				_unitOfWork.RateRepository.Update(OldRate);
 
-				var existingRoomTypeRates = await _unitOfWork.Repository<RoomTypeRate>()
+				var existingRoomTypeRates = await _unitOfWork.RoomTypeRateRepository
 					.GetAllAsync(rtr => rtr.RateId == rateDTO.Id);
 
 				var updatedRoomTypeRates = new List<RoomTypeRate>();
@@ -154,17 +155,17 @@ namespace HotelApp.Application.Services.RateService
 
 				if (newRoomTypeRates.Any())
 				{
-					await _unitOfWork.Repository<RoomTypeRate>().AddRangeAsync(newRoomTypeRates);
+					await _unitOfWork.RoomTypeRateRepository.AddRangeAsync(newRoomTypeRates);
 				}
 
 				if (updatedRoomTypeRates.Any())
 				{
-					_unitOfWork.Repository<RoomTypeRate>().UpdateRange(updatedRoomTypeRates);
+					_unitOfWork.RoomTypeRateRepository.UpdateRange(updatedRoomTypeRates);
 				}
 
 				if (roomTypeRatesToDelete.Any())
 				{
-					_unitOfWork.Repository<RoomTypeRate>().DeleteRange(roomTypeRatesToDelete);
+					_unitOfWork.RoomTypeRateRepository.DeleteRange(roomTypeRatesToDelete);
 				}
 
 				await _unitOfWork.CommitAsync();

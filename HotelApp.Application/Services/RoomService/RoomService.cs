@@ -1,17 +1,17 @@
 ﻿using AutoMapper;
-using HotelApp.Domain;
+using HotelApp.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Application.Services.RoomStatusService;
 using HotelApp.Application.Services.RoomTypeService;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Application.DTOs.RoleBased;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using BenchmarkDotNet.Running;
 using System.Web.Mvc;
 using HotelApp.Helper;
 using HotelApp.Application.DTOs.Reservation;
+using HotelApp.Application.Interfaces.IRepositories;
 
 namespace HotelApp.Application.Services.RoomService
 {
@@ -34,7 +34,7 @@ namespace HotelApp.Application.Services.RoomService
 
 		public async Task<IEnumerable<GetAllRoomsDTO>> GetAllRoomsAsync()
         {
-            var rooms = await _unitOfWork.Repository<Room>().GetAllAsDtoAsync<GetAllRoomsDTO>();
+            var rooms = await _unitOfWork.RoomRepository.GetAllAsDtoAsync<GetAllRoomsDTO>();
             
             
             return rooms;
@@ -47,14 +47,14 @@ namespace HotelApp.Application.Services.RoomService
         }
 		public async Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id)
         {
-            var room = await _unitOfWork.Repository<Room>()
+            var room = await _unitOfWork.RoomRepository
                 .GetByIdAsDtoAsync<EditRoomDTO>(Id);
             
             return room;
         }
 		public async Task<GetRoomByIdDTO?> GetRoomByIdAsync(int Id)
         {
-            var room = await _unitOfWork.Repository<Room>().GetByIdAsDtoAsync<GetRoomByIdDTO>(Id);
+            var room = await _unitOfWork.RoomRepository.GetByIdAsDtoAsync<GetRoomByIdDTO>(Id);
             return room;
         }
 
@@ -62,14 +62,14 @@ namespace HotelApp.Application.Services.RoomService
         {
             try
             {
-                bool IsRoomNumberUnique = await _unitOfWork.Repository<Room>()
+                bool IsRoomNumberUnique = await _unitOfWork.RoomRepository
                     .IsExistsAsync(r => r.RoomNumber.ToLower() == roomDTO.RoomNumber.ToLower());
                 if (IsRoomNumberUnique)
                 {
                     return ServiceResponse<AddRoomDTO>.ResponseFailure("Cannot enter duplicate room number.");
                 }
                 var mappedRoom = _mapper.Map<Room>(roomDTO);
-                await _unitOfWork.Repository<Room>().AddNewAsync(mappedRoom);
+                await _unitOfWork.RoomRepository.AddNewAsync(mappedRoom);
                 await _unitOfWork.CommitAsync();
 
                 if (roomDTO.SelectedOptions != null)
@@ -80,7 +80,7 @@ namespace HotelApp.Application.Services.RoomService
                         OptionId = optionId
                     });
 
-                    await _unitOfWork.Repository<RoomOption>().AddRangeAsync(roomOptions);
+                    await _unitOfWork.RoomOptionRepository.AddRangeAsync(roomOptions);
 
                 }
                 await _unitOfWork.CommitAsync();
@@ -112,7 +112,7 @@ namespace HotelApp.Application.Services.RoomService
 				        ? i.ToString()
 				        : $"{dto.RoomNumberText}{i}";
 
-					bool isRoomNumberExist = await _unitOfWork.Repository<Room>()
+					bool isRoomNumberExist = await _unitOfWork.RoomRepository
 						.IsExistsAsync(r => r.RoomNumber.ToLower() == roomNumber.ToLower());
 
 					if (isRoomNumberExist)
@@ -144,7 +144,7 @@ namespace HotelApp.Application.Services.RoomService
 
 				if (roomsToAdd.Count > 0)
 				{
-					await _unitOfWork.Repository<Room>().AddRangeAsync(roomsToAdd);
+					await _unitOfWork.RoomRepository.AddRangeAsync(roomsToAdd);
 					await _unitOfWork.CommitAsync();
 					return ServiceResponse<AddRoomDTO>.ResponseSuccess( $"{roomsToAdd.Count} room(s) added successfully.");
 				}
@@ -160,14 +160,14 @@ namespace HotelApp.Application.Services.RoomService
 
 		public async Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO room)
         {
-            var oldRoom = await _unitOfWork.Repository<Room>().GetByIdAsync(room.Id);
+            var oldRoom = await _unitOfWork.RoomRepository.GetByIdAsync(room.Id);
             if (oldRoom == null)
             {
                 return ServiceResponse<EditRoomDTO>.ResponseFailure("Room Is Not Found.");
             }
             try
             {
-				bool IsRoomNumberExist = await _unitOfWork.Repository<Room>()
+				bool IsRoomNumberExist = await _unitOfWork.RoomRepository
                     .IsExistsAsync(r => r.RoomNumber.ToLower() ==  room.RoomNumber.ToLower() && r.Id !=room.Id && r.BranchId == oldRoom.BranchId);
 				if (IsRoomNumberExist)
 				{
@@ -176,11 +176,11 @@ namespace HotelApp.Application.Services.RoomService
 
                 _mapper.Map(room, oldRoom);
 
-                _unitOfWork.Repository<Room>().Update(oldRoom);
+                _unitOfWork.RoomRepository.Update(oldRoom);
 
-                var oldRoomOption = await _unitOfWork.Repository<RoomOption>().GetAllAsync(ro => ro.RoomId == room.Id);
+                var oldRoomOption = await _unitOfWork.RoomOptionRepository.GetAllAsync(ro => ro.RoomId == room.Id);
 
-                _unitOfWork.Repository<RoomOption>().DeleteRange(oldRoomOption);
+                _unitOfWork.RoomOptionRepository.DeleteRange(oldRoomOption);
 
                 if (room.SelectedOptions != null)
                 {
@@ -190,7 +190,7 @@ namespace HotelApp.Application.Services.RoomService
                         OptionId = optionId
                     });
 
-                    await _unitOfWork.Repository<RoomOption>().AddRangeAsync(roomOptions);
+                    await _unitOfWork.RoomOptionRepository.AddRangeAsync(roomOptions);
                     
                 }
                 await _unitOfWork.CommitAsync();
@@ -205,20 +205,20 @@ namespace HotelApp.Application.Services.RoomService
 
         public async Task<ServiceResponse<Room>> DeleteRoomAsync(int Id)
         {
-            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(Id);
+            var room = await _unitOfWork.RoomRepository.GetByIdAsync(Id);
             if (room == null)
             {
                 return ServiceResponse<Room>.ResponseFailure($"There is no room with this ID: {Id}");
             }
 
-            bool isRoomReserved = await _unitOfWork.Repository<ReservationRoom>().IsExistsAsync(r => r.RoomId == Id);
+            bool isRoomReserved = await _unitOfWork.ReservationRoomRepository.IsExistsAsync(r => r.RoomId == Id);
             if (isRoomReserved)
             {
                 return ServiceResponse<Room>.ResponseFailure("Cannot delete room that is already reserved before.");
             }
             try
             {
-                _unitOfWork.Repository<Room>().Delete(room);
+                _unitOfWork.RoomRepository.Delete(room);
                 await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<Room>.ResponseSuccess("Room Deleted Successfully.");
@@ -237,7 +237,7 @@ namespace HotelApp.Application.Services.RoomService
         }
         public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name)
         {
-            var rooms = await _unitOfWork.Repository<Room>()
+            var rooms = await _unitOfWork.RoomRepository
                 .GetAllAsDtoAsync<GetAvailableRoomsDTO>(r => r.RoomNumber.Contains(name) && r.IsActive && r.RoomStatus.IsReservable);
 
             return rooms;

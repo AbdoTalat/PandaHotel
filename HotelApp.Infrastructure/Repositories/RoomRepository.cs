@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HotelApp.Application.DTOs.Rooms;
-using HotelApp.Application.IRepositories;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelApp.Domain.Enums;
@@ -15,15 +14,17 @@ using Microsoft.Identity.Client;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using HotelApp.Application.Interfaces.IRepositories;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : GenericRepository<Room>, IRoomRepository
     {
         private readonly ApplicationDbContext _context;
 		private readonly IConfigurationProvider _mapperConfig;
 
 		public RoomRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+			: base(context, mapperConfig)
         {
             _context = context;
 			_mapperConfig = mapperConfig;
@@ -133,14 +134,14 @@ namespace HotelApp.Infrastructure.Repositories
             {
                 var requestedCount = typeDto.NumOfRooms;
 
-                if (!selectedByType.TryGetValue(typeDto.Id, out var selectedCount))
+                if (!selectedByType.TryGetValue(typeDto.RoomTypeId, out var selectedCount))
                 {
-                    return ServiceResponse<object>.ResponseFailure( $"You must select {requestedCount} room(s) for {GetRoomTypeName(typeDto.Id)}.");
+                    return ServiceResponse<object>.ResponseFailure( $"You must select {requestedCount} room(s) for {GetRoomTypeName(typeDto.RoomTypeId)}.");
                 }
 
                 if (requestedCount != selectedCount)
                 {
-                    return ServiceResponse<object>.ResponseFailure($"For {GetRoomTypeName(typeDto.Id)} you selected {selectedCount}, but required {requestedCount}.");
+                    return ServiceResponse<object>.ResponseFailure($"For {GetRoomTypeName(typeDto.RoomTypeId)} you selected {selectedCount}, but required {requestedCount}.");
                 }
             }
 

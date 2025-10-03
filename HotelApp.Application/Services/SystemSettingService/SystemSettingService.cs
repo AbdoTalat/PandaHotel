@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs.SystemSetting;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -12,28 +13,26 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Application.Services.SystemSettingService
 {
-	public class SystemSettingService : ISystemSettingService
+    public class SystemSettingService : ISystemSettingService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-		private readonly ISystemSettingRepositroy _systemSettingRepositroy;
 
-		public SystemSettingService(IUnitOfWork unitOfWork, IMapper mapper, ISystemSettingRepositroy systemSettingRepositroy)
+		public SystemSettingService(IUnitOfWork unitOfWork, IMapper mapper)
         {
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_systemSettingRepositroy = systemSettingRepositroy;
 		}
         public async Task<SystemSettingDTO?> GetSystemSettingForEditAsync()
 		{
-			var systemSetting = await _unitOfWork.Repository<SystemSetting>()
+			var systemSetting = await _unitOfWork.SystemSettingRepository
 				.FirstOrDefaultAsDtoAsync<SystemSettingDTO>();
 
 			return systemSetting;
 		}
         public async Task<ServiceResponse<SystemSettingDTO>> EditSystemSettingAsync(SystemSettingDTO systemSettingDTO)
 		{
-			var OldSystemSetting = await _unitOfWork.Repository<SystemSetting>()
+			var OldSystemSetting = await _unitOfWork.SystemSettingRepository
 				.FirstOrDefaultAsync(st => st.Id == systemSettingDTO.Id);
 			if (OldSystemSetting == null)
 			{
@@ -42,7 +41,7 @@ namespace HotelApp.Application.Services.SystemSettingService
 			try
 			{
 				_mapper.Map(systemSettingDTO, OldSystemSetting);
-				_unitOfWork.Repository<SystemSetting>().Update(OldSystemSetting);
+				_unitOfWork.SystemSettingRepository.Update(OldSystemSetting);
 				await _unitOfWork.CommitAsync();
 
                 return ServiceResponse<SystemSettingDTO>.ResponseSuccess("New system settings saved successfuly.");
@@ -54,7 +53,7 @@ namespace HotelApp.Application.Services.SystemSettingService
         }
 		public GetSystemSettingForValidationDTO? GetSystemSettingForValidation()
 		{
-			var result = _systemSettingRepositroy.GetSystemSettingForValidation();
+			var result = _unitOfWork.SystemSettingRepository.GetSystemSettingForValidation();
 
 			return result;
 		}

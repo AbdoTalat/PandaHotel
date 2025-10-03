@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace HotelApp.Domain
+namespace HotelApp.Application.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -19,9 +19,9 @@ namespace HotelApp.Domain
 		void Update(T entity);
         void UpdateRange(IEnumerable<T> entities);
 
-		 Task BulkUpdateAsync(Expression<Func<T, bool>> predicate,
-	        Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
-	        bool skipBranchFilter = false, bool skipAuditFields = false);
+		 //Task BulkUpdateAsync(Expression<Func<T, bool>> predicate,
+	  //      Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setProperties,
+	  //      bool skipBranchFilter = false, bool skipAuditFields = false);
 
 		void Delete(T entity);
         void DeleteRange(IEnumerable<T> entities);

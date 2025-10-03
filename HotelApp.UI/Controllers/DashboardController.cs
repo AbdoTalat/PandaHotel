@@ -1,12 +1,12 @@
 ﻿using HotelApp.Application.DTOs.Dashboard;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Application.Services.DashboardService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelApp.UI.Controllers
 {
-	[Authorize]
+    [Authorize]
 	public class DashboardController : BaseController
 	{
 		private readonly IDashboardService _dashboardService;

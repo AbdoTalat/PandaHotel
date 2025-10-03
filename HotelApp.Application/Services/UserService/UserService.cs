@@ -7,10 +7,11 @@ using HotelApp.Application.DTOs.Users;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Application.DTOs.Branches;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Application.Interfaces;
 
 namespace HotelApp.Application.Services.UserService
 {
@@ -20,7 +21,6 @@ namespace HotelApp.Application.Services.UserService
 		private readonly IMapper _mapper;
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<Role> _roleManager;
-		private readonly IUserRepository _userRepository;
 		private readonly ICurrentUserService _currentUserService;
 
 
@@ -28,21 +28,19 @@ namespace HotelApp.Application.Services.UserService
 			IMapper mapper,
 			UserManager<User> userManager,
 			 RoleManager<Role> roleManager, 
-			 IUserRepository userRepository,
 			 ICurrentUserService currentUserService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 			_userManager = userManager;
 			_roleManager = roleManager;
-			_userRepository = userRepository;
 			_currentUserService = currentUserService;
 
 		}
 
 		public async Task<IEnumerable<UsersDTO>> GetAllUsersAsync()
 		{
-			var users = await _userRepository.GetAllUsersAsync();
+			var users = await _unitOfWork.UserRepository.GetAllUsersAsync();
 
 
 			return users;
@@ -53,8 +51,8 @@ namespace HotelApp.Application.Services.UserService
 		}
 		public async Task<IEnumerable<DropDownDTO<string>>> GetUserBranchesByUserIdAsync(int Id)
 		{
-			var userBranches = await _unitOfWork.Repository<UserBranch>()
-				.GetAllAsDtoAsync<DropDownDTO<string>>(ub => ub.UserId == Id, SkipBranchFilter: true);
+			var userBranches = await _unitOfWork.UserBranchRepository
+                .GetAllAsDtoAsync<DropDownDTO<string>>(ub => ub.UserId == Id, SkipBranchFilter: true);
 
 			return userBranches;
 		}
@@ -69,10 +67,10 @@ namespace HotelApp.Application.Services.UserService
 			{
 				var dto = _mapper.Map<EditUserDTO>(user);
 
-				dto.SelectedBranchIds = (await _userRepository.GetUserBranchesIDsByUserIdAsync(Id)).ToList();
+				dto.SelectedBranchIds = (await _unitOfWork.UserRepository.GetUserBranchesIDsByUserIdAsync(Id)).ToList();
 				dto.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
 				dto.SelectedRoles = (await _userManager.GetRolesAsync(user)).ToList();
-				dto.AllBranches = await _unitOfWork.Repository<Branch>()
+				dto.AllBranches = await _unitOfWork.BranchRepository
 					.GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter: true);
 
 				return ServiceResponse<EditUserDTO>.ResponseSuccess("Success",dto);
@@ -119,7 +117,7 @@ namespace HotelApp.Application.Services.UserService
 					AssignedAt = DateTime.UtcNow
 				}).ToList();
 
-				await _unitOfWork.Repository<UserBranch>().AddRangeAsync(newUserBranches);
+				await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<AddUserDTO>.ResponseSuccess($"New user '{newUser.UserName}' created successfully.");
@@ -151,9 +149,9 @@ namespace HotelApp.Application.Services.UserService
 				await _userManager.AddToRolesAsync(user, userDTO.SelectedRoles);
 
 				// Update branches
-				var existingBranches = await _unitOfWork.Repository<UserBranch>()
+				var existingBranches = await _unitOfWork.UserBranchRepository
 					.GetAllAsync(ub => ub.UserId == userDTO.Id, SkipBranchFilter:true);
-				_unitOfWork.Repository<UserBranch>().DeleteRange(existingBranches);
+				_unitOfWork.UserBranchRepository.DeleteRange(existingBranches);
 
 				var newUserBranches = userDTO.SelectedBranchIds.Select(branchId => new UserBranch
 				{
@@ -162,7 +160,7 @@ namespace HotelApp.Application.Services.UserService
 					AssignedAt = DateTime.UtcNow
 				}).ToList();
 
-				await _unitOfWork.Repository<UserBranch>().AddRangeAsync(newUserBranches);
+				await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
 				await _unitOfWork.CommitAsync();
 
 
@@ -176,14 +174,14 @@ namespace HotelApp.Application.Services.UserService
 
 		public async Task<ServiceResponse<User>> DeleteUserAsync(int Id)
 		{
-            var user = await _unitOfWork.Repository<User>().GetByIdAsync(Id);
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(Id);
             if (user == null) 
 				return ServiceResponse<User>.ResponseFailure($"User with ID:{Id} is not found");
 
 			try
 			{
-				var userBranches = await _unitOfWork.Repository<UserBranch>().GetAllAsync(ub => ub.UserId == Id);
-				_unitOfWork.Repository<UserBranch>().DeleteRange(userBranches);
+				var userBranches = await _unitOfWork.UserBranchRepository.GetAllAsync(ub => ub.UserId == Id);
+				_unitOfWork.UserBranchRepository.DeleteRange(userBranches);
 				await _unitOfWork.CommitAsync();
 				var result = await _userManager.DeleteAsync(user);
 				

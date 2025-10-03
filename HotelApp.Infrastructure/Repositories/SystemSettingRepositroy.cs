@@ -1,5 +1,6 @@
-﻿using HotelApp.Application.DTOs.SystemSetting;
-using HotelApp.Application.IRepositories;
+﻿using AutoMapper;
+using HotelApp.Application.DTOs.SystemSetting;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using System;
@@ -10,14 +11,17 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-	public class SystemSettingRepositroy : ISystemSettingRepositroy
+    public class SystemSettingRepositroy : GenericRepository<SystemSetting>, ISystemSettingRepositroy
 	{
 		private readonly ApplicationDbContext _context;
+        private readonly IConfigurationProvider _mapperConfig;
 
-		public SystemSettingRepositroy(ApplicationDbContext context)
+        public SystemSettingRepositroy(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+			: base(context, mapperConfig)
 		{
 			_context = context;
-		}
+            _mapperConfig = mapperConfig;
+        }
 
 		public GetSystemSettingForValidationDTO? GetSystemSettingForValidation()
 		{

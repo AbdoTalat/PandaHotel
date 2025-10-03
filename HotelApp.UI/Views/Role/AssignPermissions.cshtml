@@ -67,11 +67,14 @@
                         {
                             <div class="row">
                                 <div class="col-md-2">
-                                    <div class="checkbox-container">
-                                        <input type="checkbox" id="selectAll" class="checkbox-input" />
-                                        <label for="selectAll" class="checkbox-custom"></label>
-                                        <label for="selectAll" class="checkbox-label" style="cursor:pointer">Select All</label>
-                                    </div>
+                                    <label class="checkbox-inline" for="selectAllCheckbox">
+                                        <div>
+                                            <span>
+                                                <input type="checkbox" class="styled" id="selectAllCheckbox" />
+                                            </span>
+                                        </div>
+                                        Select All
+                                    </label>
                                 </div>
                             </div>
                             
@@ -81,30 +84,32 @@
 
                         @foreach (var group in Model.PermissionGroups)
                         {
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <h5> @group.Key</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-2">
+                                    <h5>@group.Key</h5>
                                 </div>
-                                @foreach (var perm in group.Value)
-                                {
-                                    var checkboxId = $"perm_{perm.Action.Replace(" ", "_")}";
-                                    <div class="col-md-2">
-                                        <div class="checkbox-container">
-                                            <input type="checkbox"
-                                                   id="@checkboxId"
-                                                   name="permissionStrings"
-                                                   value="@perm.Action"
-                                                   class="checkbox-input"
-                                            @(perm.IsAssigned ? "checked" : "")
-                                            @(Model.IsBasic ? "disabled" : "") />
 
-                                            <label for="@checkboxId" class="checkbox-custom"></label>
-                                            <label for="@checkboxId" class="checkbox-label" style="cursor:pointer">@perm.Action</label>
-                                        </div>
-                                    </div>
-                                }
+                                <div class="col-md-10">
+                                    @foreach (var perm in group.Value)
+                                    {
+                                        var checkboxId = $"perm_{perm.Action.Replace(" ", "_")}";
 
+                                        <label class="checkbox-inline me-3" for="@checkboxId">
+                                            <div>
+                                                <span>
+                                                    <input type="checkbox"
+                                                           id="@checkboxId"
+                                                           name="permissionStrings"
+                                                           value="@perm.Action"
+                                                           class="styled permission-checkbox"
+                                                    @(perm.IsAssigned ? "checked" : "")
+                                                    @(Model.IsBasic ? "disabled" : "") />
+                                                </span>
+                                            </div>
+                                            @perm.Action
+                                        </label>
+                                    }
+                                </div>
                             </div>
                             <hr />
                         }
@@ -113,7 +118,7 @@
             </div>
             <div class="text-center">
                 <a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Role">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-lg" @(Model.IsBasic ? "disabled" : "")>
+                <button type="submit" class="btn btn-primary btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" @(Model.IsBasic ? "disabled" : "")>
                     <i class="icon-checkmark4"></i> Save
                 </button>
             </div>
@@ -124,30 +129,54 @@
 
 
 
-@section Scripts{
-    @if (TempData["Error"] != null)
-    {
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: '@TempData["Error"]'
-            });
-        </script>
-    }
+@section Scripts {
     <script>
-        $(document).ready(function () {
-            $("#selectAll").change(function () {
-                let isChecked = this.checked;
-                $(".checkbox-input").prop("checked", isChecked);
+        $(function () {
+            var $selectAll = $('#selectAllCheckbox');
+            var $items = $('input.permission-checkbox');
+
+            // Helper: update the visual plugin if present
+            function updatePlugins($elems, checked) {
+                // iCheck support
+                if ($.fn.iCheck) {
+                    $elems.filter(':not(:disabled)').iCheck(checked ? 'check' : 'uncheck');
+                    return;
+                }
+                // Uniform support (older plugin)
+                if (typeof $.uniform !== 'undefined') {
+                    // set native checked then update uniform visuals
+                    $elems.each(function () {
+                        if (!this.disabled) this.checked = checked;
+                    });
+                    $.uniform.update($elems);
+                    return;
+                }
+                // Fallback: set native checked + trigger change so any handlers update
+                $elems.each(function () {
+                    if (this.disabled) return;
+                    if (this.checked !== checked) {
+                        this.checked = checked;
+                        $(this).trigger('change');
+                    }
+                });
+            }
+
+            // Select All toggle
+            $selectAll.on('change', function () {
+                var checked = this.checked;
+                updatePlugins($items, checked);
             });
 
-            $(".checkbox-input").change(function () {
-                let allChecked = $(".checkbox-input").length === $(".checkbox-input:checked").length;
-                $("#selectAll").prop("checked", allChecked);
+            // When any individual checkbox changes, update Select All state.
+            // Listen to both iCheck event and normal change
+            $items.on('ifChanged change', function () {
+                var $enabled = $items.filter(':not(:disabled)');
+                var allChecked = $enabled.length && ($enabled.filter(':checked').length === $enabled.length);
+                $selectAll.prop('checked', !!allChecked);
             });
         });
     </script>
 
-    @await Html.PartialAsync("_ValidationScriptsPartial");
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
+

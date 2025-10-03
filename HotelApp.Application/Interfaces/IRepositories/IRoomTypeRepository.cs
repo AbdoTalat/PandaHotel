@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelApp.Application.IRepositories
+namespace HotelApp.Application.Interfaces.IRepositories
 {
-    public interface IRoomTypeRepository
+    public interface IRoomTypeRepository : IGenericRepository<RoomType>
     {
         Task<IEnumerable<RoomType>> GetRoomTypesByIDsAsync(List<int> roomTypeIds);
         Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservation();

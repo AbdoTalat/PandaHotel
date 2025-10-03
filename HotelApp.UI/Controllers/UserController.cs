@@ -21,21 +21,19 @@ namespace HotelApp.UI.Controllers
         private readonly IBranchService _branchService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthorizationService _authorizationService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
 
         public UserController(IBranchService branchService, IUserService userService,
-            IRoleService roleService, IUnitOfWork unitOfWork,
+            IRoleService roleService ,
             IAuthorizationService authorizationService, SignInManager<User> signInManager,
             UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _branchService = branchService;
             _userService = userService;
             _roleService = roleService;
-            _unitOfWork = unitOfWork;
             _authorizationService = authorizationService;
             _signInManager = signInManager;
             _userManager = userManager;

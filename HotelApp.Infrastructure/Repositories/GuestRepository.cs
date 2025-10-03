@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelApp.Application.DTOs.Guests;
-using HotelApp.Application.IRepositories;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Helper;
@@ -11,19 +10,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using HotelApp.Domain.Entities;
+using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Domain;
+using HotelApp.Application.Interfaces.IRepositories;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class GuestRepository : IGuestRepository
+    public class GuestRepository : GenericRepository<Guest> , IGuestRepository
     {
         private readonly ApplicationDbContext _context;
 		private readonly IConfigurationProvider _mapperConfig;
+        private readonly ICurrentUserService _currentUserService;
 
-		public GuestRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+        public GuestRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig, ICurrentUserService currentUserService)
+            : base(context, mapperConfig)
         {
             _context = context;
 			_mapperConfig = mapperConfig;
-		}
+            _currentUserService = currentUserService;
+        }
 		public async Task<IEnumerable<GetSearchedGuestsDTO>> SerachGuestsByEmailAsync(string email)
 		{
 			var guest = await _context.Guests

@@ -1,4 +1,5 @@
 ﻿using HotelApp.Application.DTOs;
+using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -19,7 +20,7 @@ namespace HotelApp.Application.Services.CalculationTypeService
         }
         public async Task<IEnumerable<DropDownDTO<string>>> GetAllCalculationTypesDropDown()
         {
-            var CalculationTypes = await _unitOfWork.Repository<CalculationType>()
+            var CalculationTypes = await _unitOfWork.CalculationTypeRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>();
 
             return CalculationTypes;

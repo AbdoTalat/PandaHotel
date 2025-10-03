@@ -22,13 +22,13 @@ namespace HotelApp.Domain.Entities
         public decimal TotalPrice { get; set; }
         public string? Notes { get; set; }
 
-		public bool IsConfirmed { get; set; }
-		public bool IsPending { get; set; }
-		public bool IsCheckedIn { get; set; }
-		public bool IsCheckedOut { get; set; }
-		public bool IsClosed { get; set; }
-		public bool IsCancelled { get; set; }
-		public string? CancellationReason { get; set; }
+        public bool IsPending { get; set; }
+        public bool IsConfirmed { get; set; }
+        public bool IsCheckedIn { get; set; }
+        public bool IsCheckedOut { get; set; }
+        public bool IsCancelled { get; set; }
+        public bool IsNoShow { get; set; }
+        public string? CancellationReason { get; set; }
 
         public int ReservationSourceId { get; set; }
         public ReservationSource? ReservationSource { get; set; }
@@ -44,4 +44,8 @@ namespace HotelApp.Domain.Entities
         public ICollection<ReservationRoom> ReservationsRooms { get; set; } = new HashSet<ReservationRoom>();
 
     }
+
+
+
+
 }

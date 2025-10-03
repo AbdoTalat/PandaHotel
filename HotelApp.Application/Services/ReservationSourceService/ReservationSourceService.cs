@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using HotelApp.Application.Interfaces;
 
 namespace HotelApp.Application.Services.ReservationSourceService
 {
@@ -25,7 +26,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 
         public async Task<IEnumerable<DropDownDTO<string>>> GetReservationSourcesDropDownAsync()
         {
-            var reservationSources = await _unitOfWork.Repository<ReservationSource>()
+            var reservationSources = await _unitOfWork.ReservationSourceRepository
                 .GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
 
             return reservationSources;
@@ -33,7 +34,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 
 		public async Task<IEnumerable<ReservationSourceDTO>> GetAllReservationSourcesAsync()
 		{
-			var ReservationSources = await _unitOfWork.Repository<ReservationSource>()
+			var ReservationSources = await _unitOfWork.ReservationSourceRepository
 				.GetAllAsDtoAsync<ReservationSourceDTO>();
 
 			return ReservationSources;
@@ -44,7 +45,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 			try
 			{
 				var ReservationSource = _mapper.Map<ReservationSource>(dto);
-				await _unitOfWork.Repository<ReservationSource>().AddNewAsync(ReservationSource);
+				await _unitOfWork.ReservationSourceRepository.AddNewAsync(ReservationSource);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<ReservationSourceDTO>.ResponseSuccess("New Reservation Source added successfully.");
@@ -56,14 +57,14 @@ namespace HotelApp.Application.Services.ReservationSourceService
 		}
 		public async Task<ReservationSourceDTO?> GetReservationSourceToEditByIdAsync(int Id)
 		{
-			var ReservationSource = await _unitOfWork.Repository<ReservationSource>()
+			var ReservationSource = await _unitOfWork.ReservationSourceRepository
 				.GetByIdAsDtoAsync<ReservationSourceDTO>(Id);
 
 			return ReservationSource;
 		}
 		public async Task<ServiceResponse<ReservationSourceDTO>> EditReservationSourceAsync(ReservationSourceDTO dto)
 		{
-			var OldReservationSource = await _unitOfWork.Repository<ReservationSource>()
+			var OldReservationSource = await _unitOfWork.ReservationSourceRepository
 				.GetByIdAsync(dto.Id);
 			if (OldReservationSource == null)
 			{
@@ -73,7 +74,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 			{
 				_mapper.Map(dto, OldReservationSource);
 
-				_unitOfWork.Repository<ReservationSource>().Update(OldReservationSource);
+				_unitOfWork.ReservationSourceRepository.Update(OldReservationSource);
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<ReservationSourceDTO>.ResponseSuccess("Reservation Source Updated Successfully.");
@@ -86,7 +87,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 		}
 		public async Task<ServiceResponse<object>> DeleteReservationSourceAsync(int Id)
 		{
-			bool IsExist = await _unitOfWork.Repository<ReservationSource>()
+			bool IsExist = await _unitOfWork.ReservationSourceRepository
 				.IsExistsAsync(pt => pt.Id == Id);
 			if (!IsExist)
 			{
@@ -94,7 +95,7 @@ namespace HotelApp.Application.Services.ReservationSourceService
 			}
 			try
 			{
-				await _unitOfWork.Repository<ReservationSource>().DeleteByIdAsync(Id);
+				await _unitOfWork.ReservationSourceRepository.DeleteByIdAsync(Id);
 				await _unitOfWork.CommitAsync();
 				return ServiceResponse<object>.ResponseSuccess("Reservation Source Deleted Successfully.");
 			}

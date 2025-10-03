@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using HotelApp.Application.DTOs.Rates;
 using HotelApp.Application.DTOs.RoomTypes;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Domain;
 using HotelApp.Infrastructure.DbContext;
@@ -15,16 +14,18 @@ using System.Threading.Tasks;
 using HotelApp.Application.DTOs.RoleBased;
 using Microsoft.AspNetCore.Http;
 using HotelApp.Helper;
+using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Application.Services.CurrentUserService;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-    public class RateRepository : IRateRepository
+    public class RateRepository : GenericRepository<Rate>, IRateRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
 
-		public RateRepository(ApplicationDbContext context,
-            IConfigurationProvider mapperConfig)
+		public RateRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+             : base(context, mapperConfig)
         {
             _context = context;
             _mapperConfig = mapperConfig;

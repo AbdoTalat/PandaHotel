@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="/Panda/dist/style.css">
 
 </head>
-<body>
+<body >
 	<!-- partial:index.partial.html -->
 	<!DOCTYPE html>
 	<html>
@@ -23,7 +23,9 @@
 		<!--Fontawesome CDN-->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	</head>
-	<body style="margin-left:580px">
+	<body style="margin-left:580px; background-image: url(' /assets/images/login_cover.jpg');
+		  background-size: cover;
+		  background-position: center;">
 		<div class="login">
 			<form asp-action="Login" asp-controller="Account" method="post">
 
@@ -50,7 +52,7 @@
 				</div>
 				<br>
 
-				<button type="submit" style="cursor: pointer">Login</button>
+				<button type="submit" style="cursor: pointer; background-color:#26A69A">Login</button>
             </form>
 		</div>
 		<div class="backg">

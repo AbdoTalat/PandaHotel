@@ -9,9 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using HotelApp.Application.IRepositories;
 using HotelApp.Domain.Entities;
 using HotelApp.Helper;
+using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Application.Interfaces;
 
 namespace HotelApp.Infrastructure
 {

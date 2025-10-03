@@ -1,5 +1,5 @@
 ﻿using HotelApp.Application.DTOs.Dashboard;
-using HotelApp.Application.IRepositories;
+using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using HotelApp.Domain.Enums;
@@ -15,7 +15,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-	public class DashboardRepository : IDashboardRepository
+    public class DashboardRepository : IDashboardRepository
 	{
 		private readonly ApplicationDbContext _context;
 

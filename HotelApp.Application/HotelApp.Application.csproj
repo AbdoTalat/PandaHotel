@@ -34,4 +34,8 @@
     <ProjectReference Include="..\HotelApp.Helper\HotelApp.Helper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Validators\Guests\" />
+  </ItemGroup>
+
 </Project>

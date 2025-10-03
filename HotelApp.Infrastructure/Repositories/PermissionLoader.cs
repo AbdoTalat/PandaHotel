@@ -1,4 +1,4 @@
-﻿using HotelApp.Application.IRepositories;
+﻿using HotelApp.Application.Interfaces.IRepositories;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HotelApp.Infrastructure.Repositories
 {
-	public class PermissionLoader : IPermissionLoader
+    public class PermissionLoader : IPermissionLoader
 	{
 		private readonly IHostEnvironment _env;
 

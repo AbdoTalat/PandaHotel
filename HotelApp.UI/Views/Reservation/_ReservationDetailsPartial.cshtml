@@ -3,6 +3,12 @@
 
 <div class="row">
     <form id="bookRoomForm">
+
+        <input asp-for="CheckInDate" />
+        <span asp-validation-for="CheckInDate"></span>
+
+        <input asp-for="CheckOutDate" />
+        <span asp-validation-for="CheckOutDate"></span>
         <fieldset>
             <div class="row">                
 
@@ -91,7 +97,7 @@
                             <tbody>
                             </tbody>
                         </table>
-                        <span asp-validation-for="roomTypeToBookDTOs" class="text-danger validation-error-label"></span>
+                        <span asp-validation-for="RoomTypeToBookDTOs" class="text-danger validation-error-label"></span>
 
                         <div id="addRoomWrapper" style="margin-top:10px">
                             <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
@@ -521,7 +527,7 @@
                                 data-name="@item.Name"
                                 data-count="@item.NumOfAvailableRooms"
                                 data-max-adults="@item.MaxNumOfAdults"
-                                data-max-children="@item.MaxNumOfChildrens">
+                                        data-max-children="@item.MaxNumOfChildrens">
                 @item.Name (@item.NumOfAvailableRooms available)
                             </option>`;
             }
@@ -645,37 +651,82 @@
         // 🔹 Load rate details into modal
         function loadRateDetails() {
             const rateId = $rateSelect.val();
-            if (!rateId) {
-                $rateDetails.html('<p class="text-danger">Please select a rate first.</p>').show();
+            const checkIn = $checkIn.val();
+            const checkOut = $checkOut.val();
+
+            if (!rateId || !checkIn || !checkOut) {
+                $rateDetails.html('<p class="text-danger">Please select a rate, check-in, and check-out.</p>').show();
                 return;
             }
 
-            $.get('/Rate/GetRateDetailsForReservation', { rateId })
-                .done(details => {
-                    if (!details || !details.length) {
-                        $rateDetails.html('<p>No rate details available.</p>').show();
+            // 🔹 Build roomTypeQuantities from table
+            const roomTypeQuantities = [];
+            $('#roomTable tbody tr').each(function () {
+                const roomTypeId = $(this).find('.room-type-select').val();
+                const quantity = $(this).find('.num-rooms-select').val(); // <-- use this class
+
+                if (roomTypeId && quantity) {
+                    roomTypeQuantities.push({
+                        RoomTypeId: parseInt(roomTypeId),
+                        Quantity: parseInt(quantity)
+                    });
+
+                }
+            });
+
+
+            if (roomTypeQuantities.length === 0) {
+                $rateDetails.html('<p class="text-danger">Please add at least one room with quantity.</p>').show();
+                return;
+            }
+
+            $.ajax({
+                url: '/Rate/GetReservationChargesSummary',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RateId: parseInt(rateId),
+                    CheckIn: new Date(checkIn),
+                    CheckOut: new Date(checkOut),
+                    roomTypeQuantities: roomTypeQuantities
+                })
+            })
+                .done(res => {
+                    if (!res.success || !res.data) {
+                        $rateDetails.html(`<p class="text-danger">${res.message || 'No calculation available.'}</p>`).show();
                         return;
                     }
 
-                    let html = details.map(d => `
-                            <h4>${d.typeName}</h4>
-                            <ul>
-                                <li><strong>Hourly:</strong> $${d.hourlyPrice}</li>
-                                <li><strong>Daily:</strong> $${d.dailyPrice}</li>
-                                <li><strong>Extra Daily:</strong> $${d.extraDailyPrice}</li>
-                                <li><strong>Weekly:</strong> $${d.weeklyPrice}</li>
-                                <li><strong>Monthly:</strong> $${d.monthlyPrice}</li>
-                            </ul>
-                            <hr>
-                        `).join('');
+                    const summary = res.data.chargesSummary;
+                    let html = `<table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Charge</th>
+                                    <th>Unit</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    summary.forEach(item => {
+                        html += `<tr>
+                            <td>${item.charge}</td>
+                            <td>${item.unit}</td>
+                            <td>${item.rate}</td>
+                            <td>${item.total}</td>
+                         </tr>`;
+                    });
+                    html += `</tbody></table>
+                     <h4 class="text-success">Total Price: ${res.data.totalPrice}</h4>`;
 
                     $rateDetails.html(html).show();
                 })
                 .fail(xhr => {
-                    console.error('❌ Failed to load rate details:', xhr.responseText);
-                    $rateDetails.html('<p class="text-danger">Error loading rate details.</p>').show();
+                    console.error('❌ Failed to load reservation charges summary:', xhr.responseText);
+                    $rateDetails.html('<p class="text-danger">Error loading charges summary.</p>').show();
                 });
         }
+
 
         // 🔹 Modal events
         $modal.on('show.bs.modal', loadRateDetails);

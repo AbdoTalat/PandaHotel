@@ -7,6 +7,7 @@ using HotelApp.Application.Services.ReservationService;
 using HotelApp.Application.Services.ReservationSourceService;
 using HotelApp.Application.Services.RoomService;
 using HotelApp.Application.Services.RoomTypeService;
+using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,13 +38,27 @@ namespace HotelApp.UI.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index([FromQuery] ReservationFilterDTO? model)
 		{
-			var allReservations = await _reservationService.GetAllReservationAsync();
+			IEnumerable<GetAllReservationsDTO> reservations;
 
-			return View(allReservations);
+			if (model != null && model.ReservationCategory.HasValue)
+				reservations = await _reservationService.GetFilteredReservationsAsync(model);
+			else
+				reservations = await _reservationService.GetAllReservationAsync();
+
+			ViewBag.CurrentReservationCategory = ((int?)model?.ReservationCategory) ?? 0;
+
+            return View(reservations);
 		}
 
+		[HttpGet]
+		[Authorize(Policy = "Reservation.View")]
+		public async Task<IActionResult> Details(int Id)
+		{
+			var model = await _reservationService.GetReservationDetailsByIdAsync(Id);
+			return View(model);
+		}
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
 		public async Task<IActionResult> GetReservationJson([FromQuery] ReservationFilterDTO model)
@@ -53,22 +68,21 @@ namespace HotelApp.UI.Controllers
 			var result = filteredReservations.Select(r => new
 			{
 				id = r.Id,
-				PrimaryGuestName = r.PrimaryGuestName,
-				CheckInDate = r.CheckInDate,
-				CheckOutDate = r.CheckOutDate,
-				CreatedBy = r.CreatedBy,
-				Status = r.Status,
-                ReservationSource = r.ReservationSource,
-                NumberOfNights = r.NumberOfNights,
-                NumberOfPeople = r.NumberOfPeople,
-                TotalPrice = r.TotalPrice,
-				IsConfirmed = r.IsConfirmed,
-				IsPending = r.IsPending,
-				IsStarted = r.IsStarted,
-				IsCheckedIn = r.IsCheckedIn,
-				IsCheckedOut = r.IsCheckedOut,
-				IsClosed = r.IsClosed,
-				IsCancelled = r.IsCancelled,
+				primaryGuestName = r.PrimaryGuestName,
+				checkInDate = r.CheckInDate,
+				checkOutDate = r.CheckOutDate,
+				createdBy = r.CreatedBy,
+				status = r.Status,
+				reservationSource = r.ReservationSource,
+				numberOfNights = r.NumberOfNights,
+				numberOfPeople = r.NumberOfPeople,
+				totalPrice = r.TotalPrice,
+				isConfirmed = r.IsConfirmed,
+				isPending = r.IsPending,
+				isCheckedIn = r.IsCheckedIn,
+				isCheckedOut = r.IsCheckedOut,
+				isNoShow = r.IsNoShow,
+				isCancelled = r.IsCancelled
 			}).ToList();
 
 			return Json(new { success = true, data = result });
@@ -90,7 +104,7 @@ namespace HotelApp.UI.Controllers
 				return Json(new { success = false, message = "Please fill in all required fields correctly." });
             }
 
-			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.roomTypeToBookDTOs, model.RoomsIDs);
+			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.RoomTypeToBookDTOs, model.RoomsIDs);
 			if (!ValidateSelectedRooms.Success)
 			{
 				return Json(new { success = false, message = ValidateSelectedRooms.Message });
