@@ -1,4 +1,5 @@
 ﻿using HotelApp.Domain.Entities;
+using HotelApp.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -13,7 +14,10 @@ namespace HotelApp.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Reservation> builder)
 		{
-			builder.Property(b => b.CheckInDate)
+            builder.Property(r => r.ReservationNumber)
+                .HasMaxLength(20);
+
+            builder.Property(b => b.CheckInDate)
 			   .IsRequired();
 
 			builder.Property(b => b.CheckOutDate)
@@ -23,10 +27,15 @@ namespace HotelApp.Infrastructure.Configurations
 				.IsRequired();
 
 			builder.Property(r => r.Notes)
-				.HasMaxLength(200);
+				.HasMaxLength(100);
 
 			builder.Property(b => b.CancellationReason)
 			   .HasMaxLength(50);
+
+			builder.Property(r => r.Status)
+				.HasConversion<int>();
+			//	.HasDefaultValue((int)ReservationStatus.Pending);
+
 
 			builder.Property(r => r.TotalPrice)
 				.HasColumnType("decimal(18,2)");

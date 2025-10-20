@@ -51,6 +51,7 @@
 <div class="content">
 	<div class="row">
 		<form id="addUserForm" class="form-basic" asp-action="AddUser" asp-controller="User" method="post">
+			<div asp-validation-summary="All" class="text-danger"></div>
 			<div class="col-md-12">
 				<div class="panel panel-flat border-left-lg border-left-teal">
 					<div class="panel-heading" style="height:70px">
@@ -119,8 +120,8 @@
 											<div class="input-group">
 												<span class="input-group-addon"><i class="icon-user"></i></span>
 												<input asp-for="Password" class="form-control" placeholder="Password">
-												<span class="validation-badge" asp-validation-for="Password"></span>
-											</div>
+                                            </div>		
+											<span class="text-danger validation-error-label" asp-validation-for="Password"></span>
 										</div>
 									</div>
 									<div class="col-md-6">
@@ -135,31 +136,11 @@
 									</div>
 
 								</div>
-
-								<div class="row">
-									<div class="col-md-6">
-										<label>Default Branch<span class="text-danger">*</span></label>
-										<div class="form-group">
-											<div class="input-group input-group">
-												<span class="input-group-addon"><i class="icon-user"></i></span>
-												<select asp-for="DefaultBranchId" id="DefaultBranchId" class="form-control select" required data-placeholder="Default Branch">
-													<option value=""></option>
-
-													@foreach (var item in Model.AllBranches)
-													{
-														<option value="@item.Id">@item.DisplayText</option>
-													}
-												</select>
-											</div>
-											<span class="text-danger validation-error-label" asp-validation-for="DefaultBranchId"></span>
-										</div>
-									</div>
-								</div>
 								<div class="col-md-6">
 									<div class="form-group">
 										<div class="alpaca-control checkbox">
 											<label class="checkbox-inline checkbox-left checkbox-switchery switchery-sm">
-												<input type="checkbox" asp-for="IsActive" class="switchery">
+												<input type="checkbox" asp-for="IsActive" class="switchery" checked>
 												Is Active
 											</label>
 										</div>
@@ -190,30 +171,16 @@
 									<div class="form-group">
 										@foreach (var branch in Model.AllBranches)
 										{
-											var isDefault = Model.DefaultBranchId == branch.Id;
-											var isChecked = isDefault || Model.SelectedBranchIds.Contains(branch.Id);
-
 											<div class="col-md-6">
 												<label class="checkbox-container">
-													<input type="checkbox"
-														   name="SelectedBranchIds"
+													<input type="checkbox" name="SelectedBranchIds"
 														   class="checkbox-input roomTypeCheckbox"
-														   value="@branch.Id"
-													@(isChecked ? "checked" : "")
-													@(isDefault ? "disabled" : "") />
-
-													@if (isDefault)
-													{
-														<!-- Hidden input to ensure default branch still posted -->
-														<input type="hidden" name="SelectedBranchIds" value="@branch.Id" />
-													}
-
+														   value="@branch.Id" />
 													<div class="checkbox-custom"></div>
 													<a class="text-default">@branch.DisplayText</a>
 												</label>
 											</div>
 										}
-
 									</div>
 								</div>
 							</div>
@@ -277,46 +244,5 @@
 
 
 @section Scripts {
-	<script>
-		$(function () {
-			const checkboxSelector = 'input[name="SelectedBranchIds"]';
-			const hiddenInputName = 'SelectedBranchIds';
-			let previousDefaultBranchId = $('#DefaultBranchId').val();
-
-			function syncDefaultBranchSelection() {
-				const newDefaultBranchId = $('#DefaultBranchId').val();
-
-				$(checkboxSelector).each(function () {
-					const $checkbox = $(this);
-					const val = $checkbox.val();
-
-					// Handle the new default branch
-					if (val === newDefaultBranchId) {
-						$checkbox.prop('checked', true).prop('disabled', true);
-
-						// Ensure a hidden input exists to submit this value
-						if ($checkbox.closest('label').find(`input[type="hidden"][value="${val}"]`).length === 0) {
-							$checkbox.closest('label').append(`<input type="hidden" name="${hiddenInputName}" value="${val}" />`);
-						}
-					}
-					// Handle the old default branch (now no longer default)
-					else if (val === previousDefaultBranchId) {
-						$checkbox.prop('disabled', false).prop('checked', false);
-						$checkbox.closest('label').find(`input[type="hidden"][value="${val}"]`).remove();
-					}
-				});
-
-				// Update the reference
-				previousDefaultBranchId = newDefaultBranchId;
-			}
-
-			// Trigger on page load
-			syncDefaultBranchSelection();
-
-			// Watch for changes to the default branch dropdown
-			$('#DefaultBranchId').on('change', syncDefaultBranchSelection);
-		});
-	</script>
-
 	@await Html.PartialAsync("_ValidationScriptsPartial")
 }

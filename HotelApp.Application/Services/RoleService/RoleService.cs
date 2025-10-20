@@ -95,7 +95,7 @@ namespace HotelApp.Application.Services.RoleService
 			var role = await GetRoleByIdAsync(roleId);
 			var assignedPermissions = await _unitOfWork.RoleRepository.GetAssignedPermissionsAsync(roleId);
 
-			var groupedPermissions = await _unitOfWork.RoleRepository.GetAllPermissionsGroupedAsync(); // New method below
+			var groupedPermissions = await _unitOfWork.RoleRepository.GetAllPermissionsGroupedAsync();
 
 			var result = new Dictionary<string, List<PermissionDTO>>();
 			foreach (var group in groupedPermissions)

@@ -10,8 +10,9 @@ namespace HotelApp.Application.Interfaces.IRepositories
 {
     public interface IReservationRepository : IGenericRepository<Reservation>
     {
-        //public Task<IEnumerable<GetAllReservationsDTO>> GetAllReservationsByBranchId(int? branchId);
+        Task<ReservationDTO> GetReservationToEditByIdAsync(int Id);
         Task<Reservation> GetReservationDetailsByIds(int Id);
         Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto);
+        Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id);
     }
 }

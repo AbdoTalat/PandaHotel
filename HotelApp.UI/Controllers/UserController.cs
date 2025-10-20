@@ -56,15 +56,14 @@ namespace HotelApp.UI.Controllers
             int? branchId = HttpContext.Session.GetInt32("DefaultBranchId");
             var users = await _userService.GetAllUsersAsync();
 
-            var result = users.Select((item, index) => new
+            var result = users.Select((item) => new
             {
-                Number = index + 1,
                 item.Id,
                 item.FirstName,
                 item.LastName,
                 item.UserName,
                 item.Email,
-                IsActive = item.IsActive ? "Active" : "Not Active",
+                IsActive = item.IsActive,
                 CreatedAt = item.CreatedDate.ToShortDateString(),
                 CanEditUser = User != null && _authorizationService.AuthorizeAsync(User, "User.Edit").Result.Succeeded,
                 CanDeleteUser = User != null && _authorizationService.AuthorizeAsync(User, "User.Delete").Result.Succeeded
@@ -91,7 +90,7 @@ namespace HotelApp.UI.Controllers
         {
             if (!ModelState.IsValid)
             {
-				model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+				model.AllRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
 				model.AllBranches = await _branchService.GetBranchsDropDownAsync();
 				return View(model);
 			}
@@ -100,21 +99,24 @@ namespace HotelApp.UI.Controllers
 
             if (result.Success)
             {
-                TempData["Success"] = "User updated successfully.";
-                return RedirectToAction("GetUsers");
+                TempData["Success"] = result.Message;
+                return RedirectToAction("Index");
             }
 
-			model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+			ModelState.AddModelError(string.Empty, result.Message);
+			model.AllRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
 			model.AllBranches = await _branchService.GetBranchsDropDownAsync();
-			return View(result);
+			return View(model);
 		}
 
         [HttpGet]
         public async Task<IActionResult> EditUser(int id)
         {
-            var reult = await _userService.GetUserToEditByIdAsync(id);
+            var result = await _userService.GetUserToEditByIdAsync(id);
+			if (!result.Success)
+				return NotFound(result.Message);
 
-            return View(reult.Data);
+			return View(result.Data);
         }
 
         [HttpPost]
@@ -133,12 +135,14 @@ namespace HotelApp.UI.Controllers
             if (result.Success)
             {
                 TempData["Success"] = "User updated successfully.";
-                return RedirectToAction("GetUsers");
+                return RedirectToAction("Index");
             }
+
+			ModelState.AddModelError("", result.Message);
 			model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
 			model.AllBranches = await _branchService.GetBranchsDropDownAsync();
-			return View(result);
-        }
+			return View(model);
+		}
 
 
         [HttpDelete]

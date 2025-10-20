@@ -27,14 +27,12 @@ namespace HotelApp.Application.DTOs.Users
         [DataType(DataType.Password)]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
-
-        public int DefaultBranchId { get; set; }
         public bool IsActive { get; set; }
 
-		public List<string> SelectedRoles { get; set; } = new List<string>();		
-        public List<string> AllRoles { get; set; } = new();
+		public List<string?> SelectedRoles { get; set; } = new();
+		public List<string?> AllRoles { get; set; } = new();
 
-		public List<int> SelectedBranchIds { get; set; } = new List<int>();
+		public List<int?> SelectedBranchIds { get; set; } = new List<int?>();
 		public IEnumerable<DropDownDTO<string>> AllBranches { get; set; } = Enumerable.Empty<DropDownDTO<string>>();
 
 	}

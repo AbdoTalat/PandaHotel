@@ -1,47 +1,49 @@
-﻿﻿@{
-	TempData["Title"] = "Add Reservation";
+﻿@using HotelApp.UI.Controllers
+@model ReservationDTO
+@{
+    TempData["Title"] = "Edit Reservation";
 
 }
 <div class="page-header page-header-default page-header-xs">
-	<div class="page-header-content">
-		<div class="page-title">
-			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Add Reservation</span> </h4>
-		</div>
-	</div>
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Edit Reservation</span> </h4>
+        </div>
+    </div>
 
-	<div class="breadcrumb-line">
-		<ul class="breadcrumb">
-			<li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-			<li><a asp-action="Index" asp-controller="Reservation">Reservations</a></li>
-			<li class="active">Add Reservation</li>
-		</ul>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li><a asp-action="Index" asp-controller="Reservation">Reservations</a></li>
+            <li class="active">Edit Reservation</li>
+        </ul>
 
-		<ul class="breadcrumb-elements">
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<i class="icon-gear position-left"></i>
-					Settings
-					<span class="caret"></span>
-				</a>
+        <ul class="breadcrumb-elements">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-gear position-left"></i>
+                    Settings
+                    <span class="caret"></span>
+                </a>
 
-				<ul class="dropdown-menu dropdown-menu-right">
-					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
-					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
-					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
-					<li class="divider"></li>
-					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
-				</ul>
-			</li>
-		</ul>
-	</div>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                    <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                    <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <div class="content">
     <div class="panel">
         @* <div class="panel-heading alpha-slate" style="margin:10px">
-            <div class="text-center">
-                <h4>Add Reservation</h4>
-            </div>
+        <div class="text-center">
+        <h4>Add Reservation</h4>
+        </div>
 
         </div> *@
         <div class="panel-body">
@@ -56,17 +58,21 @@
             <div class="tab-content">
 
                 <div class="tab-pane active has-padding" id="tab1">
-                    @await Html.PartialAsync("Partials/_ReservationInfoPartial", new ReservationInfoDTO())
+                    @await Html.PartialAsync("Partials/_ReservationInfoPartial", Model.ReservationInfoDto)
                 </div>
 
                 <div class="tab-pane  has-padding" id="tab2">
                     <div id="guestTab">
-                        @await Html.PartialAsync("Partials/_GuestInformationPartial")
+                        @await Html.PartialAsync("Partials/_GuestInformationPartial", new ReservationGuestsViewModel
+                   {
+                       GuestForm = new GuestDTO(),
+                       ExistingGuests = Model.GuestDtos // already coming from your ReservationDTO
+                   })
                     </div>
                 </div>
 
                 <div class="tab-pane has-padding" id="tab3">
-                    @await Html.PartialAsync("Partials/_ConfirmReservationPartial")
+                    @await Html.PartialAsync("Partials/_ConfirmReservationPartial", Model.ConfirmDto)
                 </div>
 
             </div>
@@ -86,12 +92,12 @@
 
 @section Scripts {
 
-	<script>
-		$(document).ready(function () {
-			loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
-			loadSelect("#reservationSourceSelect", "/ReservationSource/GetReservationSourcesDropDown", "displayText", "id");
-		});
-	</script>
+    <script>
+        $(document).ready(function () {
+            loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
+            loadSelect("#reservationSourceSelect", "/ReservationSource/GetReservationSourcesDropDown", "displayText", "id");
+        });
+    </script>
 
     <script>
         // ===== Permissions injected from server =====
@@ -100,7 +106,7 @@
             canConfirm: @User.HasClaim("permission", "Reservation.Confirm").ToString().ToLower(),
             canCheckIn: @User.HasClaim("permission", "Reservation.CheckIn").ToString().ToLower(),
             canPending: @User.HasClaim("permission", "Reservation.Pending").ToString().ToLower()
-                                    };
+                                            };
 
         let currentTab = 1; // start from tab 1
 
@@ -120,10 +126,10 @@
                 updateNextButtonLabel();
             } else {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                    Next <i class="icon-arrow-right14 position-right"></i>
-                                                </button>
-                                            `);
+                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
+                                                            Next <i class="icon-arrow-right14 position-right"></i>
+                                                        </button>
+                                                    `);
             }
 
             // Lazy load guest form
@@ -136,41 +142,41 @@
         function updateNextButtonLabel() {
             if (userPermissions.canManageStatus) {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                    Submit
-                                                </button>
-                                            `);
+                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
+                                                            Submit
+                                                        </button>
+                                                    `);
             }
             else if (userPermissions.canConfirm && userPermissions.canCheckIn) {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="saveConfirmBtn" class="btn bg-blue-600 me-2">
-                                                    Save & Confirm <i class="icon-checkmark4 position-right"></i>
-                                                </button>
-                                                <button type="button" id="saveCheckInBtn" class="btn bg-success-600">
-                                                    Save & Check-In <i class="icon-user-check position-right"></i>
-                                                </button>
-                                            `);
+                                                        <button type="button" id="saveConfirmBtn" class="btn bg-blue-600 me-2">
+                                                            Save & Confirm <i class="icon-checkmark4 position-right"></i>
+                                                        </button>
+                                                        <button type="button" id="saveCheckInBtn" class="btn bg-success-600">
+                                                            Save & Check-In <i class="icon-user-check position-right"></i>
+                                                        </button>
+                                                    `);
             }
             else if (userPermissions.canConfirm) {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="nextBtn" class="btn bg-blue-600">
-                                                    Save & Confirm <i class="icon-checkmark4 position-right"></i>
-                                                </button>
-                                            `);
+                                                        <button type="button" id="nextBtn" class="btn bg-blue-600">
+                                                            Save & Confirm <i class="icon-checkmark4 position-right"></i>
+                                                        </button>
+                                                    `);
             }
             else if (userPermissions.canCheckIn) {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="nextBtn" class="btn bg-success-600">
-                                                    Save & Check-In <i class="icon-user-check position-right"></i>
-                                                </button>
-                                            `);
+                                                        <button type="button" id="nextBtn" class="btn bg-success-600">
+                                                            Save & Check-In <i class="icon-user-check position-right"></i>
+                                                        </button>
+                                                    `);
             }
             else {
                 $("#nextBtn").replaceWith(`
-                                                <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                    Submit
-                                                </button>
-                                            `);
+                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
+                                                            Submit
+                                                        </button>
+                                                    `);
             }
         }
 
@@ -278,5 +284,5 @@
     </script>
 
 
-	@await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

@@ -36,6 +36,7 @@ using HotelApp.Application.Services.CalculationTypeService;
 using HotelApp.Application.Services.DashboardService;
 using HotelApp.Application.Services.RateCalculationService;
 using HotelApp.Application.DTOs.Reservation;
+using HotelApp.Application.Services.DropdownService;
 
 namespace HotelApp.Application
 {
@@ -64,6 +65,7 @@ namespace HotelApp.Application
             services.AddScoped<ICalculationTypeService, CalculationTypeService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IRateCalculationService, RateCalculationService>();
+            services.AddScoped<IDropdownService, DropdownService>();
             
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

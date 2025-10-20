@@ -12,7 +12,7 @@ namespace HotelApp.Domain.Entities
         public string LastName { get; set; }
         public bool IsActive { get; set; }
 
-        public int DefaultBranchId { get; set; }
+        public int? DefaultBranchId { get; set; }
         public Branch? DefaultBranch { get; set; }
 
         public int? CreatedById { get; set; }
@@ -24,5 +24,6 @@ namespace HotelApp.Domain.Entities
         public DateTime? LastModifiedDate { get; set; }
 
         public ICollection<UserBranch> userBranches { get; set; } = new HashSet<UserBranch>();
+        public ICollection<ReservationHistory> ReservationHistories { get; set; } = new HashSet<ReservationHistory>();        
     }
 }

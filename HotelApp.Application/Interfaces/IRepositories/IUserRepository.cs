@@ -11,6 +11,6 @@ namespace HotelApp.Application.Interfaces.IRepositories
     public interface IUserRepository : IGenericRepository<User>
     {
         Task<IEnumerable<UsersDTO>> GetAllUsersAsync();
-        Task<IEnumerable<int>> GetUserBranchesIDsByUserIdAsync(int Id);
+        Task<IEnumerable<int>?> GetUserBranchesIDsByUserIdAsync(int Id);
     }
 }

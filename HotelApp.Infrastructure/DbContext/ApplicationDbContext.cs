@@ -38,8 +38,8 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<Company> Companies { get; set; }
 		public DbSet<ProofType> ProofTypes { get; set; }
 		public DbSet<ReservationRoom> ReservationRooms { get; set; }
-
 		public DbSet<CalculationType> CalculationTypes { get; set; }
+		public DbSet<ReservationHistory> ReservationHistory { get; set; }
         #endregion
 
 
@@ -79,6 +79,7 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new ReservationRoomConfiguration());
 
 			builder.ApplyConfiguration(new CalculationTypeConfiguration());
+			builder.ApplyConfiguration(new ReservationHistoryConfiguration());
             #endregion
 
             #region Seed Data

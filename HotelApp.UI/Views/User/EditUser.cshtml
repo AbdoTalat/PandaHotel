@@ -118,25 +118,6 @@
 
 									</div>
 
-								<div class="row">
-									<div class="col-md-6">
-										<label>Default Branch<span class="text-danger">*</span></label>
-										<div class="form-group">
-											<div class="input-group input-group">
-												<span class="input-group-addon"><i class="icon-user"></i></span>
-												<select asp-for="DefaultBranchId" id="DefaultBranchId" class="form-control select" required data-placeholder="Default Branch">
-													<option value=""></option>
-
-													@foreach (var item in Model.AllBranches)
-													{
-														<option value="@item.Id">@item.DisplayText</option>
-													}
-												</select>
-											</div>
-											<span class="text-danger validation-error-label" asp-validation-for="DefaultBranchId"></span>
-										</div>
-									</div>
-								</div>
 								<div class="col-md-6">
 									<div class="form-group">
 										<div class="alpaca-control checkbox">
@@ -172,27 +153,19 @@
 									<div class="form-group">
 										@foreach (var branch in Model.AllBranches)
 										{
-											var isDefault = Model.DefaultBranchId == branch.Id;
-											var isChecked = isDefault || Model.SelectedBranchIds.Contains(branch.Id);
-
 											<div class="col-md-6">
 												<label class="checkbox-container">
 													<input type="checkbox"
 														   name="SelectedBranchIds"
 														   class="checkbox-input roomTypeCheckbox"
-														   value="@branch.Id" />
-
-													@* @if (isDefault)
-													{
-														<!-- Hidden input to ensure default branch still posted -->
-														<input type="hidden" name="SelectedBranchIds" value="@branch.Id" />
-													} *@
-
+														   value="@branch.Id"
+													@(Model.SelectedBranchIds != null && Model.SelectedBranchIds.Contains(branch.Id) ? "checked" : "") />
 													<div class="checkbox-custom"></div>
 													<a class="text-default">@branch.DisplayText</a>
 												</label>
 											</div>
 										}
+
 									</div>
 								</div>
 							</div>
@@ -252,59 +225,5 @@
 
 
 @section Scripts{
-
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			// Inject server values
-			var defaultBranchId = '@(Model.DefaultBranchId == null ? "" : Model.DefaultBranchId.ToString())';
-
-			// Serialize previously selected branches to JS (strings to match checkbox value attributes)
-			var selectedBranchIds = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-			(Model.SelectedBranchIds ?? new List<int>()).Select(x => x.ToString()).ToList()
-			));
-
-			// 1) Pre-check all previously saved branches
-			(selectedBranchIds || []).forEach(function (id) {
-				document.querySelectorAll('input[name="SelectedBranchIds"][value="' + id + '"]')
-					.forEach(cb => cb.checked = true);
-			});
-
-			// 2) Make sure the default branch is checked and the dropdown reflects it
-			if (defaultBranchId) {
-				var defaultSelect = document.getElementById('DefaultBranchId');
-				if (defaultSelect) {
-					defaultSelect.value = defaultBranchId;
-					// If you're using Select2 or similar, uncomment the next line:
-					// $(defaultSelect).trigger('change.select2');
-					defaultSelect.dispatchEvent(new Event('change'));
-				}
-				document.querySelectorAll('input[name="SelectedBranchIds"][value="' + defaultBranchId + '"]')
-					.forEach(cb => cb.checked = true);
-			}
-
-			// 3) When default changes, check the same branch in the list and update guarding logic
-			document.getElementById('DefaultBranchId')?.addEventListener('change', function (e) {
-				var id = e.target.value;
-				if (!id) return;
-				defaultBranchId = id; // update current default we're guarding
-				var cb = document.querySelector('input[name="SelectedBranchIds"][value="' + id + '"]');
-				if (cb) cb.checked = true;
-			});
-
-			// 4) Prevent unchecking the current default from the checkbox list
-			document.addEventListener('change', function (e) {
-				var el = e.target;
-				if (el && el.matches('input[name="SelectedBranchIds"]')) {
-					if (defaultBranchId && el.value === defaultBranchId && !el.checked) {
-						// Re-check it; it's the default
-						el.checked = true;
-					}
-				}
-			});
-		});
-	</script>
-
-
-
 	@await Html.PartialAsync("_ValidationScriptsPartial")
 }

@@ -23,11 +23,10 @@ namespace HotelApp.Application.DTOs.Users
         [EmailAddress]
 		[RequiredEx]
 		public string Email { get; set; }
-		public int DefaultBranchId { get; set; }
 		public bool IsActive { get; set; }
 
-		public List<string> SelectedRoles { get; set; } = new List<string>();
-		public List<int> SelectedBranchIds { get; set; } = new List<int>();
+		public List<string> SelectedRoles { get; set; } = new();
+		public List<int?> SelectedBranchIds { get; set; } = new();
 
 		public List<string> AllRoles { get; set; } = new();
 		public IEnumerable<DropDownDTO<string>> AllBranches { get; set; } = Enumerable.Empty<DropDownDTO<string>>();

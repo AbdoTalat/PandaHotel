@@ -43,7 +43,7 @@ namespace HotelApp.Infrastructure.Seed
 			}
 
 			// Assign All Permissions to Admin Role
-			var allPermissions = permissionLoader.LoadAllPermissions();
+			var allPermissions = await permissionLoader.LoadAllPermissions();
 
 
 			var existingClaims = await roleManager.GetClaimsAsync(role);

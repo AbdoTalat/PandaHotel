@@ -41,7 +41,7 @@ namespace HotelApp.Infrastructure.Repositories
 		}
 
 
-		public async Task<IEnumerable<int>> GetUserBranchesIDsByUserIdAsync(int Id)
+		public async Task<IEnumerable<int>?> GetUserBranchesIDsByUserIdAsync(int Id)
 		{
 			var userBranchesIDs = await _context.UserBranches
 				.Where(ub => ub.UserId == Id)

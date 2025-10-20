@@ -1,145 +1,151 @@
 ﻿@model ReservationInfoDTO
 
-
 <div class="row">
+
     <form id="bookRoomForm">
-        <fieldset>
-            <div class="row">                
+        <div class="row">
 
+            <!-- ================= Stay Information ================= -->
+            <div class="col-md-12">
                 <legend class="text-semibold">
-                    <i class="icon-reading position-left"></i> Reservation Info
-                    <a class="control-arrow" data-toggle="collapse" data-target="#demo1">
-                        <i class="icon-circle-down2"></i>
-                    </a>
+                    <i class="icon-calendar22 position-left"></i> Stay Information
                 </legend>
-                <div class="col-md-12">
-                    <div id="demo1" class="collapse in">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Reservation Source<span class="text-danger">*</span></label>
-                                    <select asp-for="ReservationSourceId" data-selected="@Model?.ReservationSourceId" id="reservationSourceSelect" class="form-control select" required data-placeholder="Reservation Source">
-                                        <option value=""></option>
-                                    </select>
-                                    <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Company</label>
-                                    <div class="form-group has-feedback">
-                                        <input type="text" class="form-control" id="selectedCompanyName" readonly placeholder="Select Company..." data-toggle="modal" data-target="#companyModal">
-                                        <div class="form-control-feedback">
-                                            <i class="icon-search4 text-size-base"></i>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" asp-for="CompanyId" id="CompanyId" />
-                                    <span asp-validation-for="CompanyId" class="text-danger validation-error-label"></span>
-                                </div>
-                            </div>
+                <div class="row">
+                    <!-- Check-in -->
+                    <div class="col-md-5">
+                        <label>Check-In <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                            <input type="text" autocomplete="off" class="form-control daterange-time" id="CheckInVisible" placeholder="check-in Date" />
+                            <input type="hidden" asp-for="CheckInDate" id="CheckInDate" />
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label>Check-in - Check-out <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="icon-calendar22"></i></span>
-                                        <input type="text" autocomplete="off" class="form-control daterange-time" id="StayRange" placeholder="Select check-in and check-out" value="" />
-                                    </div>     
-                                    <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
-
-                                </div>
-                                <input type="hidden" asp-for="CheckInDate" id="CheckInDate" />
-                                <input type="hidden" asp-for="CheckOutDate" id="CheckOutDate" />
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Number of Nights</label>
-                                    <input type="text" class="form-control" asp-for="NumOfNights" id="NumOfNights" readonly />
-                                    <span asp-validation-for="NumOfNights" class="text-danger validation-error-label"></span>
-                                </div>
-                            </div>
-                        </div>
+                        <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
                     </div>
-                </div>
 
-                <legend class="text-semibold" style="margin-top:200px">
-                    <i class="icon-reading position-left"></i> Rooms Selection
-                    <a class="control-arrow" data-toggle="collapse" data-target="#demo2" >
-                        <i class="icon-circle-down2"></i>
-                    </a>
-                </legend>
-                <div class="col-md-12">
-                    <div id="demo2" class="collapse in">
+                    <!-- Nights -->
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <button type="button" style="width:100px" id="singleBtn" class="btn text-teal-800 border-teal btn-flat" onclick="setToSingleMode()">Single</button>
-                            <button type="button" style="width:100px" id="groupBtn" class="btn bg-teal" onclick="setToGroupMode()">Group</button>
+                            <label>Nights</label>
+                            <input type="text" class="form-control" asp-for="NumOfNights" id="NumOfNights" placeholder="Nights" readonly  />
+                            <span asp-validation-for="NumOfNights" class="text-danger validation-error-label"></span>
                         </div>
+                    </div>
 
-                        <table class="table table-bordered" id="roomTable">
-                            <thead>
-                                <tr class="active">
-                                    <th>Room Type</th>
-                                    <th>No. of Rooms</th>
-                                    <th>Adults</th>
-                                    <th>Children</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                        <span asp-validation-for="RoomTypeToBookDTOs" class="text-danger validation-error-label"></span>
-
-                        <div id="addRoomWrapper" style="margin-top:10px">
-                            <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">Add Room</button>
+                    <!-- Check-out -->
+                    <div class="col-md-5">
+                        <label>Check-Out <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="icon-calendar22"></i></span>
+                            <input type="text" autocomplete="off" class="form-control" id="CheckOutVisible" placeholder="check-out Date" readonly />
+                            <input type="hidden" asp-for="CheckOutDate" id="CheckOutDate" />
                         </div>
-                        <div class="row" style="margin-top:30px">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="roomsSelect" class="form-label fw-semibold">
-                                        Select Available Rooms
-                                    </label>
-                                    <div class="input-group">
-                                        <select id="roomsSelect" class="form-control" multiple="multiple"></select>
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rateModal">
-                                                <i class="icon-search4 text-size-base"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                        <label class="control-label">Rate <span class="text-danger">*</span></label>
-
-                                        <div class="input-group">
-                                            <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
-                                                <option></option>
-                                            </select>
-                                            <div class="input-group-btn">
-                                            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rateModal">
-                                                    <i class="icon-spinner9"></i> Rate Details
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                        <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
-                                </div>
-
-                            </div>
-
-                        </div>
+                        <span asp-validation-for="CheckOutDate" class="text-danger validation-error-label"></span>
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Reservation Source <span class="text-danger">*</span></label>
+                            <select asp-for="ReservationSourceId" data-selected="@Model?.ReservationSourceId" id="reservationSourceSelect" class="form-control select" required data-placeholder="Reservation Source">
+                                <option value=""></option>
+                            </select>
+                            <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Company</label>
+                            <div class="form-group has-feedback">
+                                <input type="text" class="form-control" id="selectedCompanyName" readonly placeholder="Select Company..." data-toggle="modal" data-target="#companyModal">
+                                <div class="form-control-feedback">
+                                    <i class="icon-search4 text-size-base"></i>
+                                </div>
+                            </div>
+                            <input type="hidden" asp-for="CompanyId" id="CompanyId" />
+                            <span asp-validation-for="CompanyId" class="text-danger validation-error-label"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </fieldset>
+
+            <!-- ================= Room Information ================= -->
+            <div class="col-md-12">
+                <legend class="text-semibold">
+                    <i class="icon-home4 position-left"></i> Rooms Information
+                </legend>
+
+                <div class="form-group">
+                    <label class="display-block text-semibold">Reservation Type</label>
+                    <label class="radio-inline">
+                            <input type="radio" name="reservationType" class="styled border-teal text-teal-600" value="single" checked onchange="setToSingleMode()">
+                            Single
+                    </label>
+                   
+                    <label class="radio-inline">
+                            <input type="radio" name="reservationType" class="styled border-teal text-teal-600" value="group" onchange="setToGroupMode()">
+                            Group
+                    </label>
+                </div>
+                <table class="table table-xxs table-bordered " id="roomTable">
+                    <thead>
+                        <tr class="active">
+                            <th class="col-lg-1">Room Type</th>
+                            <th class="col-lg-1">No. of Rooms</th>
+                            <th class="col-lg-1">Adults</th>
+                            <th class="col-lg-1">Children</th>
+                            <th class="col-lg-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <span asp-validation-for="RoomTypeToBookDTOs" class="text-danger validation-error-label"></span>
+
+                <div id="addRoomWrapper" style="margin-top:10px;">
+                    <button type="button" class="btn text-teal-800 border-teal btn-flat" onclick="addRoomRow()">
+                        <i class="icon-plus22 position-left"></i> Add Room
+                    </button>
+                </div>
+
+                <div class="row" style="margin-top:30px;">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Select Available Rooms</label>
+                            <div class="input-group">
+                                <select id="roomsSelect" class="form-control" multiple="multiple"></select>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rateModal">
+                                        <i class="icon-search4 text-size-base"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Rate <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <select id="rateSelect" asp-for="RateId" name="RateId" class="form-control select" required data-placeholder="Choose Rate">
+                                    <option></option>
+                                </select>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rateModal">
+                                        <i class="icon-info22 text-size-base"></i> Rate Details
+                                    </button>
+                                </div>
+                            </div>
+                            <span asp-validation-for="RateId" class="text-danger validation-error-label"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </form>
 </div>
+
 
 <div id="rateModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -342,13 +348,24 @@
 <script>
     $(function () {
         function clearDates() {
-            $('#CheckInDate').val('').trigger('change');
-            $('#CheckOutDate').val('').trigger('change');
-            $('#NumOfNights').val('');
-            $('#StayRange').val('');
+            $('#CheckInDate, #CheckOutDate, #NumOfNights').val('');
+            $('#CheckInVisible, #CheckOutVisible').val('');
         }
 
         clearDates();
+
+        // Keep your single date range picker
+        $('.daterange-time').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: false,
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD/MM/YYYY hh:mm A'
+            },
+            applyClass: 'bg-slate-600', 
+            cancelClass: 'btn-default'
+        });
 
         $('.daterange-time').on('apply.daterangepicker', function (ev, picker) {
             const checkIn = picker.startDate;
@@ -360,19 +377,18 @@
                 return;
             }
 
-            // Hidden fields for backend (ISO format)
+            // Set hidden fields for backend
             $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm')).trigger('change');
             $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm')).trigger('change');
 
-            // Calculate nights
+            // Set visible separate inputs
+            $('#CheckInVisible').val(checkIn.format('DD/MM/YYYY hh:mm A'));
+            $('#CheckOutVisible').val(checkOut.format('DD/MM/YYYY hh:mm A'));
+
+            // Calculate number of nights
             const durationHours = checkOut.diff(checkIn, 'hours', true);
             const nights = durationHours < 24 ? 0 : Math.floor(durationHours / 24);
             $('#NumOfNights').val(nights);
-
-            // Visible input in requested format
-            $(this).val(
-                checkIn.format('DD/MM/YYYY hh:mm a') + ' - ' + checkOut.format('DD/MM/YYYY hh:mm a')
-            );
         });
 
         $('.daterange-time').on('cancel.daterangepicker', function () {
@@ -534,7 +550,7 @@
                     <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
                     <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
                     <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
-                    <td><button type="button" class="btn btn-sm btn-danger remove-room-btn">−</button></td>
+                        <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
                 </tr>
             `);
 
@@ -758,7 +774,7 @@
 
         if (roomTypeId && numOfRooms > 0) {
             formData.roomTypeToBookDTOs.push({
-                Id: parseInt(roomTypeId),
+                RoomTypeId: parseInt(roomTypeId),
                 NumOfRooms: parseInt(numOfRooms),
                 NumOfAdults: parseInt(numAdults || 0),
                 NumOfChildren: parseInt(numChildren || 0)
@@ -797,7 +813,7 @@
                 $(document).trigger("roomBookingSuccess");
             } else {
                     $("#bookRoomContainer").html(response);
-                //showAlert('error', 'Validation Error', response.message);
+                    showAlert('error', 'Validation Error', response.message);
             }
         },
         error: function () {

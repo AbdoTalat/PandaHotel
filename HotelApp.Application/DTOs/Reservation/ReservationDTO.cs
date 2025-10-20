@@ -6,34 +6,26 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.WebPages.Html;
 
 namespace HotelApp.Application.DTOs.Reservation
 {
 	public class ReservationDTO
 	{
-		public List<ReservationGuestDTO>? GuestDtos { get; set; } 
-		public ReservationInfoDTO? reservationInfoDto { get; set; }
-		public ConfirmReservationDTO? confirmDto { get; set; }
+		public List<ReservationGuestDTO> GuestDtos { get; set; } = new List<ReservationGuestDTO>();
+		public ReservationInfoDTO ReservationInfoDto { get; set; } = new ReservationInfoDTO();
+		public ConfirmReservationDTO ConfirmDto { get; set; } = new ConfirmReservationDTO();
 	}
 
 	public class ReservationInfoDTO
 	{
-		[RequiredEx]
 		public DateTime CheckInDate { get; set; }
-		[RequiredEx]
 		public DateTime CheckOutDate { get; set; }
-
-		[RequiredEx]
 		public int NumOfNights { get; set; }
-
-		[RequiredEx]
 		public int RateId { get; set; }
-
-		[RequiredEx]
 		public int ReservationSourceId { get; set; }
 		public int? CompanyId { get; set; }
 
-		[RequiredEx]
 		public List<RoomTypeToBookDTO> RoomTypeToBookDTOs { get; set; } = new List<RoomTypeToBookDTO>();
 		public List<int> RoomsIDs { get; set; } = new List<int>();
 	}
@@ -51,7 +43,7 @@ namespace HotelApp.Application.DTOs.Reservation
 	}
 	public class ConfirmReservationDTO
 	{
-		[MaxLength(200)]
+		[MaxLength(100)]
 		public string? Comment { get; set; }
 		public bool IsPending { get; set; }
 		public bool IsConfirmed { get; set; }
@@ -61,4 +53,5 @@ namespace HotelApp.Application.DTOs.Reservation
 		public bool IsNoShow { get; set; }
 		public string? CancellationReason { get; set; } = null;
 	}
+
 }

@@ -30,11 +30,9 @@ namespace HotelApp.Application.Mapping
 				.ForMember(dest => dest.SelectedBranchIds, opt => opt.Ignore());
 
 			CreateMap<EditUserDTO, User>()
-			 .ForMember(dest => dest.Id, opt => opt.Ignore())
 			 .ForMember(dest => dest.LastModifiedDate, opt => opt.Ignore())
-			 .ForMember(dest => dest.LastModifiedById, opt => opt.Ignore());
-
-			CreateMap<EditUserDTO, User>();
+			 .ForMember(dest => dest.LastModifiedById, opt => opt.Ignore())
+             .ForMember(dest => dest.DefaultBranchId, opt => opt.Ignore());
 
 			CreateMap<UserBranch, DropDownDTO<string>>()
 				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Branch.Name))

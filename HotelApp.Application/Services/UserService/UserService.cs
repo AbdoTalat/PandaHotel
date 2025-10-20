@@ -67,13 +67,16 @@ namespace HotelApp.Application.Services.UserService
 			{
 				var dto = _mapper.Map<EditUserDTO>(user);
 
-				dto.SelectedBranchIds = (await _unitOfWork.UserRepository.GetUserBranchesIDsByUserIdAsync(Id)).ToList();
-				dto.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+				dto.SelectedBranchIds = (await _unitOfWork.UserRepository
+					.GetUserBranchesIDsByUserIdAsync(Id))?.Select(b => (int?)b).ToList() ?? new();
+
+				dto.AllRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
 				dto.SelectedRoles = (await _userManager.GetRolesAsync(user)).ToList();
+
 				dto.AllBranches = await _unitOfWork.BranchRepository
 					.GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter: true);
 
-				return ServiceResponse<EditUserDTO>.ResponseSuccess("Success",dto);
+				return ServiceResponse<EditUserDTO>.ResponseSuccess(Data: dto);
 			}
 			catch (Exception ex)
 			{
@@ -88,7 +91,7 @@ namespace HotelApp.Application.Services.UserService
 				LastName = userDTO.LastName,
 				UserName = userDTO.UserName,
 				Email = userDTO.Email,
-				DefaultBranchId = userDTO.DefaultBranchId,
+				DefaultBranchId = userDTO.SelectedBranchIds.FirstOrDefault(),
 				IsActive = userDTO.IsActive,
 				CreatedById = _currentUserService.UserId,
 				CreatedDate = DateTime.UtcNow
@@ -109,15 +112,20 @@ namespace HotelApp.Application.Services.UserService
 					var roleErrors = roleResult.Errors.Select(e => e.Description).ToList();
 					return ServiceResponse<AddUserDTO>.ResponseFailure(string.Join(", ", roleErrors));
 				}
-				
-				var newUserBranches = userDTO.SelectedBranchIds.Select(branchId => new UserBranch
-				{
-					UserId = newUser.Id,
-					BranchId = branchId,
-					AssignedAt = DateTime.UtcNow
-				}).ToList();
 
-				await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
+				if (userDTO.SelectedBranchIds != null && userDTO.SelectedBranchIds.Any(b => b.HasValue))
+				{
+					var newUserBranches = userDTO.SelectedBranchIds
+						.Where(b => b.HasValue)
+						.Select(branchId => new UserBranch
+						{
+							UserId = newUser.Id,
+							BranchId = branchId.Value,
+							AssignedAt = DateTime.UtcNow
+						})
+						.ToList();
+					await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
+				}
 				await _unitOfWork.CommitAsync();
 
 				return ServiceResponse<AddUserDTO>.ResponseSuccess($"New user '{newUser.UserName}' created successfully.");
@@ -141,26 +149,37 @@ namespace HotelApp.Application.Services.UserService
 				_mapper.Map(userDTO, user);
 				user.LastModifiedById = _currentUserService.UserId;
 				user.LastModifiedDate = DateTime.UtcNow;
-				await _userManager.UpdateAsync(user);
-
+				user.DefaultBranchId = userDTO.SelectedBranchIds?.FirstOrDefault();
+				var result = await _userManager.UpdateAsync(user);
+				if (!result.Succeeded)
+				{
+					var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+					return ServiceResponse<EditUserDTO>.ResponseFailure($"Failed to update user: {errors}");
+				}
 				// Update roles
 				var currentRoles = await _userManager.GetRolesAsync(user);
 				await _userManager.RemoveFromRolesAsync(user, currentRoles);
-				await _userManager.AddToRolesAsync(user, userDTO.SelectedRoles);
+				if (userDTO.SelectedRoles?.Any() == true)
+					await _userManager.AddToRolesAsync(user, userDTO.SelectedRoles);
 
 				// Update branches
 				var existingBranches = await _unitOfWork.UserBranchRepository
 					.GetAllAsync(ub => ub.UserId == userDTO.Id, SkipBranchFilter:true);
 				_unitOfWork.UserBranchRepository.DeleteRange(existingBranches);
 
-				var newUserBranches = userDTO.SelectedBranchIds.Select(branchId => new UserBranch
+				if (userDTO.SelectedBranchIds != null && userDTO.SelectedBranchIds.Any(b => b.HasValue))
 				{
-					UserId = user.Id,
-					BranchId = branchId,
-					AssignedAt = DateTime.UtcNow
-				}).ToList();
-
-				await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
+					var newUserBranches = userDTO.SelectedBranchIds
+						.Where(b => b.HasValue)
+						.Select(branchId => new UserBranch
+						{
+							UserId = user.Id,
+							BranchId = branchId.Value,
+							AssignedAt = DateTime.UtcNow
+						})
+						.ToList();
+					await _unitOfWork.UserBranchRepository.AddRangeAsync(newUserBranches);
+				}
 				await _unitOfWork.CommitAsync();
 
 
@@ -189,11 +208,11 @@ namespace HotelApp.Application.Services.UserService
 				{
 					return ServiceResponse<User>.ResponseSuccess("User Deleted successfully.");
 				}
-				return ServiceResponse<User>.ResponseFailure(result.Errors.FirstOrDefault().ToString());
+				return ServiceResponse<User>.ResponseFailure(string.Join(", ", result.Errors.Select(e => e.Description)));
 			}
 			catch (Exception ex)
 			{
-				return ServiceResponse<User>.ResponseFailure(ex.InnerException.Message);
+				return ServiceResponse<User>.ResponseFailure(ex.Message);
 			}
 		}
 

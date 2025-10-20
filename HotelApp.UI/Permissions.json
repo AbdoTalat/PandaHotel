@@ -1,18 +1,101 @@
 {
-  "RoomType": [ "RoomType.View", "RoomType.Add", "RoomType.Edit", "RoomType.Delete" ],
-  "Room": [ "Room.View", "Room.Add", "Room.Edit", "Room.Delete" ],
-  "Reservation": [ "Reservation.View", "Reservation.Add", "Reservation.Edit", "Reservation.Delete", "Reservation.Start", "Reservation.End" ],
-  "User": [ "User.View", "User.Add", "User.Edit", "User.Delete" ],
-  "Role": [ "Role.View", "Role.Add", "Role.Edit", "Role.Delete" ],
-  "Branch": [ "Branch.View", "Branch.Add", "Branch.Edit", "Branch.Delete" ],
-  "Guest": [ "Guest.View", "Guest.Add", "Guest.Edit", "Guest.Delete" ],
-  "Floor": [ "Floor.View", "Floor.Add", "Floor.Edit", "Floor.Delete" ],
-  "Option": [ "Option.View", "Option.Add", "Option.Edit", "Option.Delete" ],
-  "Rate": [ "Rate.View", "Rate.Add", "Rate.Edit", "Rate.Delete" ],
-  "RoomStatus": [ "RoomStatus.View", "RoomStatus.Add", "RoomStatus.Edit", "RoomStatus.Delete" ],
-  "SystemSetting": [ "SystemSetting.View", "SystemSetting.Add", "SystemSetting.Edit", "SystemSetting.Delete" ],
-  "Company": [ "Company.View", "Company.Add", "Company.Edit", "Company.Delete" ],
-  "Report": [ "Report.View" ],
-  "ProofType": [ "ProofType.View", "ProofType.Add", "ProofType.Edit", "ProofType.Delete" ],
-  "ReservationSource": [ "ReservationSource.View", "ReservationSource.Add", "ReservationSource.Edit", "ReservationSource.Delete" ]
+  "RoomType": [
+    "RoomType.View",
+    "RoomType.Add",
+    "RoomType.Edit",
+    "RoomType.Delete"
+  ],
+  "Room": [
+    "Room.View",
+    "Room.Add",
+    "Room.Edit",
+    "Room.Delete"
+  ],
+  "Reservation": [
+    "Reservation.View",
+    "Reservation.Add",
+    "Reservation.Edit",
+    "Reservation.Delete",
+    "Reservation.Confirm",
+    "Reservation.CheckIn",
+    "Reservation.CheckOut",
+    "Reservation.Cancel",
+    "Reservation.NoShow",
+    "Reservation.ManageStatus"
+  ],
+  "User": [
+    "User.View",
+    "User.Add",
+    "User.Edit",
+    "User.Delete"
+  ],
+  "Role": [
+    "Role.View",
+    "Role.Add",
+    "Role.Edit",
+    "Role.Delete"
+  ],
+  "Branch": [
+    "Branch.View",
+    "Branch.Add",
+    "Branch.Edit",
+    "Branch.Delete"
+  ],
+  "Guest": [
+    "Guest.View",
+    "Guest.Add",
+    "Guest.Edit",
+    "Guest.Delete"
+  ],
+  "Floor": [
+    "Floor.View",
+    "Floor.Add",
+    "Floor.Edit",
+    "Floor.Delete"
+  ],
+  "Option": [
+    "Option.View",
+    "Option.Add",
+    "Option.Edit",
+    "Option.Delete"
+  ],
+  "Rate": [
+    "Rate.View",
+    "Rate.Add",
+    "Rate.Edit",
+    "Rate.Delete"
+  ],
+  "RoomStatus": [
+    "RoomStatus.View",
+    "RoomStatus.Add",
+    "RoomStatus.Edit",
+    "RoomStatus.Delete"
+  ],
+  "SystemSetting": [
+    "SystemSetting.View",
+    "SystemSetting.Add",
+    "SystemSetting.Edit",
+    "SystemSetting.Delete"
+  ],
+  "Company": [
+    "Company.View",
+    "Company.Add",
+    "Company.Edit",
+    "Company.Delete"
+  ],
+  "Report": [
+    "Report.View"
+  ],
+  "ProofType": [
+    "ProofType.View",
+    "ProofType.Add",
+    "ProofType.Edit",
+    "ProofType.Delete"
+  ],
+  "ReservationSource": [
+    "ReservationSource.View",
+    "ReservationSource.Add",
+    "ReservationSource.Edit",
+    "ReservationSource.Delete"
+  ]
 }

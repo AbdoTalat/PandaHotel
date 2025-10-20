@@ -36,31 +36,32 @@ namespace HotelApp.Infrastructure.Repositories
 			var summary = new TodayReservationsSummaryDto
 			{
 				Arrivals = await Query
-					.Where(r => r.CheckInDate.Date == today && r.IsConfirmed && !r.IsCancelled && !r.IsCheckedOut && !r.IsCheckedIn)
+					.Where(r => r.CheckInDate.Date == today /*&& r.IsConfirmed && !r.IsCancelled && !r.IsCheckedOut && !r.IsCheckedIn*/)
 					.CountAsync(),
 
-				Departures = await Query.Where(r => r.CheckOutDate.Date == today && !r.IsCancelled)
+				Departures = await Query.Where(r => r.CheckOutDate.Date == today /*&& !r.IsCancelled*/)
 					.CountAsync(),
 
-				NewBookings = await Query.Where(r => r.CreatedDate.Value.Date == today && !r.IsCancelled)
+				NewBookings = await Query.Where(r => r.CreatedDate.Value.Date == today /*&& !r.IsCancelled*/)
 					.CountAsync(),
 
 				StayOvers = await Query.Where(r => 
 					r.CheckInDate.Date <= today && 
-					r.CheckOutDate.Date > today &&
-					r.IsCheckedIn && !r.IsCancelled && !r.IsCheckedOut)
+					r.CheckOutDate.Date > today )
+					//&&
+					//r.IsCheckedIn && !r.IsCancelled && !r.IsCheckedOut)
 					.CountAsync(),
 
 				Cancellations = await Query.Where(r => 
-					r.IsCancelled &&
+					//r.IsCancelled &&
 				    r.LastModifiedDate != null &&
 					r.LastModifiedDate.Value.Date == today)
 					.CountAsync(),
 
 				NoShow = await Query.Where(r =>
-				!r.IsCancelled &&
-				!r.IsCheckedIn &&
-				r.IsConfirmed &&
+				//!r.IsCancelled &&
+				//!r.IsCheckedIn &&
+				//r.IsConfirmed &&
 				r.CheckInDate.Date >= today && r.CheckInDate.Date < tomorrow)
 				.CountAsync()
 			};
@@ -134,7 +135,7 @@ namespace HotelApp.Infrastructure.Repositories
 				.AsNoTracking()
 				.Where(rr =>
 					roomIds.Contains(rr.RoomId) &&
-					!rr.Reservation.IsCancelled &&
+					//!rr.Reservation.IsCancelled &&
 					rr.Reservation.CheckInDate < windowEnd &&   // overlap condition
 					rr.Reservation.CheckOutDate > today)
 				.Select(rr => new
@@ -186,40 +187,40 @@ namespace HotelApp.Infrastructure.Repositories
 
 			var reservationsQuery = _context.Reservations
 				.AsNoTracking()
-				.BranchFilter()
-				.Where(r => !r.IsCancelled);
+				.BranchFilter();
+				//.Where(r => !r.IsCancelled);
 
 			var reservationStats = await reservationsQuery
 				.Select(r => new
 				{
 					r.Id,
-					r.IsConfirmed,
+					//r.IsConfirmed,
 					r.CheckInDate,
 					r.CheckOutDate,
-					r.IsCheckedIn,
-					r.IsCheckedOut,
+					//r.IsCheckedIn,
+					//r.IsCheckedOut,
 					Guests = r.guestReservations.Select(gr => gr.GuestId)
 				})
 				.ToListAsync();
 
 			var checkedInGuests = reservationStats
-				.Where(r => r.IsCheckedIn && !r.IsCheckedOut
-							&& r.CheckInDate.Date <= today
+				.Where(r => /*r.IsCheckedIn && !r.IsCheckedOut*/
+							 r.CheckInDate.Date <= today
 							&& r.CheckOutDate.Date >= today)
 				.SelectMany(r => r.Guests)
 				.Count();
 
 			var todayArrivals = reservationStats
-				.Where(r => r.CheckInDate.Date == today
-							&& !r.IsCheckedIn
-							&& r.IsConfirmed)
+				.Where(r => r.CheckInDate.Date == today)
+							//&& !r.IsCheckedIn
+							//&& r.IsConfirmed)
 				.SelectMany(r => r.Guests)
 				.Count();
 
 			var todayDepartures = reservationStats
-				.Where(r => r.CheckOutDate.Date == today
-							&& r.IsCheckedIn
-							&& !r.IsCheckedOut)
+				.Where(r => r.CheckOutDate.Date == today)
+							//&& r.IsCheckedIn
+							//&& !r.IsCheckedOut)
 				.SelectMany(r => r.Guests)
 				.Count();
 
@@ -284,7 +285,7 @@ namespace HotelApp.Infrastructure.Repositories
 				.Include(r => r.ReservationsRooms)
 				.AsNoTracking()
 				.BranchFilter()
-				.Where(r => !r.IsCancelled && r.IsConfirmed)
+				//.Where(r => !r.IsCancelled && r.IsConfirmed)
 				.SelectMany(r => r.ReservationsRooms)
 				.Where(rr => rr.StartDate <= next7Days.Last() && rr.EndDate > today)
 				.Select(rr => new

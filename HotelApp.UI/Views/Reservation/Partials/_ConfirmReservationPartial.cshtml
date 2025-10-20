@@ -1,124 +1,131 @@
 ﻿@model ConfirmReservationDTO
 
 <div class="row">
-	<div class="col-md-8">
-		<div class="panel panel-flat">
-			<div class="panel-heading">
-				<h6 class="panel-title">Reservation Details<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-				<div class="heading-elements">
-					<ul class="icons-list">
-						<li><a data-action="collapse"></a></li>
-						<li><a data-action="reload"></a></li>
-						<li><a data-action="close"></a></li>
-					</ul>
-				</div>
-			</div>
+	<div class="col-lg-8">
+        <div class="content-group">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Reservation Details<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                    <div class="heading-elements">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse"></a></li>
+                            <li><a data-action="reload"></a></li>
+                            <li><a data-action="close"></a></li>
+                        </ul>
+                    </div>
+                </div>
 
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-md-4">
-						<div class="content-group">
-							<h6 class="text-default heading-divided"><i class="icon-calendar"></i> Dates Of Stay</h6>
-							<div class="list-group no-border">
-								<a href="#" class="list-group-item">
-									Check In: <span id="confirmCheckIn" >-</span>
-								</a>
-								<a href="#" class="list-group-item">
-									Check Out: <span id="confirmCheckOut" >-</span>
-								</a>
-								<a href="#" class="list-group-item">
-									Nights: <span id="confirmNights">-</span>
-								</a>
-							</div>
-						</div>
-					</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="content-group">
+                                <h6 class="text-default heading-divided"><i class="icon-calendar"></i> Dates Of Stay</h6>
+                                <div class="list-group no-border">
+                                    <a href="#" class="list-group-item">
+                                        Check In: <span id="confirmCheckIn">-</span>
+                                    </a>
+                                    <a href="#" class="list-group-item">
+                                        Check Out: <span id="confirmCheckOut">-</span>
+                                    </a>
+                                    <a href="#" class="list-group-item">
+                                        Nights: <span id="confirmNights">-</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 
-					<div class="col-md-4">
-						<div class="content-group">
-							<h6 class="text-default heading-divided"><i class="icon-coins"></i> Balance </h6>
-							<div class="list-group no-border">
-								<a href="#" class="list-group-item">
-									Amount: <span id="confirmAmount" class="label bg-teal">$</span>
-								</a>
+                        <div class="col-md-4">
+                            <div class="content-group">
+                                <h6 class="text-default heading-divided"><i class="icon-coins"></i> Balance </h6>
+                                <div class="list-group no-border">
+                                    <a href="#" class="list-group-item">
+                                        Amount: <span id="confirmAmount" class="label bg-teal">$</span>
+                                    </a>
 
-								
-							</div>
-						</div>
-					</div>
 
-					<div class="col-md-4">
-						<div class="content-group">
-							<h6 class="text-default heading-divided"><i class="icon-pencil6"></i> Comments And Notes</h6>
+                                </div>
+                            </div>
+                        </div>
 
-							<div class="form-group">
-								<textarea id="comment" style="min-height:150px" class="form-control" maxlength="200" rows="4" oninput="updateCharCount()"></textarea>
+                        <div class="col-md-4">
+                            <div class="content-group">
+                                <h6 class="text-default heading-divided"><i class="icon-pencil6"></i> Comments And Notes</h6>
 
-								<div class="d-flex justify-content-end mt-1">
-									<label for="comment" class="form-label mb-0">
-										<span id="charCount" class="text-muted">(0/200)</span>
-									</label>
-								</div>
-							</div>
+                                <div class="form-group">
 
-						</div>
-					</div>
-				</div>
+                                    <textarea id="comment" style="min-height:150px" rows="3" cols="3" maxlength="200" class="form-control maxlength-textarea" placeholder="Comment">
 
+                                </textarea>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>			
-		
-	</div>
-	<div class="col-md-4">
-		<div class="panel panel-flat">
-			<div class="panel-heading">
-				<h6 class="panel-title">Guests<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-				<div class="heading-elements">
-					<span class="label label-success heading-text" id="guestCountLabel">0 guests</span>
-				</div>
-			</div>
-			<div class="panel-body">
-				<ul class="media-list" id="guestDisplayList">
-				</ul>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <div class="panel panel-flat">
-            <div class="panel-heading">
-				<h6 class="panel-title">Reservation Status<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
-            </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label><input type="checkbox" id="isPending" checked> Pending</label>
-                    </div>
-					<div class="checkbox">
-						<label><input type="checkbox" id="isConfirmed"> Confirmed</label>
-					</div>
-					<div class="checkbox">
-						<label><input type="checkbox" id="isCheckedIn"> Checked In</label>
-					</div>
-					<div class="checkbox">
-						<label><input type="checkbox" id="isCheckedOut"> Checked Out</label>
-                    </div>
-					<div class="checkbox">
-                        <label><input type="checkbox" id="isNoShow"> No Show</label>
-                    </div>
-					<div class="checkbox">
-						<label><input type="checkbox" id="isCancelled"> Cancelled</label>
-					</div>
 
-					<!-- Cancellation Reason -->
-					<div class="form-group" id="cancelReasonGroup" style="display:none;">
-						<label for="cancellationReason">Cancellation Reason</label>
-						<textarea class="form-control" id="cancellationReason" rows="2"></textarea>
-					</div>
-				</div>
+        </div>
+        <div class="content-group">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Reservation Status<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                </div>
+                <div class="panel-body">
+
+                    @if (User.HasClaim("permission", "Reservation.ManageStatus"))
+                    {
+                        <!-- Admin / Manager: full control -->
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsPending, new { id = "isPending" }) Pending</label>
+                            </div>
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsConfirmed, new { id = "isConfirmed" }) Confirmed</label>
+                            </div>
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsCheckedIn, new { id = "isCheckedIn" }) Checked In</label>
+                            </div>
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsCheckedOut, new { id = "isCheckedOut" }) Checked Out</label>
+                            </div>
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsCancelled, new { id = "isCancelled" }) Cancelled</label>
+                            </div>
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsNoShow, new { id = "isNoShow" }) No Show</label>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- For non-managers, JS auto-sets checkboxes based on permission -->
+                        <p class="text-muted text-center">Status will be set automatically based on your permission.</p>
+                    }
+
+                </div>
 
             </div>
         </div>
+
+	</div>
+    <div class="col-lg-4">
+        <div class="content-group">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Guests<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                    <div class="heading-elements">
+                        <span class="label label-success heading-text" id="guestCountLabel">0 guests</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul class="media-list" id="guestDisplayList">
+                    </ul>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
@@ -126,27 +133,32 @@
 
 <script>
 	$(document).ready(function () {
-		// Always-enabled statuses
-		const alwaysEnabled = ["#isConfirmed", "#isPending", "#isCancelled", "#isNoShow"];
+		const ids = {
+			pending: "#isPending",
+			confirmed: "#isConfirmed",
+			checkedIn: "#isCheckedIn",
+			checkedOut: "#isCheckedOut",
+			cancelled: "#isCancelled",
+			noShow: "#isNoShow"
+		};
+
+		// Always enabled statuses
+		const alwaysEnabled = [ids.pending, ids.confirmed, ids.cancelled, ids.noShow];
 
 		// Chain statuses
-		const chain = ["#isConfirmed", "#isCheckedIn", "#isCheckedOut", "#isClosed"];
+		const chain = [ids.confirmed, ids.checkedIn, ids.checkedOut];
 
-		// Initial setup
 		alwaysEnabled.forEach(sel => $(sel).prop("disabled", false));
 		chain.forEach((sel, i) => {
-			if (i > 0) $(sel).prop("disabled", true); // disable all except Confirmed
+			if (i > 0) $(sel).prop("disabled", true);
 		});
 
-		// Handle changes
+		// Chain logic
 		chain.forEach((selector, index) => {
 			$(selector).change(function () {
 				if ($(this).is(":checked")) {
-					if (chain[index + 1]) {
-						$(chain[index + 1]).prop("disabled", false);
-					}
+					if (chain[index + 1]) $(chain[index + 1]).prop("disabled", false);
 				} else {
-					// Uncheck & disable everything after it
 					for (let i = index + 1; i < chain.length; i++) {
 						$(chain[i]).prop("checked", false).prop("disabled", true);
 					}
@@ -154,27 +166,17 @@
 			});
 		});
 
-		// Cancel reason toggle
-		$("#isCancelled").change(function () {
+		// Cancellation reason
+		$(ids.cancelled).change(function () {
 			if ($(this).is(":checked")) {
 				$("#cancelReasonGroup").slideDown();
 			} else {
 				$("#cancelReasonGroup").slideUp();
-				$("#cancellationReason").val('');
+				$("#CancellationReason").val('');
 			}
 		});
+
+
+
 	});
 </script>
-<script>
-	function updateCharCount() {
-		const textarea = document.getElementById('comment');
-		const current = textarea.value.length;
-		const max = textarea.getAttribute('maxlength');
-		document.getElementById('charCount').textContent = `(${current}/${max})`;
-	}
-
-	document.addEventListener('DOMContentLoaded', updateCharCount);
-</script>
-
-
-

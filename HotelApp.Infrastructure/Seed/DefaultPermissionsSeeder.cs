@@ -24,7 +24,7 @@ namespace HotelApp.Infrastructure.Seed
 			var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
 
-			var allPermissions = permissionLoader.LoadAllPermissions();
+			var allPermissions = permissionLoader.LoadAllPermissionsFromJsonFile();
 
 			// 🔁 Seed permissions for Admin or any other roles
 			await SeedPermissionsToRole(roleManager, "Admin", allPermissions);

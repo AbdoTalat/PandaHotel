@@ -1,21 +1,27 @@
-﻿@model Reservation
+﻿@model GetReservationDetailsByIdDTO
 @{
     TempData["Title"] = "Reservation Details";
+    var currentStatusColor = ReservationStatusHelper.GetColorClass(Model.Status);
+
 }
+<style>
+    .list-feed-time > li {
+        margin-left: 90px;
+    }
+
+        .list-feed-time > li .feed-time {
+            position: absolute;
+            left: -90px;
+            top: 0;
+            font-size: 12px;
+        }
+</style>
 
 <!-- Page header -->
-<div class="page-header page-header-default">
+<div class="page-header page-header-default page-header-xs">
     <div class="page-header-content">
         <div class="page-title">
             <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Reservation Details</span> </h4>
-        </div>
-
-        <div class="heading-elements">
-            <div class="heading-btn-group">
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
-            </div>
         </div>
     </div>
 
@@ -49,283 +55,498 @@
 </div>
 <!-- /page header -->
 
-<!-- Content area -->
 <div class="content">
-    <div class="row">
-        <div class="col-md-12">
-            <h6 class="content-group text-semibold col-md-2">
-                Reservation #@Model.Id
-            </h6>
+    <div class="container-detached">
+        <div class="content-detached">
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title text-semibold"><a href="">Reservation #@Model.Id</a><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
 
-            <div class="text-right">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="#"> Add Payment</a></li>
-                        <li><a href="#"> Create Order</a></li>
-                        <li><a href="#"> Change Dates</a></li>
-                        <li><a href="#" class="text-danger"> Delete</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"> Add Guest</a></li>
-                        <li><a href="#"> Send Email</a></li>
-                    </ul>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="#"> Add Payment</a></li>
-                        <li><a href="#"> Create Order</a></li>
-                        <li><a href="#"> Change Dates</a></li>
-                        <li><a href="#" class="text-danger"> Delete</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"> Add Guest</a></li>
-                        <li><a href="#"> Send Email</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-	<div class="row">
-        <!-- Guests lists -->
-		<div class="col-md-6">
-			<div class="panel panel-flat">
-				<div class="panel-heading">
-					<h5 class="panel-title">GUESTS LIST</h5>
-
-					<div class="heading-elements">
-                        <a data-title="Add New Guest" data-url="/Guest/AddGuest" class="btn border-primary text-primary btn-flat btn-icon btn-md btnOpenModal" style="padding: 2px 6px; font-size: 16px;">
-                            <i class="icon-plus2"></i>
-                        </a>
-
-                        <span class="label border-left-primary label-striped">Guests: @Model.guestReservations.Count()</span>
-                    </div>
-
-				</div>
-
-                <ul class="media-list media-list-linked">
-                    <!-- Primary Guest Section -->
-                    @if (Model.guestReservations.Any(g => g.IsPrimaryGuest))
-                    {
-                        <li class="media-header text-primary">PRIMARY GUEST</li>
-                        @foreach (var guest in Model.guestReservations.Where(g => g.IsPrimaryGuest))
-                        {
-                            var collapseId = $"guest_{guest.Guest.Id}";
-                            <li class="media">
-                                <div class="media-link cursor-pointer" data-toggle="collapse" data-target="#@collapseId">
-                                    <div class="media-left">
-                                        <img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="media-heading text-semibold">@guest.Guest.FullName</div>
-                                        <span class="text-muted">@guest.Guest.Email</span>
-                                    </div>
-                                    <div class="media-right media-middle">
-                                        <ul class="icons-list text-nowrap">
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                    <i class="icon-menu9"></i>
+                    <div class="heading-elements">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn dropdown-toggle @currentStatusColor" data-toggle="dropdown">
+                                        @Model.Status <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        @foreach (var status in ReservationStatusHelper.GetNextStatusesWithColor(Model.Status))
+                                        {
+                                            <li>
+                                                <a href="#" class="text-center">
+                                                    Change To <span class="btn btn-xs @status.ColorClass">@status.Text</span>
                                                 </a>
-                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                    <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
-                                                    <li><a href="#" data-toggle="modal" data-target="#change"><i class="icon-loop text-info"></i> Change</a></li>
-                                                    <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
-                                                </ul>
                                             </li>
-                                        </ul>
-                                    </div>
+                                        }
+                                    </ul>
                                 </div>
-                                <div class="collapse" id="@collapseId">
-                                    <div class="contact-details">
-                                        <ul class="list-extended list-unstyled list-icons">
-                                            <li><i class="icon-pin position-left"></i> @guest.Guest.Address</li>
-                                            <li><i class="icon-phone position-left"></i> @guest.Guest.Phone</li>
-                                            <li><i class="icon-mail5 position-left"></i> <a href="#">@guest.Guest.Email</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                        }
-                    }
 
-                    <!-- Other Guests Section -->
-                    @if (Model.guestReservations.Any(g => !g.IsPrimaryGuest))
-                    {
-                        <li class="media-header">
-                            <legend class="text-semibold">
-                                Guests
-                                <a class="control-arrow collapsed" data-toggle="collapse" data-target="#guestList" aria-expanded="false">
-                                    <i class="icon-circle-down2"></i>
-                                </a>
-                            </legend>
-                        </li>
-                        <li>
-                            <div class="collapse" id="guestList">
-                                <ul class="media-list">
-                                    @foreach (var guest in Model.guestReservations.Where(g => !g.IsPrimaryGuest))
-                                    {
-                                        var collapseId = $"guest_{guest.Guest.Id}";
-                                        <li class="media">
-                                            <div class="media-link cursor-pointer" data-toggle="collapse" data-target="#@collapseId">
-                                                <div class="media-left">
-                                                    <img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-                                                </div>
-                                                <div class="media-body">
-                                                    <div class="media-heading text-semibold">@guest.Guest.FullName</div>
-                                                    <span class="text-muted">@guest.Guest.Email</span>
-                                                </div>
-                                                <div class="media-right media-middle">
-                                                    <ul class="icons-list text-nowrap">
-                                                        <li class="dropdown">
-                                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                                <i class="icon-menu9"></i>
-                                                            </a>
-                                                            <ul class="dropdown-menu dropdown-menu-right">
-                                                                <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
-                                                                <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="collapse" id="@collapseId">
-                                                <div class="contact-details">
-                                                    <ul class="list-extended list-unstyled list-icons">
-                                                        <li><i class="icon-pin position-left"></i> @guest.Guest.Address</li>
-                                                        <li><i class="icon-phone position-left"></i> @guest.Guest.Phone</li>
-                                                        <li><i class="icon-mail5 position-left"></i> <a href="#">@guest.Guest.Email</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a href="#"> Add Payment</a></li>
+                                        <li><a href="#"> Create Order</a></li>
+                                        <li><a href="#" id="btnChangeDates"> Change Dates</a></li>
+                                        <li><a href="#" class="text-danger"> Delete</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#"> Add Guest</a></li>
+                                        <li><a href="#"> Send Email</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                        </li>
-                    }
+                        </div>
+
+                    </div>
+                </div>
+
+                <ul class="nav nav-lg nav-tabs nav-tabs-bottom nav-tabs-toolbar no-margin">
+                    <li class="active"><a href="#reservation-Details" data-toggle="tab"><i class="icon-menu7 position-left"></i> Reservation Details</a></li>
+                    <li><a href="#guest-Details" data-toggle="tab"><i class="icon-people position-left"></i> Guests</a></li>
+                    <li><a href="#course-schedule" data-toggle="tab"><i class="icon-calendar3 position-left"></i> Actions</a></li>
                 </ul>
 
-			</div>
-        </div>
-        <!-- /guests list -->
+                <div class="tab-content">
+                    <div class="tab-pane fade in active" id="reservation-Details">
+                        <div class="panel-body">
 
-        <!-- Dates Of Stay-->
-        <div class="col-md-6">
-            <div class="form-horizontal" action="#">
-                <div class="panel panel-flat">
-                    <div class="panel-heading">
-                        <h5 class="panel-title">DATES OF STAY<a class="heading-elements-toggle"><i class="icon-more"></i></a></h5>
-                        <div class="heading-elements">
-                            <span class="label border-left-primary label-striped">People: @Model.NumberOfPeople</span>
-                            <span class="label border-left-primary label-striped">Rooms: @Model.ReservationsRooms.Count()</span>
-                            
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <!-- Reservation History -->
+                                    <div class="col-md-4">
+                                        <div class="panel panel-body">
+                                            <legend class="text-semibold">
+                                                <i class="icon-reload-alt"></i> Reservation History
+                                            </legend>
+
+                                            <div id="reservationHistory">
+                                                <ul class="list-feed list-feed-time">
+                                                    @foreach (var item in Model.ReservationHistories)
+                                                    {
+                                                        <li>
+                                                            <span class="feed-time text-muted text-size-large">@item.PerformedDate.ToString("dd MMM • hh:mm")</span>
+                                                            <a href="#">@item.PerformedByName </a>
+                                                            performed: <strong>@item.Status</strong>
+                                                        </li>
+                                                    }
+                                                </ul>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- reservation history -->
+                                    <!-- Dates Of Stay-->
+                                    <div class="col-md-4 ">
+                                        <div class="panel panel-body">
+
+                                            <legend class="text-semibold">
+                                                <i class="icon-calendar3"></i> Dates Of Stay
+                                                <a class="control-arrow" data-toggle="collapse" data-target="#demo2" aria-expanded="true">
+                                                    <span class="label border-left-primary label-striped" style="margin-right:-1px">People: @Model.NumberOfPeople</span>
+                                                    <span class="label border-left-primary label-striped">Rooms: @Model.NumOfTotalRooms</span>
+
+
+                                                </a>
+                                            </legend>
+
+                                            <div class="table-responsive no-border">
+                                                <table class="table table-xs">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Source</td>
+                                                            <td class="text-right">@Model.ReservationSource</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td> Check In</td>
+                                                            <td class="text-right text-primary text-size-large">
+                                                                @Model.CheckInDate.ToString("dd-MM-yyyy • hh:mm tt")
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Check Out</td>
+                                                            <td class="text-right text-primary text-size-large">
+                                                                @Model.CheckOutDate.ToString("dd-MM-yyyy • hh:mm tt")
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Nights</td>
+                                                            <td class="text-right">@Model.NumberOfNights</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Notes</td>
+                                                            <td class="text-right">@Model.Notes</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- dates Of Stay-->
+                                    <!-- Charges Summary -->
+                                    <div class="col-md-4">
+                                        <div class="panel panel-body">
+
+                                            <legend class="text-semibold"> <i class="icon-cash3"></i> Charges Summary</legend>
+
+                                            <div class="content-group">
+                                                <h6>Total due</h6>
+                                                <div class="table-responsive no-border">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Subtotal:</th>
+                                                                <td class="text-right">$7,000</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Tax: <span class="text-regular">(25%)</span></th>
+                                                                <td class="text-right">$1,750</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Total:</th>
+                                                                <td class="text-right text-primary"><h5 class="text-semibold">$8,750</h5></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <!-- charges summary -->
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Accommodations -->
+                                <div class="col-md-12">
+                                    <div class="panel panel-body">
+                                        <legend class="text-semibold">
+                                            ACCOMMODATIONS
+                                            <a class="control-arrow" data-toggle="collapse" data-target="#accommodations">
+                                                <i class="icon-circle-down2"></i>
+                                            </a>
+                                        </legend>
+                                        <div class="table-responsive collapse" id="accommodations">
+                                            <table class="table table-framed">
+                                                <thead>
+                                                    <tr class="active border-double">
+                                                        <th>Dates</th>
+                                                        <th>Adults</th>
+                                                        <th>Children</th>
+                                                        <th>Room Type</th>
+                                                        <th>No. Rooms</th>
+                                                        <th>Rooms</th>
+                                                        <th>Rate</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model.ReservationRoomTypes)
+                                                    {
+                                                        var rooms = Model.ReservationRooms
+                                                        .Where(r => r.RoomTypeId == item.Id)
+                                                        .Select(r => r.RoomNumber)
+                                                        .ToList();
+                                                        <tr>
+                                                            <td>@Model.CheckInDate.ToString("dd-MM-yyyy") - @Model.CheckOutDate.ToString("dd-MM-yyyy")</td>
+                                                            <td>@item.NumOfAdults</td>
+                                                            <td>@item.NumOfChildren</td>
+                                                            <td>@item.RoomTypeName</td>
+                                                            <td>@item.Quantity</td>
+                                                            <td>@string.Join(", ", rooms)</td>
+                                                            <td>Rate#</td>
+                                                            <td>1000 $</td>
+                                                        </tr>
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- accommodations -->
+                                <!-- Actions Links -->
+                                <div class="col-md-6">
+                                    <div class="panel panel-body">
+                                        <legend class="text-semibold">
+                                            Actions
+                                            <a class="control-arrow" data-toggle="collapse" data-target="#actions">
+                                                <i class="icon-circle-down2"></i>
+                                            </a>
+                                        </legend>
+
+                                        <div class="collapse" id="actions">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="content-group">
+                                                        <ul class="list list-unstyled">
+                                                            <li><a href="#">Add Payment</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="content-group">
+                                                        <ul class="list list-unstyled">
+                                                            <li><a href="#">Edit</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="content-group">
+                                                        <ul class="list list-unstyled">
+                                                            <li><a href="#">Add Order</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- actions links -->
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="panel-body">
-                        <div class="col-md-12">
-                            <div class="content-group">
-                                <div class="table-responsive no-border">
-                                    <table class="table table-xs">
-                                        <thead>
-                                            <tr>
-                                                <td>Source</td>
-                                                <td class="text-right">@Model.ReservationSource.Name</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="active">
-                                                <td> Check In</td>
-                                                <td class="text-right text-primary text-size-large">
-                                                    @Model.CheckInDate.ToString("dd-MM-yyyy • hh:mm tt")
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td> Check Out</td>
-                                                <td class="text-right text-primary text-size-large">
-                                                    @Model.CheckOutDate.ToString("dd-MM-yyyy • hh:mm tt")
-                                                </td>
-                                            </tr>
+                    <div class="tab-pane fade" id="guest-Details">
+                        <div class="panel-body">
+                            <div class="row">
+                                <legend class="text-semibold">
+                                    Guests
+                                    <a class="control-arrow" data-toggle="collapse" data-target="#demo2" aria-expanded="true">
+                                        <span class="label border-left-primary label-striped">
+                                            Guests: @Model.GuestReservations.Count()
+                                        </span>
+                                    </a>
+                                </legend>
 
-                                            <tr class="active">
-                                                <td>Nights</td>
-                                                <td class="text-right">@Model.NumberOfNights</td>
-                                            </tr>
-                                            <tr >
-                                                <td>Notes</td>
-                                                <td class="text-right">@Model.Notes</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="col-md-6">
+
+                                    <!-- ===== Primary Guest Card (Top) ===== -->
+                                    @if (Model.GuestReservations.Any(g => g.IsPrimaryGuest))
+                                    {
+                                        var primary = Model.GuestReservations.FirstOrDefault(g => g.IsPrimaryGuest);
+                                        if (primary != null)
+                                        {
+                                            <div class="panel panel-body border-left-xlg border-left-primary">
+                                                <div class="media">
+                                                    <div class="media-left">
+                                                        <a href="/assets/images/placeholder.jpg" data-popup="lightbox">
+                                                            <img src="/assets/images/placeholder.jpg" class="img-circle img-lg" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <h6 class="media-heading text-semibold text-primary"><i class="icon-crown"></i> @primary.FullName</h6>
+                                                        <div class="text-muted mt-5">
+                                                            <i class="icon-phone position-left"></i> @primary.Phone<br>
+                                                            <i class="icon-mail5 position-left"></i>
+                                                            <a href="mailto:@primary.Email">@primary.Email</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="media-right media-middle">
+                                                        <ul class="icons-list">
+                                                            <li class="dropdown">
+                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                                    <i class="icon-menu7"></i>
+                                                                </a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
+                                                                    <li><a href="#" data-toggle="modal" data-target="#change"><i class="icon-loop text-info"></i> Change</a></li>
+                                                                    <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+
+                                    <!-- ===== Other Guests Collapsible Section ===== -->
+                                    @if (Model.GuestReservations.Any(g => !g.IsPrimaryGuest))
+                                    {
+                                        <legend class="text-semibold">
+                                            Other Guests
+                                            <a class="control-arrow collapsed" data-toggle="collapse" data-target="#guestList" aria-expanded="false">
+                                                <i class="icon-circle-down2"></i>
+                                            </a>
+                                        </legend>
+
+                                        <div class="collapse" id="guestList">
+                                            <ul class="media-list">
+                                                @foreach (var guest in Model.GuestReservations.Where(g => !g.IsPrimaryGuest))
+                                                {
+                                                    var collapseId = $"guest_{guest.Id}";
+                                                    <li class="media">
+                                                        <div class="media-link cursor-pointer" data-toggle="collapse" data-target="#@collapseId">
+                                                            <div class="media-left">
+                                                                <img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+                                                            </div>
+                                                            <div class="media-body">
+                                                                <div class="media-heading text-semibold">@guest.FullName</div>
+                                                            </div>
+                                                            <div class="media-right media-middle">
+                                                                <ul class="icons-list text-nowrap">
+                                                                    <li class="dropdown">
+                                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                                            <i class="icon-menu9"></i>
+                                                                        </a>
+                                                                        <ul class="dropdown-menu dropdown-menu-right">
+                                                                            <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
+                                                                            <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Collapsible details -->
+                                                        <div class="collapse" id="@collapseId">
+                                                            <div class="contact-details">
+                                                                <ul class="list-extended list-unstyled list-icons">
+                                                                    <li><i class="icon-phone position-left"></i> @guest.Phone</li>
+                                                                    <li>
+                                                                        <i class="icon-mail5 position-left"></i>
+                                                                        <a href="mailto:@guest.Email">@guest.Email</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+
+                                    @if (!Model.GuestReservations.Any())
+                                    {
+                                        <div class="text-muted text-center mt-10">No guests added yet.</div>
+                                    }
+
                                 </div>
-
                             </div>
                         </div>
+                    </div>
 
+                    <div class="tab-pane fade" id="course-schedule">
+                        <div class="panel-body">
+                            <div class="schedule"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- dates Of Stay-->
     </div>
 
-    <!-- Accommodations -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-flat">
-                <div class="panel-heading">
-                    <h5 class="panel-title">ACCOMMODATIONS<a class="heading-elements-toggle"><i class="icon-more"></i></a></h5>
-                    <div class="heading-elements">
-                        <ul class="icons-list">
-                            <li><a data-action="collapse"></a></li>
-                            <li><a data-action="reload"></a></li>
-                            <li><a data-action="close"></a></li>
-                        </ul>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-xs">
-                            <thead>
-                                <tr class=" active">
-                                    <th>Dates</th>
-                                    <th>Adults</th>
-                                    <th>Children</th>
-                                    <th>Room Type</th>
-                                    <th>No. Rooms</th>
-                                    <th>Rooms</th>
-                                    <th>Rate</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(var item in Model.ReservationRoomTypes)
-                                {
-                                    var rooms = Model.ReservationsRooms
-                                    .Where(r => r.Room.RoomTypeId == item.RoomTypeId)
-                                    .Select(r => r.Room.RoomNumber)
-                                    .ToList();
-                                    <tr>
-                                        <td>@Model.CheckInDate.ToString("dd-MM-yyyy") - @Model.CheckOutDate.ToString("dd-MM-yyyy")</td>
-                                        <td>@item.NumOfAdults</td>
-                                        <td>@item.NumOfChildren</td>
-                                        <td>@item.RoomType.Name</td>
-                                        <td>@item.Quantity</td>
-                                        <td>@string.Join(", ", rooms)</td>
-                                        <td>Rate#</td>
-                                        <td>1000 $</td>
-                                    </tr>
-                                }
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <!-- accommodations -->
 </div>
-<!-- content area -->
+
+
+
+
+
+<!-- Modals -->
+
+<!-- Change Dates Modal -->
+<div id="changeDatesModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-center">Change Reservation Dates</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="changeDatesForm" class="col-md-12">
+                    <input type="hidden" id="ReservationId" value="@Model.Id" />
+
+                    <div class="form-group col-md-6">
+                        <label>From</label>
+                        <input type="datetime-local" class="form-control" id="CheckIn"
+                               value="@Model.CheckInDate.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                    
+                    <div class="form-group col-md-6">
+                        <label>To</label>
+                        <input type="datetime-local" class="form-control" id="CheckOut"
+                               value="@Model.CheckOutDate.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="saveDatesBtn" class="btn btn-primary">
+                     Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modals -->
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            const toastData = localStorage.getItem("toastData");
+            if (toastData) {
+                const { type, title, message } = JSON.parse(toastData);
+                showToast(type, title, message);
+                localStorage.removeItem("toastData"); 
+            }
+
+            const originalCheckIn = $("#CheckIn").val();
+            const originalCheckOut = $("#CheckOut").val();
+
+            $("#btnChangeDates").on("click", function (e) {
+                e.preventDefault();
+
+                $("#CheckIn").val(originalCheckIn);
+                $("#CheckOut").val(originalCheckOut);
+
+                $("#changeDatesModal").modal("show");
+            });
+
+            $("#saveDatesBtn").on("click", function () {
+                const data = {
+                    reservationId: $("#ReservationId").val(),
+                    checkIn: $("#CheckIn").val(),
+                    checkOut: $("#CheckOut").val()
+                };
+
+                $.ajax({
+                    url: '@Url.Action("ChangeReservationDates", "Reservation")',
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.success) {
+                            $("#changeDatesModal").modal("hide");
+
+                            localStorage.setItem("toastData", JSON.stringify({
+                                type: "success",
+                                title: "Success",
+                                message: response.message
+                            }));
+
+                            setTimeout(() => location.reload());
+                        } else {
+                            showToast('error', 'Error', response.message);
+                        }
+                    },
+                    error: function () {
+                        showToast('error', 'Error', "An unexpected error occurred.");
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

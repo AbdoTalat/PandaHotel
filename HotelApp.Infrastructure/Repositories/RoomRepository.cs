@@ -140,7 +140,7 @@ namespace HotelApp.Infrastructure.Repositories
                     return ServiceResponse<object>.ResponseFailure( $"You must select {requestedCount} room(s) for {GetRoomTypeName(typeDto.RoomTypeId)}.");
                 }
 
-                if (requestedCount != selectedCount)
+                if (requestedCount < selectedCount)
                 {
                     return ServiceResponse<object>.ResponseFailure($"For {GetRoomTypeName(typeDto.RoomTypeId)} you selected {selectedCount}, but required {requestedCount}.");
                 }

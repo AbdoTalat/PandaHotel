@@ -8,7 +8,8 @@ namespace HotelApp.Application.Interfaces.IRepositories
 {
     public interface IPermissionLoader
     {
-        List<string?> LoadAllPermissions();
+        Task<List<string?>> LoadAllPermissions();
+        List<string?> LoadAllPermissionsFromJsonFile();
         Dictionary<string, List<string>> LoadGroupedPermissions();
     }
 

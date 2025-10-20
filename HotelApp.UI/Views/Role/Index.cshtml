@@ -110,13 +110,13 @@
 							<td>
 							@if (User.HasClaim("permission", "Role.Edit"))
 							{
-								<a data-popup="popover" title="Assign Permissions" 
-								data-trigger="hover" data-content=""
+								<a data-popup="tooltip-custom" title=""
+								   data-original-title="Assign Permissions"
 								   asp-action="AssignPermissions" asp-controller="Role" asp-route-Id="@item.Id"
 								   class="text-primary-600">
 									<i class="icon-cog7" style="font-size:20px; margin-right:8px"></i>
 								</a>
-
+								
 							}    
 							@if (item.IsBasic == false)
                             {

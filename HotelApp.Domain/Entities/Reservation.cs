@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,20 +15,17 @@ namespace HotelApp.Domain.Entities
     public class Reservation : BaseEntity, IHasBranch
 	{
         public int Id { get; set; }
+        public string? ReservationNumber { get; set; } // e.g. "R-2025-0001234" UNIQUE
+        public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
+
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
         public int NumberOfNights { get; set; }
         public int NumberOfPeople { get; set; }
         public decimal PricePerNight { get; set; }
         public decimal TotalPrice { get; set; }
-        public string? Notes { get; set; }
 
-        public bool IsPending { get; set; }
-        public bool IsConfirmed { get; set; }
-        public bool IsCheckedIn { get; set; }
-        public bool IsCheckedOut { get; set; }
-        public bool IsCancelled { get; set; }
-        public bool IsNoShow { get; set; }
+        public string? Notes { get; set; }
         public string? CancellationReason { get; set; }
 
         public int ReservationSourceId { get; set; }
@@ -36,16 +34,15 @@ namespace HotelApp.Domain.Entities
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
 
+
         public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
 		public ICollection<ReservationRoomType> ReservationRoomTypes { get; set; } = new HashSet<ReservationRoomType>();
 		public ICollection<GuestReservation> guestReservations { get; set; } = new HashSet<GuestReservation>();
         public ICollection<ReservationRoom> ReservationsRooms { get; set; } = new HashSet<ReservationRoom>();
+        public ICollection<ReservationHistory> ReservationHistories { get; set; } = new HashSet<ReservationHistory>();
 
     }
-
-
-
 
 }

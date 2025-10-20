@@ -4,6 +4,7 @@ using HotelApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251015201943_UpdateDefaultBranchIdToAllowNull")]
+    partial class UpdateDefaultBranchIdToAllowNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,7 +89,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.CalculationType", b =>
@@ -104,7 +107,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CalculationTypes", (string)null);
+                    b.ToTable("CalculationTypes");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Company", b =>
@@ -165,7 +168,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Country", b =>
@@ -189,7 +192,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Floor", b =>
@@ -229,7 +232,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("Floors", (string)null);
+                    b.ToTable("Floors");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Guest", b =>
@@ -292,7 +295,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("ProofTypeId");
 
-                    b.ToTable("Guests", (string)null);
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.GuestReservation", b =>
@@ -318,7 +321,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("GuestReservations", (string)null);
+                    b.ToTable("GuestReservations");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
@@ -383,7 +386,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("Options", (string)null);
+                    b.ToTable("Options");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
@@ -420,7 +423,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("ProofTypes", (string)null);
+                    b.ToTable("ProofTypes");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Rate", b =>
@@ -481,7 +484,7 @@ namespace HotelApp.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[BranchId] IS NOT NULL");
 
-                    b.ToTable("Rates", (string)null);
+                    b.ToTable("Rates");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Reservation", b =>
@@ -558,7 +561,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("ReservationSourceId");
 
-                    b.ToTable("Reservations", (string)null);
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ReservationHistory", b =>
@@ -587,7 +590,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("ReservationHistory", (string)null);
+                    b.ToTable("ReservationHistory");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ReservationRoom", b =>
@@ -619,7 +622,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("ReservationRooms", (string)null);
+                    b.ToTable("ReservationRooms");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ReservationRoomType", b =>
@@ -651,7 +654,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("ReservationRoomTypes", (string)null);
+                    b.ToTable("ReservationRoomTypes");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ReservationSource", b =>
@@ -672,7 +675,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReservationSources", (string)null);
+                    b.ToTable("ReservationSources");
 
                     b.HasData(
                         new
@@ -834,7 +837,7 @@ namespace HotelApp.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[BranchId] IS NOT NULL");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.RoomOption", b =>
@@ -857,7 +860,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RoomOptions", (string)null);
+                    b.ToTable("RoomOptions");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.RoomStatus", b =>
@@ -918,7 +921,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("RoomStatuses", (string)null);
+                    b.ToTable("RoomStatuses");
 
                     b.HasData(
                         new
@@ -1037,7 +1040,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("RoomTypes", (string)null);
+                    b.ToTable("RoomTypes");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.RoomTypeRate", b =>
@@ -1075,7 +1078,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("RoomTypeRates", (string)null);
+                    b.ToTable("RoomTypeRates");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.State", b =>
@@ -1095,7 +1098,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("States", (string)null);
+                    b.ToTable("States");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.SystemSetting", b =>
@@ -1157,7 +1160,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.ToTable("SystemSettings", (string)null);
+                    b.ToTable("SystemSettings");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.User", b =>
@@ -1289,7 +1292,7 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserBranches", (string)null);
+                    b.ToTable("UserBranches");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

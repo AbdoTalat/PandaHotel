@@ -11,6 +11,7 @@ using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -25,16 +26,18 @@ namespace HotelApp.UI.Controllers
 		private readonly IRoomService _roomService;
 		private readonly IGuestService _guestService;
 		private readonly IRoomTypeService _roomTypeService;
+        private readonly IReservationSourceService _reservationSourceService;
 
-		public ReservationController(IReservationService reservationService, IRoomService roomService,
-			IGuestService guestService, IRoomTypeService roomTypeService
+        public ReservationController(IReservationService reservationService, IRoomService roomService,
+			IGuestService guestService, IRoomTypeService roomTypeService, IReservationSourceService reservationSourceService
 			)
 		{
 			_reservationService = reservationService;
 			_roomService = roomService;
 			_guestService = guestService;
 			_roomTypeService = roomTypeService;
-		}
+            _reservationSourceService = reservationSourceService;
+        }
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
@@ -77,12 +80,6 @@ namespace HotelApp.UI.Controllers
 				numberOfNights = r.NumberOfNights,
 				numberOfPeople = r.NumberOfPeople,
 				totalPrice = r.TotalPrice,
-				isConfirmed = r.IsConfirmed,
-				isPending = r.IsPending,
-				isCheckedIn = r.IsCheckedIn,
-				isCheckedOut = r.IsCheckedOut,
-				isNoShow = r.IsNoShow,
-				isCancelled = r.IsCancelled
 			}).ToList();
 
 			return Json(new { success = true, data = result });
@@ -102,7 +99,8 @@ namespace HotelApp.UI.Controllers
             if (!ModelState.IsValid)
             {
 				return Json(new { success = false, message = "Please fill in all required fields correctly." });
-            }
+				//return PartialView("Partial/_ReservationInfoPartial", model);
+			}
 
 			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.RoomTypeToBookDTOs, model.RoomsIDs);
 			if (!ValidateSelectedRooms.Success)
@@ -120,48 +118,80 @@ namespace HotelApp.UI.Controllers
             });
         }
 
-
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
 		{
-            var roomDataJson = HttpContext.Session.GetString("ReservationDetailsData");
+			var roomDataJson = HttpContext.Session.GetString("ReservationDetailsData");
 			var guestsDataJson = HttpContext.Session.GetString("ReservationGuests");
 
-			var roomData = JsonConvert.DeserializeObject<ReservationInfoDTO>(roomDataJson);
-			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO?>>(guestsDataJson);
+			if (string.IsNullOrEmpty(roomDataJson) || string.IsNullOrEmpty(guestsDataJson))
+			{
+				return Json(new { success = false, message = "Session data is missing. Please restart the reservation process." });
+			}
+
+			var roomData = JsonConvert.DeserializeObject<ReservationInfoDTO>(roomDataJson)!;
+			var guestsData = JsonConvert.DeserializeObject<List<ReservationGuestDTO>>(guestsDataJson)!;
 
 			var reservationDTO = new ReservationDTO
 			{
 				GuestDtos = guestsData,
-				reservationInfoDto = roomData,
-				confirmDto = confirmReservationDTO
+				ReservationInfoDto = roomData,
+				ConfirmDto = confirmReservationDTO
 			};
 
-			var result = await _reservationService.AddReservation(reservationDTO);
-            if (result.Success)
-            {
-                HttpContext.Session.Remove("ReservationDetailsData");
-                HttpContext.Session.Remove("ReservationGuests");
+			var result = await _reservationService.AddReservation(reservationDTO, UserId);
+
+			if (result.Success)
+			{
+				HttpContext.Session.Remove("ReservationDetailsData");
+				HttpContext.Session.Remove("ReservationGuests");
 
 				TempData["Success"] = result.Message;
-                return Json(new { success = result.Success, message = result.Message });
-            }
+			}
 
-            return Json(new {success = result.Success, message = result.Message});
+			return Json(new { success = result.Success, message = result.Message });
 		}
 
-	
 		[HttpGet]
 		public IActionResult LoadConfirmForm()
 		{
 			var commentMax = typeof(ConfirmReservationDTO)
-	.GetProperty(nameof(ConfirmReservationDTO.Comment))?
-	.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? 200;
+				.GetProperty(nameof(ConfirmReservationDTO.Comment))?
+				.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? 200;
 
 			ViewBag.CommentMaxLength = commentMax;
-			//ViewBag.ReservationComment = yourCommentText; // Optional
 			return PartialView("_ConfirmReservationPartial");
 		}
 
+        [HttpPost]
+        [Authorize(Policy = "Reservation.Edit")]
+        public async Task<IActionResult> ChangeReservationDates([FromBody] ChangeReservationDatesDTO model)
+        {
+            if (!ModelState.IsValid)
+                return Json(new { success = false, message = "Invalid input data." });
+
+            var result = await _reservationService.ChangeReservationDatesAsync(model);
+
+            return Json(new { success = result.Success, message = result.Message });
+        }
+
+
+		[HttpGet]
+		[Authorize(Policy = "Reservation.Edit")]
+        public async Task<IActionResult> EditReservation(int Id)
+		{
+			var model = await _reservationService.GetReservationToEditByIdAsync(Id);
+            ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
+
+            return View(model);
+		}
+
+    }
+
+	public class ReservationGuestsViewModel
+	{
+		public GuestDTO GuestForm { get; set; } = new GuestDTO(); // for adding/editing
+		public List<ReservationGuestDTO> ExistingGuests { get; set; } = new();
 	}
+
 }

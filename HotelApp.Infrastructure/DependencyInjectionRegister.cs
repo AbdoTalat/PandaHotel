@@ -101,14 +101,12 @@ namespace HotelApp.Infrastructure
             services.AddScoped<IAuthorizationHandler, PermissionHandler>();
             services.AddScoped<IPermissionLoader, PermissionLoader>();
 
-            services.AddAuthorization(options =>
+            services.AddAuthorization(async options =>
             {
                 using var serviceProvider = services.BuildServiceProvider();
                 var permissionLoader = serviceProvider.GetRequiredService<IPermissionLoader>();
 
-                var allPermissions = permissionLoader.LoadAllPermissions()
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Distinct();
+                var allPermissions = await permissionLoader.LoadAllPermissions();
 
                 foreach (var permission in allPermissions)
                 {

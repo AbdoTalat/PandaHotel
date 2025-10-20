@@ -53,7 +53,7 @@
                     <div class="panel-heading">
                         <div class="heading-elements">
                             <ul class="icons-list">
-                                <li><a data-action="collapse" class=""></a></li>
+                                @* <li><a data-action="collapse" class=""></a></li> *@
                             </ul>
                         </div>
                     </div>
@@ -80,21 +80,55 @@
                             
                         }
                         <br />
-                        <br />
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr class="border-double">
+                                    <th style="width: 20%;"><h4>Permission Group</h4></th>
+                                    <th><h4>Permissions</h4></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in Model.PermissionGroups)
+                                {
+                                    <tr>
+                                        <td><strong>@group.Key</strong></td>
+                                        <td>
+                                            <div class="row">
+                                                @foreach (var perm in group.Value)
+                                                {
+                                                    var checkboxId = $"perm_{perm.Action.Replace(" ", "_")}";
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="checkbox-inline" for="@checkboxId">
+                                                            <input type="checkbox"
+                                                                   id="@checkboxId"
+                                                                   name="permissionStrings"
+                                                                   value="@perm.Action"
+                                                                   class="styled permission-checkbox"
+                                                            @(perm.IsAssigned ? "checked" : "")
+                                                            @(Model.IsBasic ? "disabled" : "") />
+                                                            @perm.Action
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
 
-                        @foreach (var group in Model.PermissionGroups)
+@*                         @foreach (var group in Model.PermissionGroups)
                         {
-                            <div class="row mb-3">
+                            <div class="row">
                                 <div class="col-md-2">
                                     <h5>@group.Key</h5>
                                 </div>
-
-                                <div class="col-md-10">
+                                    <div class="col-md-10" style="padding-top:20px">
                                     @foreach (var perm in group.Value)
                                     {
                                         var checkboxId = $"perm_{perm.Action.Replace(" ", "_")}";
-
-                                        <label class="checkbox-inline me-3" for="@checkboxId">
+                                        <div class=" col-md-3">
+                                        <label class="checkbox-inline" for="@checkboxId">
                                             <div>
                                                 <span>
                                                     <input type="checkbox"
@@ -107,18 +141,19 @@
                                                 </span>
                                             </div>
                                             @perm.Action
-                                        </label>
+                                            </label>
+                                        </div>
                                     }
                                 </div>
                             </div>
                             <hr />
                         }
-                    </div>
+ *@                    </div>
                 </div>
             </div>
             <div class="text-center">
                 <a class="btn btn-default btn-lg" asp-action="Index" asp-controller="Role">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" @(Model.IsBasic ? "disabled" : "")>
+                <button type="submit" class="btn btn-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" @(Model.IsBasic ? "disabled" : "")>
                     <i class="icon-checkmark4"></i> Save
                 </button>
             </div>

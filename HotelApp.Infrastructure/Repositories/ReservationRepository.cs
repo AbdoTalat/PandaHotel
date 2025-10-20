@@ -22,14 +22,69 @@ namespace HotelApp.Infrastructure.Repositories
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationProvider _mapperConfig;
 
-        public ReservationRepository(ApplicationDbContext context, IConfigurationProvider mapperConfig)
+        public ReservationRepository(ApplicationDbContext context, 
+			IConfigurationProvider mapperConfig)
             : base(context, mapperConfig)
         {
             _context = context;
             _mapperConfig = mapperConfig;
         }
+		public async Task<ReservationDTO> GetReservationToEditByIdAsync(int Id)
+		{
+			var dto = await _context.Reservations
+				.AsNoTracking()
+				.BranchFilter()
+				.Where(r => r.Id == Id)
+				.Select(r => new ReservationDTO
+				{
+					ReservationInfoDto = new ReservationInfoDTO
+					{
+						CheckInDate = r.CheckInDate,
+						CheckOutDate = r.CheckOutDate,
+						NumOfNights = r.NumberOfNights,
+						ReservationSourceId = r.ReservationSourceId,
+						CompanyId = r.CompanyId,
+						RoomsIDs = r.ReservationsRooms.Select(rr => rr.RoomId).ToList(),
+						RoomTypeToBookDTOs = r.ReservationRoomTypes
+							.Select(rt => new RoomTypeToBookDTO
+							{
+								RoomTypeId = rt.RoomTypeId,
+								NumOfRooms = rt.Quantity,
+								NumOfAdults = rt.NumOfAdults,
+								NumOfChildrens = rt.NumOfChildren
+							})
+							.ToList()
+					},
+					GuestDtos = r.guestReservations
+						.Select(gr => new ReservationGuestDTO
+						{
+							GuestId = gr.GuestId,
+							IsPrimary = gr.IsPrimaryGuest
+						}).ToList(),
 
-		public async Task<Reservation> GetReservationDetailsByIds(int Id)
+                    ConfirmDto = new ConfirmReservationDTO
+                    {
+                        IsPending = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.Pending),
+                        IsConfirmed = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.Confirmed),
+                        IsCheckedIn = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.CheckedIn),
+                        IsCheckedOut = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.CheckedOut),
+                        IsCancelled = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.Cancelled),
+                        IsNoShow = r.ReservationHistories
+                    .Any(h => h.Status == ReservationStatus.NoShow),
+                        Comment = r.Notes,
+                        CancellationReason = r.CancellationReason
+                    }
+                })
+				.FirstOrDefaultAsync();
+
+			return dto ?? new ReservationDTO();
+		}
+        public async Task<Reservation> GetReservationDetailsByIds(int Id)
 		{
 			var reservation = await _context.Reservations
 				.BranchFilter()
@@ -61,44 +116,44 @@ namespace HotelApp.Infrastructure.Repositories
 				{
 					case ReservationCategory.NewBookings:
 						query = query.Where(r => r.CreatedDate.HasValue &&
-												 r.CreatedDate.Value.Date == today &&
-												 !r.IsCancelled);
+												 r.CreatedDate.Value.Date == today);
+												 //!r.IsCancelled);
 						break;
 
 					case ReservationCategory.Arrivals:
-						query = query.Where(r => r.CheckInDate.Date == today &&
-												 r.IsConfirmed &&
-												 !r.IsCancelled &&
-												 !r.IsCheckedOut &&
-												 !r.IsCheckedIn);
+						query = query.Where(r => r.CheckInDate.Date == today );
+												 //r.IsConfirmed &&
+												 //!r.IsCancelled &&
+												 //!r.IsCheckedOut &&
+												 //!r.IsCheckedIn);
 						break;
 
 					case ReservationCategory.Departures:
-						query = query.Where(r => r.CheckOutDate.Date == today &&
-												 !r.IsCancelled);
+						query = query.Where(r => r.CheckOutDate.Date == today );
+												 //!r.IsCancelled);
 						break;
 
 					case ReservationCategory.StayOvers:
 						query = query.Where(r =>
 							r.CheckInDate.Date <= today &&
-							r.CheckOutDate.Date > today &&
-							r.IsCheckedIn &&
-							!r.IsCancelled &&
-							!r.IsCheckedOut);
+							r.CheckOutDate.Date > today);
+							//r.IsCheckedIn &&
+							//!r.IsCancelled &&
+							//!r.IsCheckedOut);
 						break;
 
 					case ReservationCategory.Cancellations:
 						query = query.Where(r =>
-							r.IsCancelled &&
+							//r.IsCancelled &&
 							r.LastModifiedDate != null &&
 							r.LastModifiedDate.Value.Date == today);
 						break;
 
 					case ReservationCategory.NoShow:
 						query = query.Where(r =>
-							!r.IsCancelled &&
-							!r.IsCheckedIn &&
-							r.IsConfirmed &&
+							//!r.IsCancelled &&
+							//!r.IsCheckedIn &&
+							//r.IsConfirmed &&
 							r.CheckInDate.Date >= today && r.CheckInDate.Date < tomorrow);
 						break;
 				}
@@ -123,7 +178,76 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return result;
 		}
-		private DateTime GetEgyptDateTime()
+
+        public async Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id)
+        {
+            var reservation = await _context.Reservations
+                .AsNoTracking()
+                .BranchFilter()
+                .Where(r => r.Id == Id)
+                .Include(r => r.ReservationSource)
+                .Include(r => r.ReservationRoomTypes)
+                .Include(r => r.ReservationsRooms)
+                    .ThenInclude(rr => rr.Room)
+                .Include(r => r.guestReservations)
+                    .ThenInclude(gr => gr.Guest)
+                .Include(r => r.ReservationHistories)
+                    .ThenInclude(h => h.PerformedBy)
+                .Select(r => new GetReservationDetailsByIdDTO
+                {
+                    Id = r.Id,
+                    ReservationNumber = r.ReservationNumber,
+                    CheckInDate = r.CheckInDate,
+                    CheckOutDate = r.CheckOutDate,
+                    Status = r.Status,
+                    NumberOfNights = r.NumberOfNights,
+                    NumberOfPeople = r.NumberOfPeople,
+                    TotalPrice = r.TotalPrice,
+                    ReservationSource = r.ReservationSource.Name,
+                    Notes = r.Notes,
+                    CreatedBy = r.CreatedBy.UserName,
+                    LastModifiedBy = r.LastModifiedBy.UserName,
+                    NumOfTotalRooms = r.ReservationsRooms.Count(),
+
+                    GuestReservations = r.guestReservations.Select(gr => new GuestsDTO
+                    {
+                        Id = gr.Guest.Id,
+                        IsPrimaryGuest = gr.IsPrimaryGuest,
+                        FullName = gr.Guest.FullName,
+                        Phone = gr.Guest.Phone,
+                        Email = gr.Guest.Email
+                    }).ToList(),
+
+                    ReservationRoomTypes = r.ReservationRoomTypes.Select(rt => new ReservationRoomTypeDTO
+                    {
+                        Id = rt.Id,
+                        RoomTypeName = rt.RoomType.Name,
+                        Quantity = rt.Quantity,
+                        NumOfAdults = rt.NumOfAdults,
+                        NumOfChildren = rt.NumOfChildren
+                    }).ToList(),
+
+                    ReservationRooms = r.ReservationsRooms.Select(rr => new RoomsDTO
+                    {
+                        RoomNumber = rr.Room.RoomNumber,
+                        RoomTypeId = rr.Room.RoomTypeId
+                    }).ToList(),
+
+                    ReservationHistories = r.ReservationHistories.Select(h => new ReservationHistoryDTO
+                    {
+                        PerformedByName = h.PerformedBy.Email,
+                        PerformedDate = h.PerformedDate,
+                        Status = h.Status.ToString()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return reservation;
+        }
+
+
+
+        private DateTime GetEgyptDateTime()
 		{
 			var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
 			var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone).Date;

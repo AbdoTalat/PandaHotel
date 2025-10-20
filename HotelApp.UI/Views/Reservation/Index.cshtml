@@ -5,10 +5,11 @@
 	var canView = User.HasClaim("permission", "Reservation.View");
 	var canEdit = User.HasClaim("permission", "Reservation.Edit");
 	var canDelete = User.HasClaim("permission", "Reservation.Delete");
+
 }
 
 <!-- Page header -->
-<div class="page-header page-header-default">
+<div class="page-header page-header-default page-header-xs">
     <div class="page-header-content">
         <div class="page-title">
             <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Reservations</span> </h4>
@@ -179,7 +180,29 @@
                         <td>@item.NumberOfNights</td>
                         <td>@item.NumberOfPeople</td>
                         <td>@item.ReservationSource</td>
-                        <td>@item.Status</td>
+                        <td>
+                            <div class="btn-group">
+                                @{
+                                    var currentStatusColor = ReservationStatusHelper.GetColorClass(item.Status);
+                                }
+                                <button type="button" class="btn dropdown-toggle @currentStatusColor" data-toggle="dropdown">
+                                    @item.Status <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    @foreach (var status in ReservationStatusHelper.GetNextStatusesWithColor(item.Status))
+                                    {
+                                        <li>
+                                            <a href="#" class="dropdown-item">
+                                                <span class="text-left">Change To</span>
+                                                <span class="btn btn-xs text-right @status.ColorClass">@status.Text</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </td>
+
+
 
 						<td class="text-center">
 
@@ -195,7 +218,7 @@
                                         }
 										@if (User.HasClaim("permission", "Reservation.Edit"))
 										{
-                                            <li><a href="#"><i class="icon-pencil7"></i> Edit</a></li>
+                                            <li><a asp-action="EditReservation" asp-controller="Reservation" asp-route-Id="@item.Id" class="text-teal-600"><i class="icon-pencil7"></i> Edit</a></li>
                                         }
 										@if (User.HasClaim("permission", "Reservation.Delete"))
 										{
@@ -236,7 +259,7 @@
 
                         $.each(items, function (index, item) {
                             dataTable.row.add([
-                                `<a>${item.id}</a>`,
+                                `<a href="/Reservation/Details/${item.id}">${item.id}</a>`,
                                 item.primaryGuestName,
                                 formatDate(item.checkInDate),
                                 formatDate(item.checkOutDate),

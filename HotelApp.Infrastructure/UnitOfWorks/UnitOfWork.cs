@@ -62,6 +62,7 @@ namespace HotelApp.Infrastructure.UnitOfWorks
             RoomRepository = new RoomRepository(_context, _mapperConfig);
             OptionRepository = new OptionRepository(_context, _mapperConfig);
             RoomTypeRateRepository = new RoomTypeRateRepository(_context, _mapperConfig);
+            ReservationHistoryRepository = new ReservationHistoryRepository(_context, _mapperConfig);
         }
 
 
@@ -90,7 +91,9 @@ namespace HotelApp.Infrastructure.UnitOfWorks
         public IRoomRepository RoomRepository { get; private set; }
         public IOptionRepository OptionRepository { get; private set; }
         public IRoomTypeRateRepository RoomTypeRateRepository { get; private set; }
+        public IReservationHistoryRepository ReservationHistoryRepository { get; private set; }
         #endregion
+
 
 
         public async Task<int> CommitAsync(bool skipAuditFields = false, CancellationToken cancellationToken = default)
@@ -99,36 +102,6 @@ namespace HotelApp.Infrastructure.UnitOfWorks
                 ApplyAuditInformation();
             return await _context.SaveChangesAsync(cancellationToken);
         }
-
-
-        #region Audit Logic
-        private void ApplyAuditInformation()
-        {
-            var entries = _context.ChangeTracker
-                .Entries<BaseEntity>()
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
-
-            var now = DateTime.UtcNow;
-            var userId = _currentUserService.UserId;
-
-            foreach (var entry in entries)
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    entry.Entity.CreatedDate = now;
-                    if (userId.HasValue)
-                        entry.Entity.CreatedById = userId.Value;
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    entry.Entity.LastModifiedDate = now;
-                    if (userId.HasValue)
-                        entry.Entity.LastModifiedById = userId.Value;
-                }
-            }
-        }
-        #endregion
-
         public async Task BeginTransactionAsync()
         {
             if (_transaction == null)
@@ -175,6 +148,34 @@ namespace HotelApp.Infrastructure.UnitOfWorks
             if (_transaction != null)
                 await _transaction.DisposeAsync();
             await _context.DisposeAsync();
+        } 
+        
+        #region Audit Logic
+        private void ApplyAuditInformation()
+        {
+            var entries = _context.ChangeTracker
+                .Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            var now = DateTime.UtcNow;
+            var userId = _currentUserService.UserId;
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedDate = now;
+                    if (userId.HasValue)
+                        entry.Entity.CreatedById = userId.Value;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.LastModifiedDate = now;
+                    if (userId.HasValue)
+                        entry.Entity.LastModifiedById = userId.Value;
+                }
+            }
         }
+        #endregion
     }
 }

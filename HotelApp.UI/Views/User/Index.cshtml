@@ -133,16 +133,14 @@
 										<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
 									</a>
 								}
-								@if (User.IsInRole("Admin"))
-								{
-									@if (User.HasClaim("permission", "User.Delete") && !item.IsActive)
+								@if (User.HasClaim("permission", "User.Delete") && !item.IsActive)
 									{
 									<a data-url="/User/DeleteUser/@item.Id"
 									   class="text-danger-600 btn-delete">
 										<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
 									</a>
 									}
-								}
+								
 						</td>
 					</tr>
 				}
@@ -159,70 +157,62 @@
 
 @section Scripts {
 
-	<script>
-		$(document).ready(function () {
-			$("#refreshUsersBtn").click(function () {
-				$.ajax({
-					url: '/User/GetUsersJson',
-					type: 'GET',
-					dataType: 'json',
-					success: function (response) {
-						if (response.success) {
-							var tbody = $("#usersTable tbody");
-							tbody.empty(); // Clear existing data
+<script>
+    $(document).ready(function () {
+        $("#refreshUsersBtn").click(function () {
+            $.ajax({
+                url: '/User/GetUsersJson',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        const tbody = $("#usersTable tbody");
+                        tbody.empty();
 
-							$.each(response.data, function (index, item) {
-								var statusLabel = item.isActive === "Active"
-									? '<span class="label label-rounded label-success">Active</span>'
-									: '<span class="label label-rounded label-danger">Not Active</span>';
+                        $.each(response.data, function (index, item) {
+                            const statusLabel = item.isActive
+                                ? '<span class="label label-rounded label-success">Active</span>'
+                                : '<span class="label label-rounded label-danger">Not Active</span>';
 
-								var rolesDropdown = `<ul class="icons-list">
-										<li class="dropdown">
-											<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-												<i class="icon-menu9"></i>
-											</a>
-											<ul class="dropdown-menu dropdown-menu-right">
-												<li><a href="#">${item.roles}</a></li>
-											</ul>
-										</li>
-									</ul>`;
+                            // Format date
+                            const createdAt = new Date(item.createdAt)
+                                .toLocaleDateString('en-GB'); // dd/mm/yyyy
 
-								var actions = "";
-								if (item.canEditUser) {
-									actions += `<a href="/User/EditUser/${item.id}" class="text-teal-600">
-											<i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i>
-										</a>`;
-								}
-								if (item.canDeleteUser) {
-									actions += `<a data-id="${item.id}" class="text-danger-600 btn-delete">
-											<i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
-										</a>`;
-								}
+                            let actions = '';
+                            if (item.canEditUser) {
+                                actions += `<a href="/User/EditUser/${item.id}" class="text-teal-600">
+                                    <i class="icon-pencil7" style="font-size:18px; margin-right:8px"></i>
+                                </a>`;
+                            }
+                            if (item.canDeleteUser && !item.isActive) {
+                                actions += `<a data-url="/User/DeleteUser/${item.id}" class="text-danger-600 btn-delete">
+                                    <i class="icon-trash" style="font-size:18px;margin-right:8px"></i>
+                                </a>`;
+                            }
 
-								var row = `<tr id="item-${item.id}">
-										<td>${item.number}</td>
-										<td>${item.firstName}</td>
-										<td>${item.lastName}</td>
-										<td>${item.userName}</td>
-										<td>${item.email}</td>
-										<td>${statusLabel}</td>
-										<td>${item.createdAt}</td>
-										<td class="text-center">${rolesDropdown}</td>
-										<td class="text-center">${actions}</td>
-									</tr>`;
+                            const row = `<tr id="item-${item.id}">
+                                <td>${item.id}</td>
+                                <td>${item.firstName}</td>
+                                <td>${item.lastName}</td>
+                                <td>${item.userName}</td>
+                                <td>${item.email}</td>
+                                <td>${statusLabel}</td>
+                                <td>${createdAt}</td>
+                                <td class="text-center">${actions}</td>
+                            </tr>`;
 
-								tbody.append(row);
-							});
-						} else {
-							console.error("Failed to load users.");
-						}
-					},
-					error: function () {
-						console.error("Error while fetching users.");
-					}
-				});
-			});
-		});
-	</script>
+                            tbody.append(row);
+                        });
 
+                    } else {
+                        showToast("error", "Error", "Failed to load users list!");
+                    }
+                },
+                error: function () {
+                    showToast("error", "Error", "An error occurred while loading users list!");
+                }
+            });
+        });
+    });
+</script>
 }

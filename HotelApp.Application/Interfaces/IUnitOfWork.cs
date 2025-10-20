@@ -33,6 +33,7 @@ namespace HotelApp.Application.Interfaces
         IReservationRoomRepository ReservationRoomRepository { get; }
         IReservationRoomTypeRepository ReservationRoomTypeRepository { get; }
         IGuestReservationRepository GuestReservationRepository { get; }
+        IReservationHistoryRepository ReservationHistoryRepository { get; }
         #endregion
 
         #region Rooms & Options
