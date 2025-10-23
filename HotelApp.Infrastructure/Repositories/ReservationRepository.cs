@@ -39,11 +39,13 @@ namespace HotelApp.Infrastructure.Repositories
 				{
 					ReservationInfoDto = new ReservationInfoDTO
 					{
+						ReservationId = r.Id,
 						CheckInDate = r.CheckInDate,
 						CheckOutDate = r.CheckOutDate,
 						NumOfNights = r.NumberOfNights,
 						ReservationSourceId = r.ReservationSourceId,
 						CompanyId = r.CompanyId,
+						RateId = (int)r.RateId,
 						RoomsIDs = r.ReservationsRooms.Select(rr => rr.RoomId).ToList(),
 						RoomTypeToBookDTOs = r.ReservationRoomTypes
 							.Select(rt => new RoomTypeToBookDTO
@@ -59,7 +61,14 @@ namespace HotelApp.Infrastructure.Repositories
 						.Select(gr => new ReservationGuestDTO
 						{
 							GuestId = gr.GuestId,
-							IsPrimary = gr.IsPrimaryGuest
+							IsPrimary = gr.IsPrimaryGuest,
+							FullName = gr.Guest.FullName,
+							Phone = gr.Guest.Phone,
+							Email = gr.Guest.Email,
+							ProofNumber = gr.Guest.ProofNumber,
+							ProofTypeId = gr.Guest.ProofTypeId,
+							Address = gr.Guest.Address,
+							DateOfBirth = gr.Guest.DateOfBirth
 						}).ToList(),
 
                     ConfirmDto = new ConfirmReservationDTO
@@ -185,6 +194,7 @@ namespace HotelApp.Infrastructure.Repositories
                 .AsNoTracking()
                 .BranchFilter()
                 .Where(r => r.Id == Id)
+				.Include(r => r.Rate)
                 .Include(r => r.ReservationSource)
                 .Include(r => r.ReservationRoomTypes)
                 .Include(r => r.ReservationsRooms)
@@ -199,6 +209,7 @@ namespace HotelApp.Infrastructure.Repositories
                     ReservationNumber = r.ReservationNumber,
                     CheckInDate = r.CheckInDate,
                     CheckOutDate = r.CheckOutDate,
+                    RateCode = r.Rate.Code,
                     Status = r.Status,
                     NumberOfNights = r.NumberOfNights,
                     NumberOfPeople = r.NumberOfPeople,
@@ -209,7 +220,7 @@ namespace HotelApp.Infrastructure.Repositories
                     LastModifiedBy = r.LastModifiedBy.UserName,
                     NumOfTotalRooms = r.ReservationsRooms.Count(),
 
-                    GuestReservations = r.guestReservations.Select(gr => new GuestsDTO
+                    GuestReservations = r.guestReservations.Select(gr => new ReservationDetailsGuestsDTO
                     {
                         Id = gr.Guest.Id,
                         IsPrimaryGuest = gr.IsPrimaryGuest,
@@ -218,7 +229,7 @@ namespace HotelApp.Infrastructure.Repositories
                         Email = gr.Guest.Email
                     }).ToList(),
 
-                    ReservationRoomTypes = r.ReservationRoomTypes.Select(rt => new ReservationRoomTypeDTO
+                    ReservationRoomTypes = r.ReservationRoomTypes.Select(rt => new ReservationDetailsRoomTypeDTO
                     {
                         Id = rt.Id,
                         RoomTypeName = rt.RoomType.Name,
@@ -227,13 +238,13 @@ namespace HotelApp.Infrastructure.Repositories
                         NumOfChildren = rt.NumOfChildren
                     }).ToList(),
 
-                    ReservationRooms = r.ReservationsRooms.Select(rr => new RoomsDTO
+                    ReservationRooms = r.ReservationsRooms.Select(rr => new ReservationDetailsRoomsDTO
                     {
                         RoomNumber = rr.Room.RoomNumber,
                         RoomTypeId = rr.Room.RoomTypeId
                     }).ToList(),
 
-                    ReservationHistories = r.ReservationHistories.Select(h => new ReservationHistoryDTO
+                    ReservationHistories = r.ReservationHistories.Select(h => new ReservationDetailsHistoryDTO
                     {
                         PerformedByName = h.PerformedBy.Email,
                         PerformedDate = h.PerformedDate,
@@ -245,6 +256,35 @@ namespace HotelApp.Infrastructure.Repositories
             return reservation;
         }
 
+
+        public async Task<string> GenerateReservationNumberAsync(int branchId)
+        {
+            var branchCode = await _context.Branches
+                .Where(b => b.Id == branchId)
+                .Select(b => b.Code)
+                .FirstOrDefaultAsync();
+
+            var currentYear = DateTime.UtcNow.Year;
+
+            // Get reservation numbers for this branch and year (only lightweight data)
+            var reservationNumbers = await _context.Reservations
+                .Where(r => r.BranchId == branchId &&
+                            r.CreatedDate.HasValue &&
+                            r.CreatedDate.Value.Year == currentYear)
+                .Select(r => r.ReservationNumber)
+                .Where(rn => rn.StartsWith($"{branchCode}-{currentYear}-"))
+                .ToListAsync(); // <-- bring to memory here
+
+            // Now safely parse sequence numbers in memory
+            var lastNumber = reservationNumbers
+                .Select(rn => int.TryParse(rn.Split('-').Last(), out var seq) ? seq : 0)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            var nextSequence = lastNumber + 1;
+
+            return $"{branchCode}-{currentYear}-{nextSequence:D6}";
+        }
 
 
         private DateTime GetEgyptDateTime()

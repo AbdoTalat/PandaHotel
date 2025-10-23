@@ -16,6 +16,8 @@ using HotelApp.Application;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Infrastructure.UnitOfWorks;
+using Microsoft.AspNetCore.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HotelApp.Infrastructure.Repositories
 {
@@ -175,10 +177,7 @@ namespace HotelApp.Infrastructure.Repositories
 			return percent;
 		}
 
-
-
-
-		private string GetRoomTypeName(int roomTypeId)
+        private string GetRoomTypeName(int roomTypeId)
         {
             return _context.RoomTypes
                 .Where(rt => rt.Id == roomTypeId)

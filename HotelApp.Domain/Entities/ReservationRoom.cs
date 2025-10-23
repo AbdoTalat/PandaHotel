@@ -16,7 +16,7 @@ namespace HotelApp.Domain.Entities
         public int RoomId { get; set; }
         public Room? Room { get; set; }
 
-        public bool IsLastRoom { get; set; } = true;
+        public bool IsLastRoom { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }

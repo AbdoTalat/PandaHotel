@@ -27,7 +27,7 @@ namespace HotelApp.Application.Mapping
 			CreateMap<Branch, GetAllBranches>()
 				.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Country.Name))
 				.ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.Name))
-				.ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.UserName : "N/A"))
+                .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.UserName : "N/A"))
 				.ForMember(dest => dest.LastModifiedBy, opt => opt.MapFrom(src => src.LastModifiedBy != null ? src.LastModifiedBy.UserName : "N/A"));
 
 			CreateMap<Branch, DropDownDTO<string>>()

@@ -33,9 +33,10 @@ namespace HotelApp.Infrastructure.Configurations
 				.IsRequired()
 				.HasMaxLength(20);
 
+            builder.Property(b => b.Code)
+                .HasMaxLength(10);
 
-
-			builder.HasOne(b => b.Country)
+            builder.HasOne(b => b.Country)
 				.WithMany(c => c.Branches)
 				.HasForeignKey(b => b.CountryId)
 				.OnDelete(DeleteBehavior.Restrict);

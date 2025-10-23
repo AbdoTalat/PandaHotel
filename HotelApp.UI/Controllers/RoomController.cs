@@ -166,6 +166,17 @@ namespace HotelApp.UI.Controllers
             });
 			return Json(new { success = true, data = result });
 		}
+        [HttpGet]
+        public async Task<IActionResult> GetRoomsForEditReservationByIDs([FromQuery] List<int> ids)
+        {
+			var result = await _roomService.GetRoomsForEditReservationByIDs(ids);
+            if (result.Count() <= 0)
+                return Json(new { success = false, data = new List<object>() });
+
+			var rooms = result.Select(r => new { id = r.Id, text = r.RoomNumber + " - " + r.RoomTypeName });
+
+            return Json(new { success = true, data = rooms });
+        }
 
         [HttpGet]
         public async Task<IActionResult> CheckOccupancy()

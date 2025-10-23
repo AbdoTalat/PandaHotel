@@ -44,109 +44,232 @@ namespace HotelApp.Application.Services.ReservationService
 
 			return reservations;
 		}
+        public async Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int UserId)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
 
-		public async Task<ServiceResponse<ReservationDTO>> AddReservation(ReservationDTO dto, int UserId)
-		{
-			try
-			{
-				await _unitOfWork.BeginTransactionAsync();
+                /* Will Be Calculated */
+                decimal totalPrice = 100;
+                decimal totalRatePerNight = 100;
 
-				/* Will Be Calculated */
-				decimal totalPrice = 100;
-				decimal totalRatePerNight = 100;
+                var statuses = ExtractStatuses(dto.ConfirmDto);
 
-				var statuses = ExtractStatuses(dto.ConfirmDto);
-				//if (dto.ConfirmDto.IsPending)
-				//	statuses.Add(ReservationStatus.Pending);
-				//if (dto.ConfirmDto.IsConfirmed)
-				//	statuses.Add(ReservationStatus.Confirmed);
-				//if (dto.ConfirmDto.IsCheckedIn)
-				//	statuses.Add(ReservationStatus.CheckedIn);
-				//if (dto.ConfirmDto.IsCheckedOut)
-				//	statuses.Add(ReservationStatus.CheckedOut);
-				//if (dto.ConfirmDto.IsCancelled)
-				//	statuses.Add(ReservationStatus.Cancelled);
-				//if (dto.ConfirmDto.IsNoShow)
-				//	statuses.Add(ReservationStatus.NoShow);
+                Reservation? reservation = new Reservation();
 
-				var reservation = _mapper.Map<Reservation>(dto);
-				reservation.PricePerNight = totalRatePerNight;
-				reservation.TotalPrice = totalPrice;
+                if (dto.ReservationInfoDto.ReservationId == 0)
+                {
+                    // ===== Add New Reservation =====
+                    reservation = _mapper.Map<Reservation>(dto);
+                    reservation.PricePerNight = totalRatePerNight;
+                    reservation.TotalPrice = totalPrice;
+                    reservation.ReservationNumber = await _unitOfWork.ReservationRepository.GenerateReservationNumberAsync(2);
+                    if (statuses != null && statuses.Any())
+                        reservation.Status = statuses.Last();
 
-				if (statuses != null && statuses.Any())
-				{
-					reservation.Status = statuses.Last();
-				}
+                    await _unitOfWork.ReservationRepository.AddNewAsync(reservation);
+                    await _unitOfWork.CommitAsync();
+                }
+                else
+                {
+                    // ===== Edit Existing Reservation =====
+                    reservation = await _unitOfWork.ReservationRepository.GetByIdAsync(dto.ReservationInfoDto.ReservationId);
+                    if (reservation == null)
+                        return ServiceResponse<ReservationDTO>.ResponseFailure("Reservation not found");
 
-				await _unitOfWork.ReservationRepository.AddNewAsync(reservation);
-				await _unitOfWork.CommitAsync();
+                    _mapper.Map(dto, reservation);
+                    reservation.PricePerNight = totalRatePerNight;
+                    reservation.TotalPrice = totalPrice;
+                    if (statuses != null && statuses.Any())
+                        reservation.Status = statuses.Last();
 
-				var reservationRoomTypes = dto.ReservationInfoDto.RoomTypeToBookDTOs.Select(rt => new ReservationRoomType
-				{
-					RoomTypeId = rt.RoomTypeId,
-					ReservationId = reservation.Id,
-					Quantity = rt.NumOfRooms,
-					NumOfAdults = rt.NumOfAdults,
-					NumOfChildren = rt.NumOfChildrens
-				}).ToList();
-				await _unitOfWork.ReservationRoomTypeRepository.AddRangeAsync(reservationRoomTypes);
+                    _unitOfWork.ReservationRepository.Update(reservation);
+                    await _unitOfWork.CommitAsync();
 
-				if (dto.ReservationInfoDto.RoomsIDs.Any())
-				{
-					var reservationRooms = dto.ReservationInfoDto.RoomsIDs.Select(rr => new ReservationRoom
-					{
-						ReservationId = reservation.Id,
-						RoomId = rr,
-						StartDate = reservation.CheckInDate,
-						EndDate = reservation.CheckOutDate
-					});
-					await _unitOfWork.ReservationRoomRepository.AddRangeAsync(reservationRooms);
+                    // Remove old room types and rooms if needed
+                    var oldRoomTypes = await _unitOfWork.ReservationRoomTypeRepository
+                                            .GetAllAsync(r => r.ReservationId == reservation.Id);
+                    _unitOfWork.ReservationRoomTypeRepository.DeleteRange(oldRoomTypes);
 
-					var rooms = await _unitOfWork.RoomRepository
-						.GetAllAsync(r => dto.ReservationInfoDto.RoomsIDs.Contains(r.Id));
+                    var oldRooms = await _unitOfWork.ReservationRoomRepository
+                                        .GetAllAsync(r => r.ReservationId == reservation.Id);
+                    _unitOfWork.ReservationRoomRepository.DeleteRange(oldRooms);
 
-					if (dto.ConfirmDto.IsCheckedIn)
-					{
-						var systemSettings = await _unitOfWork.SystemSettingRepository.FirstOrDefaultAsync();
-						foreach (var room in rooms)
-						{
-							room.RoomStatusId = systemSettings.CheckInStatusId;
-						}
-					}
-					else if(dto.ConfirmDto.IsConfirmed || dto.ConfirmDto.IsPending && !dto.ConfirmDto.IsCheckedIn)
-					{
-						var roomStatus = await _unitOfWork.RoomStatusRepository.FirstOrDefaultAsync(rs => rs.Code == RoomStatusEnum.Reserved, SkipBranchFilter: true);
-						foreach (var room in rooms)
-						{
-							room.RoomStatusId = roomStatus.Id;
-						}
-					}
-					_unitOfWork.RoomRepository.UpdateRange(rooms);
-				}
+                    var oldGuests = await _unitOfWork.GuestReservationRepository
+                                        .GetAllAsync(g => g.ReservationId == reservation.Id);
+                    _unitOfWork.GuestReservationRepository.DeleteRange(oldGuests);
+                }
 
-				var guestReservations = dto.GuestDtos.Select((guest, index) => new GuestReservation
-				{
-					GuestId = guest.GuestId,
-					ReservationId = reservation.Id,
-					IsPrimaryGuest = dto.GuestDtos[index].IsPrimary
-				}).ToList();
-				await _unitOfWork.GuestReservationRepository.AddRangeAsync(guestReservations);
+                // ===== Reservation Room Types =====
+                var reservationRoomTypes = dto.ReservationInfoDto.RoomTypeToBookDTOs.Select(rt => new ReservationRoomType
+                {
+                    RoomTypeId = rt.RoomTypeId,
+                    ReservationId = reservation.Id,
+                    Quantity = rt.NumOfRooms,
+                    NumOfAdults = rt.NumOfAdults,
+                    NumOfChildren = rt.NumOfChildrens
+                }).ToList();
+                await _unitOfWork.ReservationRoomTypeRepository.AddRangeAsync(reservationRoomTypes);
+
+                // ===== Reservation Rooms =====
+                if (dto.ReservationInfoDto.RoomsIDs.Any())
+                {
+                    var reservationRooms = dto.ReservationInfoDto.RoomsIDs.Select(rr => new ReservationRoom
+                    {
+                        ReservationId = reservation.Id,
+                        RoomId = rr,
+                        StartDate = reservation.CheckInDate,
+                        EndDate = reservation.CheckOutDate
+                    });
+                    await _unitOfWork.ReservationRoomRepository.AddRangeAsync(reservationRooms);
+
+                    var rooms = await _unitOfWork.RoomRepository
+                        .GetAllAsync(r => dto.ReservationInfoDto.RoomsIDs.Contains(r.Id));
+
+                    if (dto.ConfirmDto.IsCheckedIn)
+                    {
+                        var systemSettings = await _unitOfWork.SystemSettingRepository.FirstOrDefaultAsync();
+                        foreach (var room in rooms)
+                            room.RoomStatusId = systemSettings.CheckInStatusId;
+                    }
+                    else if (dto.ConfirmDto.IsConfirmed || dto.ConfirmDto.IsPending && !dto.ConfirmDto.IsCheckedIn)
+                    {
+                        var roomStatus = await _unitOfWork.RoomStatusRepository
+                            .FirstOrDefaultAsync(rs => rs.Code == RoomStatusEnum.Reserved, SkipBranchFilter: true);
+                        foreach (var room in rooms)
+                            room.RoomStatusId = roomStatus.Id;
+                    }
+
+                    _unitOfWork.RoomRepository.UpdateRange(rooms);
+                }
+
+                // ===== Guest Reservations =====
+                var guestReservations = dto.GuestDtos.Select((guest, index) => new GuestReservation
+                {
+                    GuestId = guest.GuestId,
+                    ReservationId = reservation.Id,
+                    IsPrimaryGuest = dto.GuestDtos[index].IsPrimary
+                }).ToList();
+                await _unitOfWork.GuestReservationRepository.AddRangeAsync(guestReservations);
 
                 await AddReservationHistoryRangeAsync(reservation.Id, statuses, UserId);
 
                 await _unitOfWork.CommitTransactionAsync();
 
-				return ServiceResponse<ReservationDTO>.ResponseSuccess("New reservation added successfully");
-			}
-			catch (Exception ex)
-			{
-				 await _unitOfWork.RollbackTransactionAsync();
-				var message = ex.InnerException?.Message ?? ex.Message;
-				return ServiceResponse<ReservationDTO>.ResponseFailure($"Reservation failed: {message}");
-			}
-		}
+                return ServiceResponse<ReservationDTO>.ResponseSuccess(
+                    dto.ReservationInfoDto.ReservationId == 0 ? "New reservation added successfully" : "Reservation updated successfully");
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return ServiceResponse<ReservationDTO>.ResponseFailure($"Reservation failed: {message}");
+            }
+        }
 
-		public async Task<ServiceResponse<object>> ChangeReservationDatesAsync(ChangeReservationDatesDTO dto)
+        //public async Task<ServiceResponse<ReservationDTO>> AddReservation(ReservationDTO dto, int UserId)
+        //{
+        //	try
+        //	{
+        //		await _unitOfWork.BeginTransactionAsync();
+
+        //		/* Will Be Calculated */
+        //		decimal totalPrice = 100;
+        //		decimal totalRatePerNight = 100;
+
+        //		var statuses = ExtractStatuses(dto.ConfirmDto);
+        //		//if (dto.ConfirmDto.IsPending)
+        //		//	statuses.Add(ReservationStatus.Pending);
+        //		//if (dto.ConfirmDto.IsConfirmed)
+        //		//	statuses.Add(ReservationStatus.Confirmed);
+        //		//if (dto.ConfirmDto.IsCheckedIn)
+        //		//	statuses.Add(ReservationStatus.CheckedIn);
+        //		//if (dto.ConfirmDto.IsCheckedOut)
+        //		//	statuses.Add(ReservationStatus.CheckedOut);
+        //		//if (dto.ConfirmDto.IsCancelled)
+        //		//	statuses.Add(ReservationStatus.Cancelled);
+        //		//if (dto.ConfirmDto.IsNoShow)
+        //		//	statuses.Add(ReservationStatus.NoShow);
+
+        //		var reservation = _mapper.Map<Reservation>(dto);
+        //		reservation.PricePerNight = totalRatePerNight;
+        //		reservation.TotalPrice = totalPrice;
+
+        //		if (statuses != null && statuses.Any())
+        //		{
+        //			reservation.Status = statuses.Last();
+        //		}
+
+        //		await _unitOfWork.ReservationRepository.AddNewAsync(reservation);
+        //		await _unitOfWork.CommitAsync();
+
+        //		var reservationRoomTypes = dto.ReservationInfoDto.RoomTypeToBookDTOs.Select(rt => new ReservationRoomType
+        //		{
+        //			RoomTypeId = rt.RoomTypeId,
+        //			ReservationId = reservation.Id,
+        //			Quantity = rt.NumOfRooms,
+        //			NumOfAdults = rt.NumOfAdults,
+        //			NumOfChildren = rt.NumOfChildrens
+        //		}).ToList();
+        //		await _unitOfWork.ReservationRoomTypeRepository.AddRangeAsync(reservationRoomTypes);
+
+        //		if (dto.ReservationInfoDto.RoomsIDs.Any())
+        //		{
+        //			var reservationRooms = dto.ReservationInfoDto.RoomsIDs.Select(rr => new ReservationRoom
+        //			{
+        //				ReservationId = reservation.Id,
+        //				RoomId = rr,
+        //				StartDate = reservation.CheckInDate,
+        //				EndDate = reservation.CheckOutDate
+        //			});
+        //			await _unitOfWork.ReservationRoomRepository.AddRangeAsync(reservationRooms);
+
+        //			var rooms = await _unitOfWork.RoomRepository
+        //				.GetAllAsync(r => dto.ReservationInfoDto.RoomsIDs.Contains(r.Id));
+
+        //			if (dto.ConfirmDto.IsCheckedIn)
+        //			{
+        //				var systemSettings = await _unitOfWork.SystemSettingRepository.FirstOrDefaultAsync();
+        //				foreach (var room in rooms)
+        //				{
+        //					room.RoomStatusId = systemSettings.CheckInStatusId;
+        //				}
+        //			}
+        //			else if(dto.ConfirmDto.IsConfirmed || dto.ConfirmDto.IsPending && !dto.ConfirmDto.IsCheckedIn)
+        //			{
+        //				var roomStatus = await _unitOfWork.RoomStatusRepository.FirstOrDefaultAsync(rs => rs.Code == RoomStatusEnum.Reserved, SkipBranchFilter: true);
+        //				foreach (var room in rooms)
+        //				{
+        //					room.RoomStatusId = roomStatus.Id;
+        //				}
+        //			}
+        //			_unitOfWork.RoomRepository.UpdateRange(rooms);
+        //		}
+
+        //		var guestReservations = dto.GuestDtos.Select((guest, index) => new GuestReservation
+        //		{
+        //			GuestId = guest.GuestId,
+        //			ReservationId = reservation.Id,
+        //			IsPrimaryGuest = dto.GuestDtos[index].IsPrimary
+        //		}).ToList();
+        //		await _unitOfWork.GuestReservationRepository.AddRangeAsync(guestReservations);
+
+        //              await AddReservationHistoryRangeAsync(reservation.Id, statuses, UserId);
+
+        //              await _unitOfWork.CommitTransactionAsync();
+
+        //		return ServiceResponse<ReservationDTO>.ResponseSuccess("New reservation added successfully");
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		 await _unitOfWork.RollbackTransactionAsync();
+        //		var message = ex.InnerException?.Message ?? ex.Message;
+        //		return ServiceResponse<ReservationDTO>.ResponseFailure($"Reservation failed: {message}");
+        //	}
+        //}
+
+        public async Task<ServiceResponse<object>> ChangeReservationDatesAsync(ChangeReservationDatesDTO dto)
 		{
 			var reservation = await _unitOfWork.ReservationRepository.GetByIdAsync(dto.ReservationId);
 			if (reservation == null)

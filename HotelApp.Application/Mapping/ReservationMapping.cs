@@ -21,7 +21,8 @@ namespace HotelApp.Application.Mapping
 			CreateMap<ReservationDTO, Reservation>()
 			   .ForMember(dest => dest.CheckInDate, opt => opt.MapFrom(src => src.ReservationInfoDto.CheckInDate))
 			   .ForMember(dest => dest.CheckOutDate, opt => opt.MapFrom(src => src.ReservationInfoDto.CheckOutDate))
-			   .ForMember(dest => dest.NumberOfPeople, opt => opt.MapFrom(src =>
+               .ForMember(dest => dest.RateId, opt => opt.MapFrom(src => src.ReservationInfoDto.RateId))
+               .ForMember(dest => dest.NumberOfPeople, opt => opt.MapFrom(src =>
 					src.ReservationInfoDto.RoomTypeToBookDTOs.Sum(r => r.NumOfAdults + r.NumOfChildrens)))
 			   .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.ReservationInfoDto.CompanyId))
 			   .ForMember(dest => dest.NumberOfNights, opt => opt.MapFrom(src => src.ReservationInfoDto.NumOfNights))
@@ -51,7 +52,7 @@ namespace HotelApp.Application.Mapping
 				.ForMember(dest => dest.ReservationSource, opt => opt.MapFrom(src => src.ReservationSource.Name))
 				.ForMember(dest => dest.NumOfTotalRooms, opt => opt.MapFrom(src => src.ReservationsRooms.Count()));
 
-            CreateMap<GuestReservation, GuestsDTO>()
+            CreateMap<GuestReservation, ReservationDetailsGuestsDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Guest.Id))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Guest.FullName ?? "N/A"))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Guest.Email ?? "N/A"))
@@ -59,10 +60,10 @@ namespace HotelApp.Application.Mapping
                 .ForMember(dest => dest.IsPrimaryGuest, opt => opt.MapFrom(src => src.IsPrimaryGuest));
 
 
-            CreateMap<ReservationHistory, ReservationHistoryDTO>()
+            CreateMap<ReservationHistory, ReservationDetailsHistoryDTO>()
 				.ForMember(dest => dest.PerformedByName, opt => opt.MapFrom(src => src.PerformedBy.UserName))
 				.ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
-			CreateMap<ReservationRoomType, ReservationRoomTypeDTO>()
+			CreateMap<ReservationRoomType, ReservationDetailsRoomTypeDTO>()
 				.ForMember(dest => dest.RoomTypeName, opt => opt.MapFrom(src => src.RoomType.Name));
 
 

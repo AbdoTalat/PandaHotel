@@ -1,4 +1,5 @@
-﻿using HotelApp.Application.DTOs;
+﻿using HotelApp.Application;
+using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Guests;
 using HotelApp.Application.DTOs.Rates;
 using HotelApp.Application.DTOs.Reservation;
@@ -57,7 +58,7 @@ namespace HotelApp.UI.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
-		public async Task<IActionResult> Details(int Id)
+		public async Task<IActionResult> ReservationDetails(int Id)
 		{
 			var model = await _reservationService.GetReservationDetailsByIdAsync(Id);
 			return View(model);
@@ -139,7 +140,7 @@ namespace HotelApp.UI.Controllers
 				ConfirmDto = confirmReservationDTO
 			};
 
-			var result = await _reservationService.AddReservation(reservationDTO, UserId);
+			var result = await _reservationService.SaveReservation(reservationDTO, UserId);
 
 			if (result.Success)
 			{
@@ -155,11 +156,6 @@ namespace HotelApp.UI.Controllers
 		[HttpGet]
 		public IActionResult LoadConfirmForm()
 		{
-			var commentMax = typeof(ConfirmReservationDTO)
-				.GetProperty(nameof(ConfirmReservationDTO.Comment))?
-				.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? 200;
-
-			ViewBag.CommentMaxLength = commentMax;
 			return PartialView("_ConfirmReservationPartial");
 		}
 
@@ -187,11 +183,4 @@ namespace HotelApp.UI.Controllers
 		}
 
     }
-
-	public class ReservationGuestsViewModel
-	{
-		public GuestDTO GuestForm { get; set; } = new GuestDTO(); // for adding/editing
-		public List<ReservationGuestDTO> ExistingGuests { get; set; } = new();
-	}
-
 }

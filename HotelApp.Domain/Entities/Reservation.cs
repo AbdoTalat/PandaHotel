@@ -34,7 +34,8 @@ namespace HotelApp.Domain.Entities
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
 
-
+        public int? RateId { get; set; }
+        public Rate? Rate { get; set; }
         public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 

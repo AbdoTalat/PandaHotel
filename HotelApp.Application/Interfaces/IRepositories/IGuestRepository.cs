@@ -1,4 +1,5 @@
 ﻿using HotelApp.Application.DTOs.Guests;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using System;
@@ -13,6 +14,5 @@ namespace HotelApp.Application.Interfaces.IRepositories
     {
         Task<IEnumerable<GetSearchedGuestsDTO>> SerachGuestsByEmailAsync(string email);
         Task<List<GetSearchedGuestsDTO>> SearchGuestsAsync(string term);
-
-    }
+	}
 }

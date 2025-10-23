@@ -14,6 +14,7 @@ namespace HotelApp.Application.DTOs.Reservation
 		public string ReservationNumber { get; set; }
         public DateTime CheckInDate { get; set; }
 		public DateTime CheckOutDate { get; set; }
+		public string RateCode { get; set; }
 		public ReservationStatus Status { get; set; }
         public int NumberOfNights { get; set; }
 		public int NumberOfPeople { get; set; }
@@ -25,38 +26,37 @@ namespace HotelApp.Application.DTOs.Reservation
 
 		public int NumOfTotalRooms { get; set; }
 
-        public List<GuestsDTO> GuestReservations { get; set; } = new List<GuestsDTO>();
-		public List<ReservationRoomTypeDTO> ReservationRoomTypes { get; set; } = new List<ReservationRoomTypeDTO>();
-        public List<RoomsDTO> ReservationRooms { get; set; } = new List<RoomsDTO>();
-        public List<ReservationHistoryDTO> ReservationHistories { get; set; } = new List<ReservationHistoryDTO>();
+        public List<ReservationDetailsGuestsDTO> GuestReservations { get; set; } = new();
+		public List<ReservationDetailsRoomTypeDTO> ReservationRoomTypes { get; set; } = new();
+        public List<ReservationDetailsRoomsDTO> ReservationRooms { get; set; } = new ();
+        public List<ReservationDetailsHistoryDTO> ReservationHistories { get; set; } = new();
 	}
 
-	public class GuestsDTO
-	{
+	public class ReservationDetailsGuestsDTO
+    {
 		public int Id { get; set; }
 		public bool IsPrimaryGuest { get; set; }
         public string FullName { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
     }
-	public class ReservationHistoryDTO
-	{
-        public string PerformedByName { get; set; }
-		//public string PerformedByRole { get; set; }
-        public DateTime PerformedDate { get; set; }
-        public string Status { get; set; }
-    }
-	public class ReservationRoomTypeDTO
-	{
+	public class ReservationDetailsRoomTypeDTO
+    {
 		public int Id { get; set; }
 		public string RoomTypeName { get; set; }
 		public int Quantity { get; set; }
 		public int NumOfAdults { get; set; }
 		public int NumOfChildren { get; set; }
 	}
-	public class RoomsDTO
+	public class ReservationDetailsRoomsDTO
 	{
 		public string RoomNumber { get; set; }
 		public int RoomTypeId { get; set; }
-	}
+	}	
+	public class ReservationDetailsHistoryDTO
+    {
+        public string PerformedByName { get; set; }
+        public DateTime PerformedDate { get; set; }
+        public string Status { get; set; }
+    }
 }

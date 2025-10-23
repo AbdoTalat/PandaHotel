@@ -70,7 +70,9 @@ namespace HotelApp.Application.Services.GuestService
 				await _unitOfWork.GuestRepository.AddNewAsync(mappedGuest);
 				await _unitOfWork.CommitAsync();
 
-				return ServiceResponse<GuestDTO>.ResponseSuccess("Guest Added Successfully.");
+				var resultDto = await _unitOfWork.GuestRepository.GetByIdAsDtoAsync<GuestDTO>(mappedGuest.Id);
+
+				return ServiceResponse<GuestDTO>.ResponseSuccess("Guest Added Successfully.", Data: resultDto);
 			}
 			catch (Exception ex)
 			{
@@ -169,5 +171,6 @@ namespace HotelApp.Application.Services.GuestService
 
 			return guests;
 		}
-    }
+
+	}
 }

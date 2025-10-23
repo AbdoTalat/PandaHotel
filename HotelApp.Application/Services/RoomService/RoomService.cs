@@ -260,5 +260,16 @@ namespace HotelApp.Application.Services.RoomService
             var result = await _roomRepository.GetOccupancyPercentAsync();
             return result;
         }
-	}
+
+        public async Task<IEnumerable<GetRoomsForEditReservationDTO>> GetRoomsForEditReservationByIDs(List<int> Ids)
+        {
+            if (Ids == null || !Ids.Any())
+                return new List<GetRoomsForEditReservationDTO>();
+
+            var rooms = await _unitOfWork.RoomRepository
+                .GetAllAsDtoAsync<GetRoomsForEditReservationDTO>(r => Ids.Contains(r.Id));
+
+            return rooms;
+        }
+    }
 }

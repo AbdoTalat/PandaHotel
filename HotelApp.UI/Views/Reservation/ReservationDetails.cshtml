@@ -60,7 +60,7 @@
         <div class="content-detached">
             <div class="panel panel-white">
                 <div class="panel-heading">
-                    <h6 class="panel-title text-semibold"><a href="">Reservation #@Model.Id</a><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
+                    <h6 class="panel-title text-semibold"><a href="">Reservation: #@Model.ReservationNumber</a><a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
 
                     <div class="heading-elements">
                         <div class="col-md-12">
@@ -249,7 +249,6 @@
                                                     @foreach (var item in Model.ReservationRoomTypes)
                                                     {
                                                         var rooms = Model.ReservationRooms
-                                                        .Where(r => r.RoomTypeId == item.Id)
                                                         .Select(r => r.RoomNumber)
                                                         .ToList();
                                                         <tr>
@@ -259,7 +258,7 @@
                                                             <td>@item.RoomTypeName</td>
                                                             <td>@item.Quantity</td>
                                                             <td>@string.Join(", ", rooms)</td>
-                                                            <td>Rate#</td>
+                                                            <td>@Model.RateCode</td>
                                                             <td>1000 $</td>
                                                         </tr>
                                                     }
@@ -292,7 +291,7 @@
                                                 <div class="col-md-4">
                                                     <div class="content-group">
                                                         <ul class="list list-unstyled">
-                                                            <li><a href="#">Edit</a></li>
+                                                            <li><a asp-action="EditReservation" asp-controller="Reservation" asp-route-Id="@Model.Id">Edit</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>

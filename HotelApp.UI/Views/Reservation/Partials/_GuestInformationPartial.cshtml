@@ -1,141 +1,14 @@
-﻿@model GuestDTO
+﻿@using System.Text.Json
+@model List<ReservationGuestDTO>
+
 @{
-	int BranchId = ViewBag.BranchId;
+    int BranchId = ViewBag.BranchId;
 }
-
- <div class="row">
+<div class="row">
     <div class="col-md-8">
-        <div class="panel panel-flat">
-            <div class="panel-body">
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Serach guest </label>
-							<select id="guestSearchSelect" class="form-control select" data-placeholder="Search guest by name, email, or phone...">
-                                <option></option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <form id="guestForm">
-                    <input type="hidden" id="guestId" value="0" />
-					<input type="hidden" id="BranchId" value="0" />
-
-                    <div class="row">
-                        <div class="col-md-2">
-
-                            <label class="checkbox-container" id="primaryCheckboxContainer">
-                                <input asp-for="IsPrimary" id="isPrimary" type="checkbox" class="checkbox-input">
-                                <div class="checkbox-custom"></div>
-                                <span>Is Primary</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="GuestFullName">Guest Name</label>
-                                <div class="input-group">
-                                    <div class="input-group-btn">
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                            Mr. <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="#">Mr.</a></li>
-                                            <li><a href="#">Mrs.</a></li>
-                                            <li><a href="#">Ms.</a></li>
-                                            <li><a href="#">Dr.</a></li>
-                                        </ul>
-                                    </div>
-
-                                    <input asp-for="FullName" id="FullName" class="form-control" required placeholder="Full Name" />
-
-                                    <span class="input-group-addon"><i class="icon-vcard"></i></span>
-
-                                </div>                                   
-                                <span class="text-danger validation-error-label" asp-validation-for="FullName"></span>
-
-                            </div>
-
-                        </div>
-                    </div>
-                   
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input asp-for="Email" id="Email" class="form-control" placeholder="Email">
-                                <span class="text-danger validation-error-label" asp-validation-for="Email"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Phone #</label>
-                                <input asp-for="Phone" id="Phone" class="form-control" placeholder="Phone Number">
-                                <span class="text-danger validation-error-label" asp-validation-for="Phone"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Type Of Proof</label>
-								<select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select"
-										data-placeholder="Choose Proof Type" data-selected="@Model?.ProofTypeId">
-									<option value=""></option>
-								</select>
-                                <span class="text-danger validation-error-label" asp-validation-for="ProofTypeId"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Proof number</label>
-                                <input asp-for="ProofNumber" id="ProofNumber" class="form-control" placeholder="Proof number">
-                                <span class="text-danger validation-error-label" asp-validation-for="ProofNumber"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Date of Birth</label>
-                                <input asp-for="DateOfBirth" type="date" id="DateOfBirth" class="form-control">
-                                <span class="text-danger validation-error-label" asp-validation-for="DateOfBirth"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Address</label>
-                                <input asp-for="Address" id="Address" class="form-control" placeholder="Address">
-                                <span class="text-danger validation-error-label" asp-validation-for="Address"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="text-right">
-							<button type="button" class="btn btn-default btn-md" id="clearGuestForm">Clear</button>
-
-                            <button type="submit" class="btn bg-teal-400 btn-md">
-                                <i class="icon-plus-circle2"></i> Add
-                            </button>
-
-                        </div>
-                    </div>
-                </form> 
-            </div>
-
-        </div>
+        @await Html.PartialAsync("Partials/_AddOrEditGuest", new GuestDTO())
     </div>
-
     <div class="col-md-4">
         <!-- Primary Guest Panel -->
         <div class="panel panel-flat">
@@ -149,7 +22,7 @@
                 </div>
             </div>
 
-           
+
             <div class="panel-body" id="primaryGuestContainer">
                 <!-- Primary guest info here -->
             </div>
@@ -172,8 +45,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Normal guests will be added here -->
                         </tbody>
+
                     </table>
                 </div>
             </div>
@@ -183,278 +56,291 @@
 
 </div>
 
-<script>
-	$(document).ready(function () {
 
-		$('#guestSearchSelect').select2({
-			placeholder: "Search guest by name, email, or phone",
-			minimumInputLength: 4, // ✅ Enforce 4 characters before search
-			ajax: {
-				url: '/Guest/SearchGuests', // ✅ Unified endpoint
-				dataType: 'json',
-				delay: 250,
-				data: function (params) {
-					return {
-						term: params.term
-					};
-				},
-				processResults: function (data) {
-					return {
-						results: data.map(function (guest) {
-							return {
-								id: guest.id,
-								text: guest.text // e.g. guest.FullName OR guest.Email OR guest.Phone
-							};
-						})
-					};
-				},
-				cache: true
-			}
-		});
-
-		$('#guestSearchSelect').on('select2:select', function (e) {
-			var guestId = e.params.data.id;
-
-			if (guestId) {
-				$.ajax({
-					url: '/Guest/GetGuestJson/' + guestId,
-					type: 'GET',
-					success: function (guest) {
-						console.log("Guest Data", guest);
-
-						$('#guestId').val(guest.id);
-						$('#FullName').val(guest.fullName);
-						$('#Email').val(guest.email);
-						$('#Phone').val(guest.phone);
-						$('#Address').val(guest.address);
-						$('#proofTypeSelect').val(guest.proofTypeId).trigger('change'); // ✅ FIXED
-						$('#ProofNumber').val(guest.proofNumber);
-						$('#BranchId').val('@BranchId');
-
-						if (guest.dateOfBirth) {
-							$('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
-						} else {
-							$('#DateOfBirth').val('');
-						}
-
-						$('#guestSearchSelect').val(null).trigger('change');
-					},
-					error: function () {
-						alert('❌ Failed to fetch guest data.');
-					}
-				});
-			}
-		});
-	});
-</script>
 
 <script>
-	let guestList = [];                // Full guest data
-	let reservationGuestList = [];     // GuestId + IsPrimary only
+    (() => {
+        // ========== INIT ==========
+        const raw = @Html.Raw(JsonSerializer.Serialize(Model ?? new List<ReservationGuestDTO>()));
 
-	// ✅ Handle Guest Form Submission
-	$("#guestForm").on("submit", function (e) {
-		e.preventDefault();
+        window.guestList = Array.isArray(raw) ? raw.map(g => ({
+            id: g.GuestId ?? g.id ?? 0,
+            fullName: g.FullName ?? g.fullName ?? '',
+            email: g.Email ?? g.email ?? '',
+            phone: g.Phone ?? g.phone ?? '',
+            address: g.Address ?? g.address ?? '',
+            proofTypeId: g.ProofTypeId ?? g.proofTypeId ?? '',
+            proofNumber: g.ProofNumber ?? g.proofNumber ?? '',
+            dateOfBirth: g.DateOfBirth ?? g.dateOfBirth ?? '',
+            isPrimary: !!(g.IsPrimary ?? g.isPrimary),
+            branchId: @BranchId
+            })) : [];
 
-		const formData = {
-			id: $("#guestId").val() || 0,
-			isPrimary: $("#isPrimary").is(":checked"),
-			fullName: $("#FullName").val().trim(),
-			email: $("#Email").val() || null,
-			phone: $("#Phone").val() || null,
-			proofTypeId: $("#proofTypeSelect").val() || null,
-			proofNumber: $("#ProofNumber").val() || null,
-			dateOfBirth: $("#DateOfBirth").val() || null,
-			address: $("#Address").val() || null,
-			branchId: $("#BranchId").val() || 0
-		};
+        window.reservationGuestList = window.guestList.map(g => ({
+            guestId: g.id,
+            isPrimary: g.isPrimary
+        }));
 
-		$.ajax({
-			url: '/Guest/AddOrEditGuest',
-			method: 'POST',
-			contentType: 'application/json',
-			data: JSON.stringify(formData),
-			success: function (response) {
-				if (response.success) {
-					const guestId = response.guestId;
+        window.updateGuestTable?.();
+        window.renderGuestList?.();
 
-					// ✅ Ensure only one primary guest
-					if (formData.isPrimary) {
-						reservationGuestList = reservationGuestList.filter(g => !g.isPrimary);
-						guestList = guestList.filter(g => !g.isPrimary);
-					}
+        console.log("✅ Initial guestList:", window.guestList);
+    })();
 
-					// ✅ Update lists (no duplicates)
-					reservationGuestList = reservationGuestList.filter(g => g.guestId !== guestId);
-					reservationGuestList.push({ guestId, isPrimary: formData.isPrimary });
 
-					guestList = guestList.filter(g => g.id !== guestId);
-					guestList.push({ ...formData, id: guestId });
+    // ========== RENDERING ==========
+    function updateGuestTable() {
+        const $tbody = $('#normalGuestTable tbody').empty();
+        const normalGuests = guestList.filter(g => !g.isPrimary);
+        $('#guestCount').text(normalGuests.length);
 
-					updateGuestTable();
-					renderGuestList();
+        if (normalGuests.length === 0) {
+            $tbody.html(`<tr><td colspan="2" class="text-center text-muted">No guests added yet.</td></tr>`);
+        } else {
+            normalGuests.forEach(g => {
+                $tbody.append(`
+                        <tr data-guest-id="${g.id}">
+                            <td>${(g.fullName)}</td>
+                            <td>
+                                <a class="text-teal-600 editGuestBtn" data-id="${g.id}" title="Edit"><i class="icon-pencil7"></i></a>
+                                <a class="text-danger deleteGuestBtn ml-2" data-id="${g.id}" title="Delete"><i class="icon-trash"></i></a>
+                                <a class="text-primary makePrimaryBtn ml-2" data-id="${g.id}" title="Make Primary"><i class="icon-user-check"></i></a>
+                            </td>
+                        </tr>
+                    `);
+            });
+        }
 
-					resetGuestForm();
-					toastr.success("Guest saved successfully.");
-				} else {
-					$("#guestFormContainer").html(response); // validation error (partial re-render)
-				}
-			},
-			error: function () {
-				Swal.fire("Error", "Failed to save guest. Please try again.", "error");
-			}
-		});
-	});
+        // Primary guest display
+        const primary = guestList.find(g => g.isPrimary);
+        if (primary) {
+            $('#primaryGuestContainer').html(`
+                    <div class="row">
+                        <div class="col-md-2">
+                            <img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+                        </div>
+                        <div class="col-md-10">
+                            <h5 class="text-primary">${(primary.fullName)}</h5>
+                            <p>Email: ${(primary.email) || "-"}</p>
+                            <p>Phone: ${(primary.phone) || "-"}</p>
+                        </div>
+                    </div>
+                `);
+            $('#editPrimaryBtn').show().data('id', primary.id);
+        } else {
+            $('#primaryGuestContainer').html(`<p class="text-muted">No primary guest selected.</p>`);
+            $('#editPrimaryBtn').hide().removeData('id');
+        }
+    }
 
-	// ✅ Update Guests in Add Tab
-	function updateGuestTable() {
-		const tbody = $('#normalGuestTable tbody');
-		tbody.empty();
+    function renderGuestList() {
+        const container = $('#guestDisplayList');
+        if (!container.length)
+            return;
+        console.log("renderGuestList called, guestList:", guestList);
 
-		const normalGuests = guestList.filter(g => !g.isPrimary);
-		$('#guestCount').text(normalGuests.length);
+        container.empty();
 
-		normalGuests.forEach(guest => {
-			tbody.append(`
-					<tr data-guest-id="${guest.id}">
-						<td>${guest.fullName}</td>
-						<td>
-							<a class="text-teal-600 editGuestBtn" data-id="${guest.id}"><i class="icon-pencil7"></i></a>
-							<a class="text-danger deleteGuestBtn" data-id="${guest.id}"><i class="icon-trash"></i></a>
-							<a class="text-primary makePrimaryBtn" data-id="${guest.id}"><i class="icon-user-check"></i></a>
-						</td>
-					</tr>
-				`);
-		});
+        $('#guestCountLabel').text(`${guestList.length} guest${guestList.length !== 1 ? 's' : ''}`);
+        $('#guestCount').text(guestList.filter(g => !g.isPrimary).length);
 
-		// ✅ Primary Guest Panel
-		const primary = guestList.find(g => g.isPrimary);
-		if (primary) {
-			$('#primaryGuestContainer').html(`
-			<div class="row">
-				<div class="col-md-2">
-					<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-				</div>
-				<div class="col-md-10">
-					<h5 class="text-primary">${primary.fullName}</h5>
-					<p>Email: ${primary.email || "-"}</p>
-					<p>Phone: ${primary.phone || "-"}</p>
-				</div>
-			</div>
-		`);
-			$('#editPrimaryBtn').show();
-		} else {
-			$('#primaryGuestContainer').html(`<p class="text-muted">No primary guest selected.</p>`);
-			$('#editPrimaryBtn').hide();
-		}
+        guestList.forEach(g => {
+            const badge = g.isPrimary ? `<span class="label label-primary">Primary</span>` : '';
+            container.append(`
+                    <li class="media" data-id="${g.id}">
+                        <a class="media-left">
+                            <img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
+                        </a>
+                        <div class="media-body">
+                            <span class="media-heading text-default">${(g.fullName)} ${badge}</span>
+                            <span class="text-size-small text-muted display-block">${(g.email)}</span>
+                            <span class="text-size-small text-muted display-block">${(g.phone)}</span>
+                        </div>
+                    </li>
+                `);
+        });
+    }
 
-	}
 
-	// ✅ Confirm Tab (read-only, no edit/delete/make primary)
-	function renderGuestList() {
-		const container = $('#guestDisplayList');
-		container.empty();
+    // ========== SELECT2 SEARCH ==========
+    $(function () {
+        const $select = $('#guestSearchSelect');
+        if ($select.length && $.fn.select2) {
+            $select.select2({
+                placeholder: "Search guest by name, email, or phone",
+                minimumInputLength: 4,
+                ajax: {
+                    url: '/Guest/SearchGuests',
+                    dataType: 'json',
+                    delay: 250,
+                    data: p => ({ term: p.term }),
+                    processResults: data => ({
+                        results: (data || []).map(g => ({ id: g.id, text: g.text }))
+                    }),
+                    cache: true
+                },
+                width: '100%'
+            });
+        }
+    });
 
-		$('#guestCountLabel').text(`${guestList.length} guest${guestList.length !== 1 ? 's' : ''}`);
-		$('#guestCount').text(guestList.filter(g => !g.isPrimary).length);
+    $('#guestSearchSelect').on('select2:select', function (e) {
+        var guestId = e.params.data.id;
 
-		guestList.forEach(guest => {
-			const badge = guest.isPrimary ? `<span class="label label-primary">Primary</span>` : '';
-			container.append(`
-						<li class="media" data-id="${guest.id}">
-		<a class="media-left">
-			<img src="/assets/images/placeholder.jpg" class="img-circle img-md" alt="">
-		</a>
-		<div class="media-body">
-			<span class="media-heading text-default">${guest.fullName} ${badge}</span>
-			<span class="text-size-small text-muted display-block">
-				${guest.email || ""}
-			</span>
-			<span class="text-size-small text-muted display-block">
-				${guest.phone || ""}
-			</span>
-		</div>
-	</li>
+        if (guestId) {
+            $.ajax({
+                url: '/Guest/GetGuestJson/' + guestId,
+                type: 'GET',
+                success: function (guest) {
+                    console.log("Guest Data", guest);
 
-				`);
-		});
-	}
+                    $('#guestId').val(guest.id);
+                    $('#FullName').val(guest.fullName);
+                    $('#Email').val(guest.email);
+                    $('#Phone').val(guest.phone);
+                    $('#Address').val(guest.address);
+                    $('#proofTypeSelect').val(guest.proofTypeId).trigger('change'); // ✅ FIXED
+                    $('#ProofNumber').val(guest.proofNumber);
+                    $('#BranchId').val('@BranchId');
 
-	// ✅ Edit Guest
-	$(document).on('click', '.editGuestBtn', function () {
-		const guestId = $(this).data('id');
-		const guest = guestList.find(g => g.id == guestId);
-		if (!guest) return;
+                    if (guest.dateOfBirth) {
+                        $('#DateOfBirth').val(guest.dateOfBirth.split('T')[0]);
+                    } else {
+                        $('#DateOfBirth').val('');
+                    }
 
-		$('#guestId').val(guest.id);
-		$('#isPrimary').prop('checked', guest.isPrimary);
-		$('#FullName').val(guest.fullName);
-		$('#Email').val(guest.email);
-		$('#Phone').val(guest.phone);
-		$('#proofTypeSelect').val(guest.proofTypeId).trigger('change');
-		$('#ProofNumber').val(guest.proofNumber);
-		$('#DateOfBirth').val(guest.dateOfBirth);
-		$('#Address').val(guest.address);
-	});
+                    $('#guestSearchSelect').val(null).trigger('change');
+                },
+                error: function () {
+                    alert('❌ Failed to fetch guest data.');
+                }
+            });
+        }
+    });
 
-	// ✅ Delete Guest
-	$(document).on('click', '.deleteGuestBtn', function () {
-		const guestId = $(this).data('id');
 
-		guestList = guestList.filter(g => g.id != guestId);
-		reservationGuestList = reservationGuestList.filter(g => g.guestId != guestId);
+    // ========== ADD / EDIT ==========
+    $(document).on('submit', '#guestForm', function (e) {
+        e.preventDefault();
+        const data = {
+            id: +$('#guestId').val() || 0,
+            isPrimary: $('#isPrimary').is(':checked'),
+            fullName: $('#FullName').val().trim(),
+            email: $('#Email').val() || null,
+            phone: $('#Phone').val() || null,
+            proofTypeId: $('#proofTypeSelect').val() || null,
+            proofNumber: $('#ProofNumber').val() || null,
+            dateOfBirth: $('#DateOfBirth').val() || null,
+            address: $('#Address').val() || null,
+            branchId: $('#BranchId').val() || 0
+        };
 
-		updateGuestTable();
-		renderGuestList();
-	});
+        $.ajax({
+            url: '/Guest/AddOrEditGuest',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data)
+        })
+            .done(response => {
+                if (!response?.success) return Swal.fire("Error", response?.message || "Failed to save guest.", "error");
+                const guestId = response.guestId;
 
-	// ✅ Make Primary Guest
-	$(document).on('click', '.makePrimaryBtn', function () {
-		const guestId = $(this).data('id');
-		if (!guestId) return;
+                // Clear previous primary if needed
+                if (data.isPrimary) guestList.forEach(g => g.isPrimary = false);
 
-		guestList = guestList.map(g => ({ ...g, isPrimary: g.id == guestId }));
-		reservationGuestList = guestList.map(g => ({ guestId: g.id, isPrimary: g.id == guestId }));
+                const existing = guestList.find(g => g.id === guestId);
+                const updated = { ...data, id: guestId };
 
-		updateGuestTable();
-		renderGuestList();
+                if (existing) Object.assign(existing, updated);
+                else guestList.push(updated);
 
-		toastr.success("Primary guest updated.");
-	});
+                reservationGuestList = guestList.map(g => ({ guestId: g.id, isPrimary: g.isPrimary }));
 
-	$('#editPrimaryBtn').click(function () {
-		const primary = guestList.find(g => g.isPrimary);
-		if (!primary) {
-			Swal.fire("Info", "No primary guest selected yet.", "info");
-			return;
-		}
+                updateGuestTable();
+                renderGuestList();
+                resetGuestForm();
+                toastr.success("Guest saved successfully.");
+            })
+            .fail(() => Swal.fire("Error", "Failed to save guest.", "error"));
+    });
 
-		// Fill form with primary guest details
-		$('#guestId').val(primary.id);
-		$('#isPrimary').prop('checked', primary.isPrimary);
-		$('#FullName').val(primary.fullName);
-		$('#Email').val(primary.email);
-		$('#Phone').val(primary.phone);
-		$('#proofTypeSelect').val(primary.proofTypeId).trigger('change');
-		$('#ProofNumber').val(primary.proofNumber);
-		$('#DateOfBirth').val(primary.dateOfBirth);
-		$('#Address').val(primary.address);
 
-	});
+    // ========== EDIT (no AJAX) ==========
+    $(document).on('click', '.editGuestBtn', function () {
+        const guest = guestList.find(g => g.id == $(this).data('id'));
+        if (!guest) return Swal.fire("Error", "Guest not found in list.", "error");
+        populateGuestForm(guest);
+    });
 
-	// ✅ Reset Guest Form
-	function resetGuestForm() {
-		$('#guestForm')[0].reset();
-		$('#guestId').val(0);
-		$('#isPrimary').prop('checked', false);
-		$('#proofTypeSelect').val("").trigger("change");
-		if ($('#guestForm').data('validator')) {
-			$('#guestForm').validate().resetForm();
-		}
-	}
+    $('#editPrimaryBtn').click(() => {
+        const primary = guestList.find(g => g.isPrimary);
+        if (!primary) return Swal.fire("Info", "No primary guest selected.", "info");
+        populateGuestForm(primary);
+    });
 
-	// ✅ Clear button
-	$('#clearGuestForm').click(function () {
-		resetGuestForm();
-	});
+    function populateGuestForm(g) {
+        $('#guestId').val(g.id);
+        $('#isPrimary').prop('checked', g.isPrimary);
+        $('#FullName').val(g.fullName);
+        $('#Email').val(g.email);
+        $('#Phone').val(g.phone);
+        $('#proofTypeSelect').val(g.proofTypeId || '').trigger('change');
+        $('#ProofNumber').val(g.proofNumber || '');
+        $('#DateOfBirth').val(g.dateOfBirth ? g.dateOfBirth.split('T')[0] : '');
+        $('#Address').val(g.address || '');
+        $('#BranchId').val(g.branchId || '');
+    }
+
+
+    // ========== DELETE ==========
+    $(document).on('click', '.deleteGuestBtn', function () {
+        const guestId = $(this).data('id');
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-danger',
+                cancelButton: 'btn btn-default custom-cancel-btn'
+            },
+            buttonsStyling: false
+        });
+        swalWithBootstrapButtons.fire({
+            position: "top",
+            title: "Are you sure?",
+            text: "This will remove the guest from reservation!",
+            icon: "warning",
+            iconColor: "red",
+            showCancelButton: true,
+            confirmButtonText: "Delete!",
+            cancelButtonText: "Cancel",
+            reverseButtons: true
+        }).then(res => {
+            if (!res.isConfirmed) return;
+            guestList = guestList.filter(g => g.id != guestId);
+            reservationGuestList = reservationGuestList.filter(r => r.guestId != guestId);
+            updateGuestTable();
+            renderGuestList();
+            toastr.success("Guest removed successfully.");
+        });
+    });
+
+
+    // ========== MAKE PRIMARY ==========
+    $(document).on('click', '.makePrimaryBtn', function () {
+        const guestId = $(this).data('id');
+        guestList.forEach(g => g.isPrimary = (g.id == guestId));
+        reservationGuestList = guestList.map(g => ({ guestId: g.id, isPrimary: g.isPrimary }));
+        updateGuestTable();
+        renderGuestList();
+        toastr.success("Primary guest updated.");
+    });
+
+
+    // ========== RESET ==========
+    function resetGuestForm() {
+        $('#guestForm')[0].reset();
+        $('#guestId').val(0);
+        $('#proofTypeSelect').val("").trigger("change");
+        if ($('#guestForm').data('validator')) $('#guestForm').validate().resetForm();
+        $('#guestSearchSelect').val(null).trigger('change');
+    }
+    $('#clearGuestForm').click(resetGuestForm);
 </script>

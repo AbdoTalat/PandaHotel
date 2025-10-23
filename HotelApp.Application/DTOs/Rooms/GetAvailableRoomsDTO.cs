@@ -18,4 +18,10 @@ namespace HotelApp.Application.DTOs.Rooms
         public int Id { get; set; }
         public string RoomNumber { get; set; }
     }
+    public class GetRoomsForEditReservationDTO
+    {
+        public int Id { get; set; }
+        public string RoomNumber { get; set; }
+        public string RoomTypeName { get; set; }
+    }
 }

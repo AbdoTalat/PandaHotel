@@ -1,0 +1,131 @@
+﻿@model GuestDTO
+
+    <div class="panel panel-flat">
+        <div class="panel-body">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Serach guest </label>
+                        <select id="guestSearchSelect" class="form-control select" data-placeholder="Search guest by name, email, or phone...">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <form id="guestForm">
+                <input type="hidden" id="guestId" value="0" />
+                <input type="hidden" id="BranchId" value="0" />
+
+                <div class="row">
+                    <div class="col-md-2">
+
+                        <label class="checkbox-container" id="primaryCheckboxContainer">
+                            <input asp-for="IsPrimary" id="isPrimary" type="checkbox" class="checkbox-input">
+                            <div class="checkbox-custom"></div>
+                            <span>Is Primary</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="GuestFullName">Guest Name</label>
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        Mr. <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">Mr.</a></li>
+                                        <li><a href="#">Mrs.</a></li>
+                                        <li><a href="#">Ms.</a></li>
+                                        <li><a href="#">Dr.</a></li>
+                                    </ul>
+                                </div>
+
+                                <input asp-for="FullName" id="FullName" class="form-control" required placeholder="Full Name" />
+
+                                <span class="input-group-addon"><i class="icon-vcard"></i></span>
+
+                            </div>
+                            <span class="text-danger validation-error-label" asp-validation-for="FullName"></span>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input asp-for="Email" id="Email" class="form-control" placeholder="Email">
+                            <span class="text-danger validation-error-label" asp-validation-for="Email"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Phone #</label>
+                            <input asp-for="Phone" id="Phone" class="form-control" placeholder="Phone Number">
+                            <span class="text-danger validation-error-label" asp-validation-for="Phone"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Type Of Proof</label>
+                            <select id="proofTypeSelect" asp-for="ProofTypeId" class="form-control select"
+                                    data-placeholder="Choose Proof Type" data-selected="@Model?.ProofTypeId">
+                                <option value=""></option>
+                            </select>
+                            <span class="text-danger validation-error-label" asp-validation-for="ProofTypeId"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Proof number</label>
+                            <input asp-for="ProofNumber" id="ProofNumber" class="form-control" placeholder="Proof number">
+                            <span class="text-danger validation-error-label" asp-validation-for="ProofNumber"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input asp-for="DateOfBirth" type="date" id="DateOfBirth" class="form-control">
+                            <span class="text-danger validation-error-label" asp-validation-for="DateOfBirth"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input asp-for="Address" id="Address" class="form-control" placeholder="Address">
+                            <span class="text-danger validation-error-label" asp-validation-for="Address"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-right">
+                        <button type="button" class="btn btn-default btn-md" id="clearGuestForm">Clear</button>
+
+                        <button type="submit" class="btn bg-teal-400 btn-md">
+                            <i class="icon-plus-circle2"></i> Add
+                        </button>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>

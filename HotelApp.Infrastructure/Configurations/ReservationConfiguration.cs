@@ -15,7 +15,7 @@ namespace HotelApp.Infrastructure.Configurations
 		public void Configure(EntityTypeBuilder<Reservation> builder)
 		{
             builder.Property(r => r.ReservationNumber)
-                .HasMaxLength(20);
+                .HasMaxLength(30);
 
             builder.Property(b => b.CheckInDate)
 			   .IsRequired();
@@ -67,6 +67,11 @@ namespace HotelApp.Infrastructure.Configurations
 				.WithMany()
 				.HasForeignKey(b => b.LastModifiedById)
 				.OnDelete(DeleteBehavior.Restrict);
-		}
+
+            builder.HasOne(b => b.Rate)
+               .WithMany()
+               .HasForeignKey(b => b.RateId)
+               .OnDelete(DeleteBehavior.Restrict);
+        }
 	}
 }

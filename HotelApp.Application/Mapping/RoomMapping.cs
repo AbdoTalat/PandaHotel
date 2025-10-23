@@ -45,9 +45,11 @@ namespace HotelApp.Application.Mapping
 			CreateMap<Room, GetAvailableRoomsDTO>()
 				.ForMember(dest => dest.RoomTypeName, opt => opt.MapFrom(src => src.RoomType.Name));
 
-
+			CreateMap<Room, GetRoomsForEditReservationDTO>()
+				.ForMember(dest => dest.RoomTypeName, opt => opt.MapFrom(src => src.RoomType.Name));            
+			
 			/* Room Types */
-			CreateMap<RoomType, GetAllRoomTypesDTO>();
+            CreateMap<RoomType, GetAllRoomTypesDTO>();
 			CreateMap<RoomType, GetRoomTypesForReservationDTO>();
 			CreateMap<RoomType, GetRoomTypeByIdDTO>();
 

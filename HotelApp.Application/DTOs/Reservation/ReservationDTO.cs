@@ -1,5 +1,6 @@
 ﻿using HotelApp.Application.DTOs.Guests;
 using HotelApp.Domain.Common.Validation;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +20,8 @@ namespace HotelApp.Application.DTOs.Reservation
 
 	public class ReservationInfoDTO
 	{
-		public DateTime CheckInDate { get; set; }
+        public int ReservationId { get; set; }
+        public DateTime CheckInDate { get; set; }
 		public DateTime CheckOutDate { get; set; }
 		public int NumOfNights { get; set; }
 		public int RateId { get; set; }
@@ -40,7 +42,15 @@ namespace HotelApp.Application.DTOs.Reservation
 	{
 		public int GuestId { get; set; }
 		public bool IsPrimary { get; set; }
-	}
+		public string FullName { get; set; }
+		public string? Email { get; set; }
+		public string? Phone { get; set; }
+		public string? ProofNumber { get; set; }
+		public DateOnly? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public int? ProofTypeId { get; set; }
+
+    }
 	public class ConfirmReservationDTO
 	{
 		[MaxLength(100)]
@@ -53,5 +63,4 @@ namespace HotelApp.Application.DTOs.Reservation
 		public bool IsNoShow { get; set; }
 		public string? CancellationReason { get; set; } = null;
 	}
-
 }

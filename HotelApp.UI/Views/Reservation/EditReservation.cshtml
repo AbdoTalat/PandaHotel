@@ -1,5 +1,4 @@
-﻿@using HotelApp.UI.Controllers
-@model ReservationDTO
+﻿@model ReservationDTO
 @{
     TempData["Title"] = "Edit Reservation";
 
@@ -40,12 +39,6 @@
 
 <div class="content">
     <div class="panel">
-        @* <div class="panel-heading alpha-slate" style="margin:10px">
-        <div class="text-center">
-        <h4>Add Reservation</h4>
-        </div>
-
-        </div> *@
         <div class="panel-body">
             <div class="tabbable tab-content-bordered">
                 <ul class="nav nav-tabs nav-tabs-bottom nav-justified">
@@ -60,17 +53,11 @@
                 <div class="tab-pane active has-padding" id="tab1">
                     @await Html.PartialAsync("Partials/_ReservationInfoPartial", Model.ReservationInfoDto)
                 </div>
-
                 <div class="tab-pane  has-padding" id="tab2">
                     <div id="guestTab">
-                        @await Html.PartialAsync("Partials/_GuestInformationPartial", new ReservationGuestsViewModel
-                   {
-                       GuestForm = new GuestDTO(),
-                       ExistingGuests = Model.GuestDtos // already coming from your ReservationDTO
-                   })
+                        @await Html.PartialAsync("Partials/_GuestInformationPartial", Model.GuestDtos)
                     </div>
                 </div>
-
                 <div class="tab-pane has-padding" id="tab3">
                     @await Html.PartialAsync("Partials/_ConfirmReservationPartial", Model.ConfirmDto)
                 </div>
@@ -89,6 +76,8 @@
         </div>
     </div>
 </div>
+
+
 
 @section Scripts {
 
@@ -232,6 +221,11 @@
                     success: function (res) {
                         if (res.success) {
                             showToast('success', 'Success', res.message);
+
+                            // ✅ Re-render guest list
+                            renderGuestList();
+
+                            // ✅ Trigger event to move to the next tab
                             $(document).trigger("guestFormSuccess");
                         } else {
                             showAlert('error', 'Error!', res.message);
@@ -241,7 +235,8 @@
                         Swal.fire("Error", "Failed to save guests. Please try again.", "error");
                     }
                 });
-            } else if (currentTab === 3) {
+            }
+            else if (currentTab === 3) {
                 submitReservationWithStatus();
             }
         }

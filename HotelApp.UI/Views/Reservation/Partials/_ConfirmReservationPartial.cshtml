@@ -1,7 +1,7 @@
 ﻿@model ConfirmReservationDTO
 
 <div class="row">
-	<div class="col-lg-8">
+    <div class="col-lg-8">
         <div class="content-group">
             <div class="panel panel-flat">
                 <div class="panel-heading">
@@ -53,7 +53,7 @@
 
                                 <div class="form-group">
 
-                                    <textarea id="comment" style="min-height:150px" rows="3" cols="3" maxlength="200" class="form-control maxlength-textarea" placeholder="Comment">
+                                    <textarea id="comment" asp-for="Comment" style="min-height:150px" rows="3" cols="3" maxlength="200" class="form-control maxlength-textarea" placeholder="Comment">
 
                                 </textarea>
 
@@ -76,32 +76,43 @@
 
                     @if (User.HasClaim("permission", "Reservation.ManageStatus"))
                     {
-                        <!-- Admin / Manager: full control -->
                         <div class="form-group">
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsPending, new { id = "isPending" }) Pending</label>
+                                <input asp-for="IsPending" id="isPending" type="checkbox" />
+                                <label for="isPending">Pending</label>
                             </div>
+
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsConfirmed, new { id = "isConfirmed" }) Confirmed</label>
+                                <input asp-for="IsConfirmed" id="isConfirmed" type="checkbox" />
+                                <label for="isConfirmed">Confirmed</label>
                             </div>
+
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsCheckedIn, new { id = "isCheckedIn" }) Checked In</label>
+                                <input asp-for="IsCheckedIn" id="isCheckedIn" type="checkbox" />
+                                <label for="isCheckedIn">Checked In</label>
                             </div>
+
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsCheckedOut, new { id = "isCheckedOut" }) Checked Out</label>
+                                <input asp-for="IsCheckedOut" id="isCheckedOut" type="checkbox" />
+                                <label for="isCheckedOut">Checked Out</label>
                             </div>
+
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsCancelled, new { id = "isCancelled" }) Cancelled</label>
+                                <input asp-for="IsCancelled" id="isCancelled" type="checkbox" />
+                                <label for="isCancelled">Cancelled</label>
                             </div>
+
                             <div class="checkbox">
-                                <label>@Html.CheckBoxFor(m => m.IsNoShow, new { id = "isNoShow" }) No Show</label>
+                                <input asp-for="IsNoShow" id="isNoShow" type="checkbox" />
+                                <label for="isNoShow">No Show</label>
                             </div>
                         </div>
                     }
                     else
                     {
-                        <!-- For non-managers, JS auto-sets checkboxes based on permission -->
-                        <p class="text-muted text-center">Status will be set automatically based on your permission.</p>
+                        <p class="text-muted text-center">
+                            Status will be set automatically based on your permission.
+                        </p>
                     }
 
                 </div>
@@ -109,7 +120,7 @@
             </div>
         </div>
 
-	</div>
+    </div>
     <div class="col-lg-4">
         <div class="content-group">
             <div class="panel panel-flat">
@@ -130,53 +141,65 @@
 
 </div>
 
-
 <script>
-	$(document).ready(function () {
-		const ids = {
-			pending: "#isPending",
-			confirmed: "#isConfirmed",
-			checkedIn: "#isCheckedIn",
-			checkedOut: "#isCheckedOut",
-			cancelled: "#isCancelled",
-			noShow: "#isNoShow"
-		};
+    $(document).ready(function () {
+        const ids = {
+            pending: "#isPending",
+            confirmed: "#isConfirmed",
+            checkedIn: "#isCheckedIn",
+            checkedOut: "#isCheckedOut",
+            cancelled: "#isCancelled",
+            noShow: "#isNoShow"
+        };
+        const alwaysEnabled = [ids.pending, ids.confirmed, ids.cancelled, ids.noShow];
+        const chain = [ids.confirmed, ids.checkedIn, ids.checkedOut];
 
-		// Always enabled statuses
-		const alwaysEnabled = [ids.pending, ids.confirmed, ids.cancelled, ids.noShow];
+        // Always enable base ones
+        alwaysEnabled.forEach(sel => $(sel).prop("disabled", false));
 
-		// Chain statuses
-		const chain = [ids.confirmed, ids.checkedIn, ids.checkedOut];
+        // === Initialize chain state ===
+        chain.forEach((selector, index) => {
+            // Enable if this or any previous one is checked
+            if ($(selector).is(":checked") || (index > 0 && $(chain[index - 1]).is(":checked"))) {
+                $(selector).prop("disabled", false);
+            } else {
+                // If no previous checked and not this one, disable it
+                if (index > 0 && !$(chain[index - 1]).is(":checked")) {
+                    $(selector).prop("disabled", true).prop("checked", false);
+                }
+            }
+        });
 
-		alwaysEnabled.forEach(sel => $(sel).prop("disabled", false));
-		chain.forEach((sel, i) => {
-			if (i > 0) $(sel).prop("disabled", true);
-		});
+        // === Chain logic for user interaction ===
+        chain.forEach((selector, index) => {
+            $(selector).change(function () {
+                if ($(this).is(":checked")) {
+                    // Enable next in chain
+                    if (chain[index + 1]) $(chain[index + 1]).prop("disabled", false);
+                } else {
+                    // Disable all following in chain
+                    for (let i = index + 1; i < chain.length; i++) {
+                        $(chain[i]).prop("checked", false).prop("disabled", true);
+                    }
+                }
+            });
+        });
 
-		// Chain logic
-		chain.forEach((selector, index) => {
-			$(selector).change(function () {
-				if ($(this).is(":checked")) {
-					if (chain[index + 1]) $(chain[index + 1]).prop("disabled", false);
-				} else {
-					for (let i = index + 1; i < chain.length; i++) {
-						$(chain[i]).prop("checked", false).prop("disabled", true);
-					}
-				}
-			});
-		});
+        // === Cancellation reason logic ===
+        $(ids.cancelled).change(function () {
+            if ($(this).is(":checked")) {
+                $("#cancelReasonGroup").slideDown();
+            } else {
+                $("#cancelReasonGroup").slideUp();
+                $("#CancellationReason").val('');
+            }
+        });
 
-		// Cancellation reason
-		$(ids.cancelled).change(function () {
-			if ($(this).is(":checked")) {
-				$("#cancelReasonGroup").slideDown();
-			} else {
-				$("#cancelReasonGroup").slideUp();
-				$("#CancellationReason").val('');
-			}
-		});
-
-
-
-	});
+        // If already cancelled
+        if ($(ids.cancelled).is(":checked")) {
+            $("#cancelReasonGroup").show();
+        }
+    });
 </script>
+
+

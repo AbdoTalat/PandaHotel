@@ -55,6 +55,11 @@ namespace HotelApp.Application.Services.BranchService
             try
             {
                 var mappedBranch = _mapper.Map<Branch>(branchDTO);
+                mappedBranch.Code = string.Concat(
+                    branchDTO.Name
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(word => char.ToUpper(word[0])));
+
                 await _unitOfWork.BranchRepository.AddNewAsync(mappedBranch);
                 await _unitOfWork.CommitAsync();
 

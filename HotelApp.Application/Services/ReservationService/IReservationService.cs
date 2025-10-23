@@ -6,11 +6,11 @@ namespace HotelApp.Application.Services.ReservationService
     public interface IReservationService
     {
         Task<IEnumerable<GetAllReservationsDTO>> GetAllReservationAsync();
-        Task<ServiceResponse<ReservationDTO>> AddReservation(ReservationDTO dto, int UserId);
+        //Task<ServiceResponse<ReservationDTO>> AddReservation(ReservationDTO dto, int UserId);
         Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto);
         Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id);
         Task<ServiceResponse<object>> ChangeReservationDatesAsync(ChangeReservationDatesDTO dto);
-
+        Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int UserId);
         Task<ReservationDTO?> GetReservationToEditByIdAsync(int Id);
     }
 }
