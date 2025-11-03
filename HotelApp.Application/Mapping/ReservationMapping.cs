@@ -6,6 +6,7 @@ using HotelApp.Application.DTOs.ReservationSource;
 using HotelApp.Domain.Entities;
 using HotelApp.Domain.Enums;
 using HotelApp.Helper.Common;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,10 +69,11 @@ namespace HotelApp.Application.Mapping
 
 
             /* Reservation Source */
-            CreateMap<ReservationSource, DropDownDTO<string>>()
-				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
+            CreateMap<ReservationSource, SelectListItem>()
+				.ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Name))
+				.ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Id.ToString()));
 
-			CreateMap<ReservationSourceDTO, ReservationSource>();
+            CreateMap<ReservationSourceDTO, ReservationSource>();
 			CreateMap<ReservationSource, ReservationSourceDTO>();
 
 

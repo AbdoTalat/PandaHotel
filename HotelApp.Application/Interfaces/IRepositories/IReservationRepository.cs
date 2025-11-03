@@ -14,6 +14,7 @@ namespace HotelApp.Application.Interfaces.IRepositories
         Task<Reservation> GetReservationDetailsByIds(int Id);
         Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto);
         Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id);
+        Task<CheckOutDTO> GetCheckOutReservationByIdAsync(int Id);
         Task<string> GenerateReservationNumberAsync(int branchId);
     }
 }

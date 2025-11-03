@@ -1,5 +1,12 @@
 ﻿@model ConfirmReservationDTO
-
+<style>
+    input[type="checkbox"] {
+        accent-color: #009688; /* your chosen color */
+        width: 18px;
+        height: 18px;
+        cursor: pointer; /* better UX */
+    }
+</style>
 <div class="row">
     <div class="col-lg-8">
         <div class="content-group">
@@ -42,7 +49,6 @@
                                         Amount: <span id="confirmAmount" class="label bg-teal">$</span>
                                     </a>
 
-
                                 </div>
                             </div>
                         </div>
@@ -73,47 +79,62 @@
                     <h6 class="panel-title">Reservation Status<a class="heading-elements-toggle"><i class="icon-more"></i></a></h6>
                 </div>
                 <div class="panel-body">
+                    <div class="form-group">
 
-                    @if (User.HasClaim("permission", "Reservation.ManageStatus"))
-                    {
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <input asp-for="IsPending" id="isPending" type="checkbox" />
-                                <label for="isPending">Pending</label>
-                            </div>
-
-                            <div class="checkbox">
-                                <input asp-for="IsConfirmed" id="isConfirmed" type="checkbox" />
-                                <label for="isConfirmed">Confirmed</label>
-                            </div>
-
-                            <div class="checkbox">
-                                <input asp-for="IsCheckedIn" id="isCheckedIn" type="checkbox" />
-                                <label for="isCheckedIn">Checked In</label>
-                            </div>
-
-                            <div class="checkbox">
-                                <input asp-for="IsCheckedOut" id="isCheckedOut" type="checkbox" />
-                                <label for="isCheckedOut">Checked Out</label>
-                            </div>
-
-                            <div class="checkbox">
-                                <input asp-for="IsCancelled" id="isCancelled" type="checkbox" />
-                                <label for="isCancelled">Cancelled</label>
-                            </div>
-
-                            <div class="checkbox">
-                                <input asp-for="IsNoShow" id="isNoShow" type="checkbox" />
-                                <label for="isNoShow">No Show</label>
-                            </div>
+                        <div class="checkbox disabled">
+                            <label>
+                                <input asp-for="IsPending" id="isPending" type="checkbox" disabled="disabled" checked>
+                                Pending
+                            </label>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted text-center">
-                            Status will be set automatically based on your permission.
-                        </p>
-                    }
+                        @if (User.HasClaim("permission", "Reservation.Confirm"))
+                        {
+                            <div class="checkbox @(Model.IsConfirmed ? "disabled" : "")">
+                                <label>
+                                    <input asp-for="IsConfirmed" id="isConfirmed" type="checkbox" disabled="@(Model.IsConfirmed ? "disabled" : null)" />
+                                    Confirmed
+                                </label>
+                            </div>
+                        }
+                        @if (User.HasClaim("permission", "Reservation.CheckIn"))
+                        {
+                            <div class="checkbox @(Model.IsCheckedIn ? "disabled" : "")">
+                                <label>
+                                    <input asp-for="IsCheckedIn" id="isCheckedIn" type="checkbox" disabled="@(Model.IsCheckedIn ? "disabled" : null)" />
+                                    Checked In
+                                </label>
+                            </div>
+                        }
+                        @if (User.HasClaim("permission", "Reservation.CheckOut"))
+                        {
+                            <div class="checkbox @(Model.IsCheckedOut ? "disabled" : "")">
+                                <label>
+                                    <input asp-for="IsCheckedOut" id="isCheckedOut" type="checkbox" disabled="@(Model.IsCheckedOut ? "disabled" : null)" />
+                                    Checked Out
+                                </label>
+                            </div>
+                        }
+                        @if (User.HasClaim("permission", "Reservation.Cancel"))
+                        {
+                            <div class="checkbox @(Model.IsCancelled ? "disabled" : "")">
+                                <label>
+                                    <input asp-for="IsCancelled" id="isCancelled" type="checkbox" disabled="@(Model.IsCancelled ? "disabled" : null)" />
+
+                                    Cancelled
+                                </label>
+                            </div>
+                        }
+                        @if (User.HasClaim("permission", "Reservation.NoShow"))
+                        {
+                            <div class="checkbox @(Model.IsNoShow ? "disabled" : "")">
+                                <label>
+                                    <input asp-for="IsNoShow" id="isNoShow" type="checkbox" disabled="@(Model.IsNoShow ? "disabled" : null)" />
+
+                                    No Show
+                                </label>
+                            </div>
+                        }
+                    </div>
 
                 </div>
 
@@ -141,65 +162,5 @@
 
 </div>
 
-<script>
-    $(document).ready(function () {
-        const ids = {
-            pending: "#isPending",
-            confirmed: "#isConfirmed",
-            checkedIn: "#isCheckedIn",
-            checkedOut: "#isCheckedOut",
-            cancelled: "#isCancelled",
-            noShow: "#isNoShow"
-        };
-        const alwaysEnabled = [ids.pending, ids.confirmed, ids.cancelled, ids.noShow];
-        const chain = [ids.confirmed, ids.checkedIn, ids.checkedOut];
-
-        // Always enable base ones
-        alwaysEnabled.forEach(sel => $(sel).prop("disabled", false));
-
-        // === Initialize chain state ===
-        chain.forEach((selector, index) => {
-            // Enable if this or any previous one is checked
-            if ($(selector).is(":checked") || (index > 0 && $(chain[index - 1]).is(":checked"))) {
-                $(selector).prop("disabled", false);
-            } else {
-                // If no previous checked and not this one, disable it
-                if (index > 0 && !$(chain[index - 1]).is(":checked")) {
-                    $(selector).prop("disabled", true).prop("checked", false);
-                }
-            }
-        });
-
-        // === Chain logic for user interaction ===
-        chain.forEach((selector, index) => {
-            $(selector).change(function () {
-                if ($(this).is(":checked")) {
-                    // Enable next in chain
-                    if (chain[index + 1]) $(chain[index + 1]).prop("disabled", false);
-                } else {
-                    // Disable all following in chain
-                    for (let i = index + 1; i < chain.length; i++) {
-                        $(chain[i]).prop("checked", false).prop("disabled", true);
-                    }
-                }
-            });
-        });
-
-        // === Cancellation reason logic ===
-        $(ids.cancelled).change(function () {
-            if ($(this).is(":checked")) {
-                $("#cancelReasonGroup").slideDown();
-            } else {
-                $("#cancelReasonGroup").slideUp();
-                $("#CancellationReason").val('');
-            }
-        });
-
-        // If already cancelled
-        if ($(ids.cancelled).is(":checked")) {
-            $("#cancelReasonGroup").show();
-        }
-    });
-</script>
 
 

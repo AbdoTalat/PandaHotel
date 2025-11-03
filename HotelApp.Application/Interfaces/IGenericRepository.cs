@@ -9,7 +9,7 @@ namespace HotelApp.Application.Interfaces
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
         Task<IEnumerable<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
         Task<TDto?> GetByIdAsDtoAsync<TDto>(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class;
-        Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
+        Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes);
 		Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false);
         Task<TDto?> FirstOrDefaultAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false) where TDto : class;
 		
@@ -28,6 +28,7 @@ namespace HotelApp.Application.Interfaces
         Task DeleteByIdAsync(int id);
 
 		Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, bool skipBranchFilter = false);
-
+        Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false);
+        Task<int> SumAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, int>> selector, bool skipBranchFilter = false);
     }
 }

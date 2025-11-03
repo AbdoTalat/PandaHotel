@@ -23,97 +23,57 @@ namespace HotelApp.Infrastructure.Repositories
         {
 			_context = context;
 		}
-		public async Task<TodayReservationsSummaryDto> GetTodayReservationsSummaryAsync()
-		{
-			var today = GetEgyptDateTime();
-			var tomorrow = today.AddDays(1);
+        public async Task<TodayReservationsSummaryDto> GetTodayReservationsSummaryAsync()
+        {
+            var today = GetEgyptDateTime().Date;
+            var tomorrow = today.AddDays(1);
 
-			var Query = _context.Reservations
-				.AsNoTracking()
-				.BranchFilter()
-				.AsQueryable();
+            var query = _context.Reservations
+                .AsNoTracking()
+                .BranchFilter()
+                .Where(r =>
+                    (r.CheckInDate >= today && r.CheckInDate < tomorrow) ||
+                    (r.CheckOutDate >= today && r.CheckOutDate < tomorrow) ||
+                    (r.CreatedDate >= today && r.CreatedDate < tomorrow) ||
+                    (r.LastModifiedDate >= today && r.LastModifiedDate < tomorrow) ||
+                    (r.Status == ReservationStatus.CheckedIn && r.CheckInDate < today && r.CheckOutDate > today)
+                );
 
-			var summary = new TodayReservationsSummaryDto
-			{
-				Arrivals = await Query
-					.Where(r => r.CheckInDate.Date == today /*&& r.IsConfirmed && !r.IsCancelled && !r.IsCheckedOut && !r.IsCheckedIn*/)
-					.CountAsync(),
+            var summary = await query
+                .GroupBy(_ => 1)
+                .Select(g => new TodayReservationsSummaryDto
+                {
+                    Arrivals = g.Count(r =>
+                        r.Status == ReservationStatus.Confirmed &&
+                        r.CheckInDate >= today && r.CheckInDate < tomorrow),
 
-				Departures = await Query.Where(r => r.CheckOutDate.Date == today /*&& !r.IsCancelled*/)
-					.CountAsync(),
+                    Departures = g.Count(r =>
+                        r.Status != ReservationStatus.Cancelled &&
+                        r.CheckOutDate >= today && r.CheckOutDate < tomorrow),
 
-				NewBookings = await Query.Where(r => r.CreatedDate.Value.Date == today /*&& !r.IsCancelled*/)
-					.CountAsync(),
+                    NewBookings = g.Count(r =>
+                        r.Status != ReservationStatus.Cancelled &&
+                        r.CreatedDate >= today && r.CreatedDate < tomorrow),
 
-				StayOvers = await Query.Where(r => 
-					r.CheckInDate.Date <= today && 
-					r.CheckOutDate.Date > today )
-					//&&
-					//r.IsCheckedIn && !r.IsCancelled && !r.IsCheckedOut)
-					.CountAsync(),
+                    StayOvers = g.Count(r =>
+                        r.Status == ReservationStatus.CheckedIn &&
+                        r.CheckInDate <= today && r.CheckOutDate > today),
 
-				Cancellations = await Query.Where(r => 
-					//r.IsCancelled &&
-				    r.LastModifiedDate != null &&
-					r.LastModifiedDate.Value.Date == today)
-					.CountAsync(),
+                    Cancellations = g.Count(r =>
+                        r.Status == ReservationStatus.Cancelled &&
+                        r.LastModifiedDate >= today && r.LastModifiedDate < tomorrow),
 
-				NoShow = await Query.Where(r =>
-				//!r.IsCancelled &&
-				//!r.IsCheckedIn &&
-				//r.IsConfirmed &&
-				r.CheckInDate.Date >= today && r.CheckInDate.Date < tomorrow)
-				.CountAsync()
-			};
+                    NoShow = g.Count(r =>
+                        r.Status == ReservationStatus.NoShow &&
+                        r.CheckInDate >= today && r.CheckInDate < tomorrow)
+                })
+                .FirstOrDefaultAsync();
 
-			return summary;
-		}
+            return summary ?? new TodayReservationsSummaryDto();
+        }
 
-		//public async Task<TodayReservationsSummaryDto> GetTodayReservationsSummaryAsync()
-		//{
-		//    // NOTE: decide which time basis to use (UTC vs branch local). 
-		//    // Here I keep your original UTC choice but you should prefer branch-local date.
-		//    var today = DateTime.UtcNow.Date;
-		//    var tomorrow = today.AddDays(1);
 
-		//    // Base query (apply BranchFilter extension which should return IQueryable)
-		//    var q = _context.Reservations
-		//        .BranchFilter()        // make sure this just adds a WHERE/Filter and returns IQueryable
-		//        .AsNoTracking();       // read-only, avoid change tracking overhead
-
-		//    // Single grouped aggregation -> translates to one SQL query with SUM(CASE WHEN ...)
-		//    var aggregated = await q
-		//        .GroupBy(r => 1)
-		//        .Select(g => new TodayReservationsSummaryDto
-		//        {
-		//            Arrivals = g.Sum(r =>
-		//                (r.IsConfirmed && !r.IsCancelled
-		//                 && r.CheckInDate >= today && r.CheckInDate < tomorrow) ? 1 : 0),
-
-		//            Departures = g.Sum(r =>
-		//                (!r.IsCancelled
-		//                 && r.CheckOutDate >= today && r.CheckOutDate < tomorrow) ? 1 : 0),
-
-		//            NewBookings = g.Sum(r =>
-		//                (!r.IsCancelled
-		//                 && r.CreatedDate >= today && r.CreatedDate < tomorrow) ? 1 : 0),
-
-		//            StayOvers = g.Sum(r =>
-		//                (r.IsCheckedIn && !r.IsCancelled
-		//                 && r.CheckInDate < today && r.CheckOutDate > today) ? 1 : 0),
-
-		//            Cancellations = g.Sum(r =>
-		//                (r.IsCancelled
-		//                 && r.LastModifiedDate != null
-		//                 && r.LastModifiedDate >= today
-		//                 && r.LastModifiedDate < tomorrow) ? 1 : 0)
-		//        })
-		//        .FirstOrDefaultAsync();
-
-		//    return aggregated ?? new TodayReservationsSummaryDto();
-		//}
-
-		public async Task<RoomAvailabilityDto> GetAvailabilityRoomsAsync(int? roomTypeId)
+        public async Task<RoomAvailabilityDto> GetAvailabilityRoomsAsync(int? roomTypeId)
 		{
 			var today = GetEgyptDateTime();
 			var next7Days = Enumerable.Range(0, 7).Select(i => today.AddDays(i)).ToList();
@@ -135,7 +95,7 @@ namespace HotelApp.Infrastructure.Repositories
 				.AsNoTracking()
 				.Where(rr =>
 					roomIds.Contains(rr.RoomId) &&
-					//!rr.Reservation.IsCancelled &&
+					rr.Reservation.Status != ReservationStatus.Cancelled &&
 					rr.Reservation.CheckInDate < windowEnd &&   // overlap condition
 					rr.Reservation.CheckOutDate > today)
 				.Select(rr => new
@@ -187,50 +147,47 @@ namespace HotelApp.Infrastructure.Repositories
 
 			var reservationsQuery = _context.Reservations
 				.AsNoTracking()
-				.BranchFilter();
-				//.Where(r => !r.IsCancelled);
+				.BranchFilter()
+				.Where(r => r.Status != ReservationStatus.Cancelled);
 
-			var reservationStats = await reservationsQuery
+			var reservations = await reservationsQuery
 				.Select(r => new
 				{
 					r.Id,
-					//r.IsConfirmed,
+					r.Status,
 					r.CheckInDate,
 					r.CheckOutDate,
-					//r.IsCheckedIn,
-					//r.IsCheckedOut,
-					Guests = r.guestReservations.Select(gr => gr.GuestId)
+					GuestIDs = r.guestReservations.Select(gr => gr.GuestId)
 				})
 				.ToListAsync();
 
-			var checkedInGuests = reservationStats
-				.Where(r => /*r.IsCheckedIn && !r.IsCheckedOut*/
-							 r.CheckInDate.Date <= today
-							&& r.CheckOutDate.Date >= today)
-				.SelectMany(r => r.Guests)
+
+            var checkedInGuests = reservations
+				.Where(r => r.Status == ReservationStatus.CheckedIn
+						 || (r.CheckInDate <= today && r.CheckOutDate >= today && r.Status != ReservationStatus.CheckedOut))
+				.SelectMany(r => r.GuestIDs)
+				.Distinct()
 				.Count();
 
-			var todayArrivals = reservationStats
-				.Where(r => r.CheckInDate.Date == today)
-							//&& !r.IsCheckedIn
-							//&& r.IsConfirmed)
-				.SelectMany(r => r.Guests)
-				.Count();
+            var todayArrivals = reservations
+                .Where(r => r.CheckInDate.Date == today && r.Status == ReservationStatus.Confirmed)
+                .SelectMany(r => r.GuestIDs)
+                .Distinct()
+                .Count();
 
-			var todayDepartures = reservationStats
-				.Where(r => r.CheckOutDate.Date == today)
-							//&& r.IsCheckedIn
-							//&& !r.IsCheckedOut)
-				.SelectMany(r => r.Guests)
-				.Count();
+            var todayDepartures = reservations
+                .Where(r => r.CheckOutDate.Date == today && r.Status == ReservationStatus.CheckedIn)
+                .SelectMany(r => r.GuestIDs)
+                .Distinct()
+                .Count();
 
-			var totalGuests = await _context.Guests
+            var totalGuests = await _context.Guests
 				.AsNoTracking()
 				.BranchFilter()
 				.CountAsync();
 
-			var returningGuestsCount = reservationStats
-				.SelectMany(r => r.Guests)
+			var returningGuestsCount = reservations
+				.SelectMany(r => r.GuestIDs)
 				.GroupBy(g => g)
 				.Count(g => g.Count() > 1);
 
@@ -271,47 +228,49 @@ namespace HotelApp.Infrastructure.Repositories
 				OutOfService = outOfService
 			};
 		}
-		public async Task<List<RoomOccupancyDashboardDTO>> GetRoomOccupancyDashboardAsync()
-		{
-			var today = GetEgyptDateTime();
-			var next7Days = Enumerable.Range(0, 7).Select(d => today.AddDays(d)).ToList();
+        public async Task<List<RoomOccupancyDashboardDTO>> GetRoomOccupancyDashboardAsync()
+        {
+            var today = GetEgyptDateTime().Date;
+            var next7Days = Enumerable.Range(0, 7).Select(d => today.AddDays(d)).ToList();
 
             var totalRooms = await _context.Rooms
-				.AsNoTracking()
-				.BranchFilter()
-				.CountAsync(); 
+                .AsNoTracking()
+                .BranchFilter()
+                .CountAsync();
 
-            var reservedRooms = await _context.Reservations 
-				.Include(r => r.ReservationsRooms)
-				.AsNoTracking()
-				.BranchFilter()
-				//.Where(r => !r.IsCancelled && r.IsConfirmed)
-				.SelectMany(r => r.ReservationsRooms)
-				.Where(rr => rr.StartDate <= next7Days.Last() && rr.EndDate > today)
-				.Select(rr => new
-				{
-					rr.RoomId,
-					rr.StartDate,
-					rr.EndDate,
-				}).ToListAsync();
+            var activeReservations = await _context.Reservations
+                .AsNoTracking()
+                .BranchFilter()
+                .Include(r => r.ReservationsRooms)
+                .Where(r => r.Status != ReservationStatus.Cancelled)
+                .SelectMany(r => r.ReservationsRooms)
+                .Where(rr => rr.StartDate <= next7Days.Last() && rr.EndDate > today)
+                .Select(rr => new
+                {
+                    rr.RoomId,
+                    rr.StartDate,
+                    rr.EndDate
+                })
+                .ToListAsync();
 
-			var result = next7Days.Select(date => new RoomOccupancyDashboardDTO
-			{
-				Date = date,
-				Label = date.ToString("ddd dd MMM"),
-				OccupiedRooms = reservedRooms
-					.Where(rr => rr.StartDate <= date && rr.EndDate > date)
-					.Select(rr => rr.RoomId)
-					.Distinct()
-					.Count(),
-                TotalRooms = totalRooms 
+            var result = next7Days.Select(date => new RoomOccupancyDashboardDTO
+            {
+                Date = date,
+                Label = date.ToString("ddd dd MMM"),
+                OccupiedRooms = activeReservations
+                    .Where(rr => rr.StartDate <= date && rr.EndDate > date)
+                    .Select(rr => rr.RoomId)
+                    .Distinct()
+                    .Count(),
+                TotalRooms = totalRooms
             }).ToList();
 
-			return result;
-		}
+            return result;
+        }
 
 
-		private DateTime GetEgyptDateTime()
+
+        private DateTime GetEgyptDateTime()
 		{
 			var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
 			var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone).Date;

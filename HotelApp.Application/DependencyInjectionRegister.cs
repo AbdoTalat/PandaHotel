@@ -37,13 +37,15 @@ using HotelApp.Application.Services.DashboardService;
 using HotelApp.Application.Services.RateCalculationService;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.Services.DropdownService;
+using HotelApp.Application.Validators.Reservations;
 
 namespace HotelApp.Application
 {
     public static class DependencyInjectionRegister
     {
-		public static IServiceCollection AddApplicationDI(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationDI(this IServiceCollection services, IConfiguration configuration)
         {
+            #region Services
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IBranchService, BranchService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
@@ -66,16 +68,16 @@ namespace HotelApp.Application
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IRateCalculationService, RateCalculationService>();
             services.AddScoped<IDropdownService, DropdownService>();
-            
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            #endregion
 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
             services.AddControllersWithViews()
 	        .AddFluentValidation(fv =>
 	        {
 		        fv.RegisterValidatorsFromAssemblyContaining<GuestValidator>();
-                fv.RegisterValidatorsFromAssemblyContaining<ReservationDTO>();
+                fv.RegisterValidatorsFromAssemblyContaining<ReservationDTOValidator>();
             });
 
 			services.AddFluentValidationAutoValidation();

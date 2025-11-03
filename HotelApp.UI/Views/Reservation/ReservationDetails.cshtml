@@ -2,8 +2,14 @@
 @{
     TempData["Title"] = "Reservation Details";
     var currentStatusColor = ReservationStatusHelper.GetColorClass(Model.Status);
+    bool isCheckInDisabled = Model.Status == ReservationStatus.CheckedIn ||
+                      Model.Status == ReservationStatus.CheckedOut ||
+                      Model.Status == ReservationStatus.Cancelled;
 
+    bool isCheckOutDisabled = Model.Status == ReservationStatus.CheckedOut ||
+                        Model.Status == ReservationStatus.Cancelled;
 }
+
 <style>
     .list-feed-time > li {
         margin-left: 90px;
@@ -15,6 +21,13 @@
             top: 0;
             font-size: 12px;
         }
+
+    .disabled-link {
+        pointer-events: none;
+        cursor: not-allowed;
+        color: #aaa !important;
+        text-decoration: none;
+    }
 </style>
 
 <!-- Page header -->
@@ -72,11 +85,23 @@
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         @foreach (var status in ReservationStatusHelper.GetNextStatusesWithColor(Model.Status))
                                         {
-                                            <li>
-                                                <a href="#" class="text-center">
-                                                    Change To <span class="btn btn-xs @status.ColorClass">@status.Text</span>
-                                                </a>
-                                            </li>
+                                            if (status.Text == "Checked In")
+                                            {
+                                                <li>
+                                                    <a href="/Reservation/QuickCheckIn/@Model.Id" id="quickCheckIn">
+                                                        Change To <span class="btn btn-xs @status.ColorClass">@status.Text</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a href="@Url.Action("ChangeStatus", "Reservation", new { id = Model.Id, status = status.Text })"
+                                                       class="change-status-link text-center">
+                                                        Change To <span class="btn btn-xs @status.ColorClass">@status.Text</span>
+                                                    </a>
+                                                </li>
+                                            }
                                         }
                                     </ul>
                                 </div>
@@ -110,7 +135,6 @@
                         <div class="panel-body">
 
                             <div class="row">
-                                <div class="col-md-12">
 
                                     <!-- Reservation History -->
                                     <div class="col-md-4">
@@ -218,7 +242,6 @@
                                         </div>
                                     </div>
                                     <!-- charges summary -->
-                                </div>
                             </div>
 
                             <div class="row">
@@ -231,7 +254,7 @@
                                                 <i class="icon-circle-down2"></i>
                                             </a>
                                         </legend>
-                                        <div class="table-responsive collapse" id="accommodations">
+                                        <div class="table-responsive collapse in" id="accommodations">
                                             <table class="table table-framed">
                                                 <thead>
                                                     <tr class="active border-double">
@@ -278,20 +301,36 @@
                                                 <i class="icon-circle-down2"></i>
                                             </a>
                                         </legend>
-
-                                        <div class="collapse" id="actions">
+                                        <div class="collapse in" id="actions">
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <div class="content-group">
                                                         <ul class="list list-unstyled">
-                                                            <li><a href="#">Add Payment</a></li>
+                                                            @if (User.HasClaim("permission", "Reservation.Edit"))
+                                                            {
+                                                                <li><a asp-action="EditReservation" asp-controller="Reservation" asp-route-Id="@Model.Id">Edit</a></li>
+                                                            }
+                                                            @if (User.HasClaim("permission", "Reservation.CheckIn"))
+                                                            {
+                                                                <li><a asp-action="EditReservation" asp-controller="Reservation" asp-route-Id="@Model.Id" asp-route-mode="checkIn"
+                                                                    class="@(isCheckInDisabled ? "disabled-link text-muted" : "")"> Check In </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="/Reservation/QuickCheckIn/@Model.Id" id="quickCheckIn" class="@(isCheckInDisabled ? "disabled-link text-muted" : "")">Quick Check In</a>
+                                                                </li>
+                                                            }
+                                                            @if (User.HasClaim("permission", "Reservation.CheckOut"))
+                                                            {
+                                                            <li><a asp-action="CheckOut" asp-controller="Reservation" asp-route-Id="@Model.Id" class="@(isCheckOutDisabled ? "disabled-link text-muted" : "")">Check Out</a></li>
+                                                            }
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="content-group">
                                                         <ul class="list list-unstyled">
-                                                            <li><a asp-action="EditReservation" asp-controller="Reservation" asp-route-Id="@Model.Id">Edit</a></li>
+                                                            <li><a href="#">Add Payment</a></li>
+                                                            <li><a href="#">Assign Rooms</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -547,5 +586,56 @@
         });
     </script>
 
+
+    <script>
+        $(document).on('click', '#quickCheckIn', function (e) {
+            e.preventDefault();
+
+            const url = $(this).attr('href');
+
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn bg-teal-400',
+                    cancelButton: 'btn btn-default custom-cancel-btn'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: "Confirm Quick Check-In?",
+                text: "Are you sure you want to check in this reservation?",
+                icon: "question",
+                iconColor: 'teal',
+                showCancelButton: true,
+                confirmButtonText: "Yes, Check In",
+                cancelButtonText: "Cancel",
+                position: 'top',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        success: function (res) {
+                            if (res.success) {
+                                showToast('success', 'Success', res.message);
+                                setTimeout(() => location.reload(), 100);
+                            } else {
+                                showAlert('error', 'Error', res.message);
+                            }
+                        },
+                        error: function () {
+                            showAlert('error', 'Error', 'An unexpected error occurred. Please try again.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', 'a.disabled', e => e.preventDefault());
+
+    </script>
 }
 

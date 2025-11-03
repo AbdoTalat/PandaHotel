@@ -1,5 +1,6 @@
 ﻿using HotelApp.Application.DTOs.Guests;
 using HotelApp.Domain.Common.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
@@ -7,20 +8,21 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.WebPages.Html;
 
 namespace HotelApp.Application.DTOs.Reservation
 {
 	public class ReservationDTO
 	{
-		public List<ReservationGuestDTO> GuestDtos { get; set; } = new List<ReservationGuestDTO>();
+        public List<ReservationGuestDTO> GuestDtos { get; set; } = new List<ReservationGuestDTO>();
 		public ReservationInfoDTO ReservationInfoDto { get; set; } = new ReservationInfoDTO();
 		public ConfirmReservationDTO ConfirmDto { get; set; } = new ConfirmReservationDTO();
 	}
 
 	public class ReservationInfoDTO
 	{
+        public IEnumerable<SelectListItem> ReservationSources { get; set; } = new List<SelectListItem>();
         public int ReservationId { get; set; }
+		public string ReservationNumber { get; set; }
         public DateTime CheckInDate { get; set; }
 		public DateTime CheckOutDate { get; set; }
 		public int NumOfNights { get; set; }

@@ -40,6 +40,7 @@ namespace HotelApp.Infrastructure.Repositories
 					ReservationInfoDto = new ReservationInfoDTO
 					{
 						ReservationId = r.Id,
+						ReservationNumber = r.ReservationNumber,
 						CheckInDate = r.CheckInDate,
 						CheckOutDate = r.CheckOutDate,
 						NumOfNights = r.NumberOfNights,
@@ -110,83 +111,77 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return reservation;
 		}
-		public async Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto)
-		{
-			var today = GetEgyptDateTime().Date;
-			var tomorrow = today.AddDays(1);
+        public async Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto)
+        {
+            var today = GetEgyptDateTime().Date;
+            var tomorrow = today.AddDays(1);
 
-			var query = _context.Reservations
-				.BranchFilter()
-				.AsQueryable();
+            var query = _context.Reservations
+                .AsNoTracking()
+                .BranchFilter()
+                .AsQueryable();
 
-			if (dto.ReservationCategory.HasValue && dto.ReservationCategory.Value != ReservationCategory.All)
-			{
-				switch (dto.ReservationCategory.Value)
-				{
-					case ReservationCategory.NewBookings:
-						query = query.Where(r => r.CreatedDate.HasValue &&
-												 r.CreatedDate.Value.Date == today);
-												 //!r.IsCancelled);
-						break;
+            if (dto.ReservationCategory.HasValue && dto.ReservationCategory.Value != ReservationCategory.All)
+            {
+                switch (dto.ReservationCategory.Value)
+                {
+                    case ReservationCategory.NewBookings:
+                        query = query.Where(r =>
+                            r.Status != ReservationStatus.Cancelled &&
+                            r.CreatedDate.HasValue &&
+                            r.CreatedDate.Value >= today && r.CreatedDate.Value < tomorrow);
+                        break;
 
-					case ReservationCategory.Arrivals:
-						query = query.Where(r => r.CheckInDate.Date == today );
-												 //r.IsConfirmed &&
-												 //!r.IsCancelled &&
-												 //!r.IsCheckedOut &&
-												 //!r.IsCheckedIn);
-						break;
+                    case ReservationCategory.Arrivals:
+                        query = query.Where(r =>
+                            r.Status == ReservationStatus.Confirmed &&
+                            r.CheckInDate >= today && r.CheckInDate < tomorrow);
+                        break;
 
-					case ReservationCategory.Departures:
-						query = query.Where(r => r.CheckOutDate.Date == today );
-												 //!r.IsCancelled);
-						break;
+                    case ReservationCategory.Departures:
+                        query = query.Where(r =>
+                            r.Status != ReservationStatus.Cancelled &&
+                            r.CheckOutDate >= today && r.CheckOutDate < tomorrow);
+                        break;
 
-					case ReservationCategory.StayOvers:
-						query = query.Where(r =>
-							r.CheckInDate.Date <= today &&
-							r.CheckOutDate.Date > today);
-							//r.IsCheckedIn &&
-							//!r.IsCancelled &&
-							//!r.IsCheckedOut);
-						break;
+                    case ReservationCategory.StayOvers:
+                        query = query.Where(r =>
+                            r.Status == ReservationStatus.CheckedIn &&
+                            r.CheckInDate <= today && r.CheckOutDate > today);
+                        break;
 
-					case ReservationCategory.Cancellations:
-						query = query.Where(r =>
-							//r.IsCancelled &&
-							r.LastModifiedDate != null &&
-							r.LastModifiedDate.Value.Date == today);
-						break;
+                    case ReservationCategory.Cancellations:
+                        query = query.Where(r =>
+                            r.Status == ReservationStatus.Cancelled &&
+                            r.LastModifiedDate.HasValue &&
+                            r.LastModifiedDate.Value >= today && r.LastModifiedDate.Value < tomorrow);
+                        break;
 
-					case ReservationCategory.NoShow:
-						query = query.Where(r =>
-							//!r.IsCancelled &&
-							//!r.IsCheckedIn &&
-							//r.IsConfirmed &&
-							r.CheckInDate.Date >= today && r.CheckInDate.Date < tomorrow);
-						break;
-				}
-			}
+                    case ReservationCategory.NoShow:
+                        query = query.Where(r =>
+                            r.Status == ReservationStatus.NoShow &&
+                            r.CheckInDate >= today && r.CheckInDate < tomorrow);
+                        break;
+                }
+            }
 
-			if (dto.CheckInDate.HasValue)
-				query = query.Where(r => r.CheckInDate >= dto.CheckInDate.Value);
+            if (dto.CheckInDate.HasValue)
+                query = query.Where(r => r.CheckInDate >= dto.CheckInDate.Value.Date);
 
-			if (dto.CheckOutDate.HasValue)
-				query = query.Where(r => r.CheckOutDate <= dto.CheckOutDate.Value);
+            if (dto.CheckOutDate.HasValue)
+                query = query.Where(r => r.CheckOutDate <= dto.CheckOutDate.Value.Date);
 
-			if (!string.IsNullOrEmpty(dto.PrimaryGuestName))
-			{
-				query = query.Where(r => r.guestReservations.Any(gr =>
-					gr.IsPrimaryGuest &&
-					gr.Guest.FullName.Contains(dto.PrimaryGuestName)));
-			}
+            if (!string.IsNullOrWhiteSpace(dto.PrimaryGuestName))
+            {
+                query = query.Where(r => r.guestReservations.Any(gr =>
+                    gr.IsPrimaryGuest &&
+                    gr.Guest.FullName.Contains(dto.PrimaryGuestName)));
+            }
 
-			var result = await query
-				.ProjectTo<GetAllReservationsDTO>(_mapperConfig)
-				.ToListAsync();
-
-			return result;
-		}
+            return await query
+                .ProjectTo<GetAllReservationsDTO>(_mapperConfig)
+                .ToListAsync();
+        }
 
         public async Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id)
         {
@@ -256,7 +251,22 @@ namespace HotelApp.Infrastructure.Repositories
             return reservation;
         }
 
+		public async Task<CheckOutDTO> GetCheckOutReservationByIdAsync(int Id)
+		{
+			var dto = await _context.Reservations.
+				BranchFilter()
+				.Where(r => r.Id == Id)
+				.Select(r => new CheckOutDTO
+				{
+					Id = r.Id,
+					ReservationNumber = r.ReservationNumber ?? "N",
+					CheckInDate = r.CheckInDate,
+					CheckOutDate = r.CheckOutDate,
+				})
+				.FirstOrDefaultAsync();
 
+			return dto ?? new CheckOutDTO();
+		}
         public async Task<string> GenerateReservationNumberAsync(int branchId)
         {
             var branchCode = await _context.Branches

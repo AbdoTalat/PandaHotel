@@ -48,63 +48,6 @@
 }
 
 
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* hidden real input */
-.checkbox-input {
-    opacity: 0;
-    position: absolute;
-    width: 0;
-    height: 0;
-}
-
-/* custom square */
-.checkbox-custom {
-    width: 20px;
-    height: 20px;
-    background-color: #fff;
-    border-radius: 2px;
-    border: 1.5px solid #00897B;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-}
-
-/* label text */
-.checkbox-label {
-    cursor: pointer;
-}
-
-/* checked state */
-.checkbox-input:checked + .checkbox-custom {
-    background-color: #009688;
-}
-
-.checkbox-custom::after {
-    content: "";
-    width: 6px;
-    height: 13px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    position: absolute;
-    bottom: 4px;
-    left: 6px;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.checkbox-input:checked + .checkbox-custom::after {
-    opacity: 1;
-}
-
 .btn-xxs {
     padding: 2px 4px ; /* shrink padding */
     font-size: 12px ; /* smaller icon/text */
@@ -210,11 +153,11 @@
     background-color: #17a2b8 !important; /* blue */
 }
 
-/* Make all toastr notifications solid white */
-/*#toast-container > .toast {
-    opacity: 1 !important;*/ /* remove transparency */
-    /*background-color: #ffffff !important;*/ /* solid white */
-    /*color: #333 !important;*/ /* text color (dark for readability) */
-    /*border: 1px solid #ddd;*/ /* optional subtle border */
-    /*box-shadow: 0 2px 8px rgba(0,0,0,0.15);*/ /* optional shadow */
-/*}*/
+
+
+input[type="checkbox"] {
+    accent-color: #009688; /* your chosen color */
+    width: 18px;
+    height: 18px;
+    cursor: pointer; /* better UX */
+}

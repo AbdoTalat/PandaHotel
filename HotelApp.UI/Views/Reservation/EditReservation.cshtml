@@ -1,12 +1,12 @@
 ﻿@model ReservationDTO
 @{
-    TempData["Title"] = "Edit Reservation";
+    TempData["Title"] = ViewBag.PageTitle;
 
 }
 <div class="page-header page-header-default page-header-xs">
     <div class="page-header-content">
         <div class="page-title">
-            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Edit Reservation</span> </h4>
+            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">@ViewBag.PageTitle</span> #@Model.ReservationInfoDto.ReservationNumber </h4>
         </div>
     </div>
 
@@ -14,7 +14,8 @@
         <ul class="breadcrumb">
             <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
             <li><a asp-action="Index" asp-controller="Reservation">Reservations</a></li>
-            <li class="active">Edit Reservation</li>
+            <li><a asp-action="ReservationDetails" asp-controller="Reservation" asp-route-Id="@Model.ReservationInfoDto.ReservationId">Reservation #@Model.ReservationInfoDto.ReservationNumber</a></li>
+            <li class="active">@ViewBag.PageTitle</li>
         </ul>
 
         <ul class="breadcrumb-elements">
@@ -84,22 +85,12 @@
     <script>
         $(document).ready(function () {
             loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
-            loadSelect("#reservationSourceSelect", "/ReservationSource/GetReservationSourcesDropDown", "displayText", "id");
         });
     </script>
 
     <script>
-        // ===== Permissions injected from server =====
-        const userPermissions = {
-            canManageStatus: @User.HasClaim("permission", "Reservation.ManageStatus").ToString().ToLower(),
-            canConfirm: @User.HasClaim("permission", "Reservation.Confirm").ToString().ToLower(),
-            canCheckIn: @User.HasClaim("permission", "Reservation.CheckIn").ToString().ToLower(),
-            canPending: @User.HasClaim("permission", "Reservation.Pending").ToString().ToLower()
-                                            };
+        let currentTab = 1;
 
-        let currentTab = 1; // start from tab 1
-
-        // ===== Main tab control =====
         function showTab(index) {
             $(".tab-pane").removeClass("show active");
             $(`#tab${index}`).addClass("show active");
@@ -107,91 +98,40 @@
             $(".nav-tabs li").removeClass("active").addClass("disabled");
             $(`#tab${index}-link`).parent("li").removeClass("disabled").addClass("active");
 
-            // Show or hide Back button
             $("#prevBtn").toggle(index > 1);
 
-            // Handle dynamic button rendering
+            // Only one button in the final tab
             if (index === 3) {
-                updateNextButtonLabel();
+                $("#nextBtn").replaceWith(`
+                                <button type="button" id="nextBtn" class="btn bg-teal-400">
+                                     <i class="icon-checkmark4 position-right"></i> Submit
+                                </button>
+                            `);
             } else {
                 $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                            Next <i class="icon-arrow-right14 position-right"></i>
-                                                        </button>
-                                                    `);
+                                <button type="button" id="nextBtn" class="btn bg-teal-400">
+                                    Next <i class="icon-arrow-right14 position-right"></i>
+                                </button>
+                            `);
             }
 
-            // Lazy load guest form
+            // Lazy load guest tab
             if (index === 2 && $("#guestTab").is(':empty')) {
                 $("#guestTab").load("/Guest/LoadGuestForm", initializeSelect2);
             }
         }
 
-        // ===== Dynamically render Next/Submit buttons based on permission =====
-        function updateNextButtonLabel() {
-            if (userPermissions.canManageStatus) {
-                $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                            Submit
-                                                        </button>
-                                                    `);
-            }
-            else if (userPermissions.canConfirm && userPermissions.canCheckIn) {
-                $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="saveConfirmBtn" class="btn bg-blue-600 me-2">
-                                                            Save & Confirm <i class="icon-checkmark4 position-right"></i>
-                                                        </button>
-                                                        <button type="button" id="saveCheckInBtn" class="btn bg-success-600">
-                                                            Save & Check-In <i class="icon-user-check position-right"></i>
-                                                        </button>
-                                                    `);
-            }
-            else if (userPermissions.canConfirm) {
-                $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="nextBtn" class="btn bg-blue-600">
-                                                            Save & Confirm <i class="icon-checkmark4 position-right"></i>
-                                                        </button>
-                                                    `);
-            }
-            else if (userPermissions.canCheckIn) {
-                $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="nextBtn" class="btn bg-success-600">
-                                                            Save & Check-In <i class="icon-user-check position-right"></i>
-                                                        </button>
-                                                    `);
-            }
-            else {
-                $("#nextBtn").replaceWith(`
-                                                        <button type="button" id="nextBtn" class="btn bg-teal-400">
-                                                            Submit
-                                                        </button>
-                                                    `);
-            }
-        }
-
-        // ===== Submit Reservation with chosen status =====
-        function submitReservationWithStatus(options = {}) {
+        function submitReservationWithStatus() {
             const data = {
                 Comment: $('#reservationComment').val(),
-                IsPending: false,
-                IsConfirmed: !!options.confirm,
-                IsCheckedIn: !!options.checkIn,
-                IsCheckedOut: false,
-                IsCancelled: false,
-                IsNoShow: false,
+                IsPending: $('#isPending').is(':checked'),
+                IsConfirmed: $('#isConfirmed').is(':checked'),
+                IsCheckedIn: $('#isCheckedIn').is(':checked'),
+                IsCheckedOut: $('#isCheckedOut').is(':checked'),
+                IsCancelled: $('#isCancelled').is(':checked'),
+                IsNoShow: $('#isNoShow').is(':checked'),
                 CancellationReason: $('#cancellationReason').val()
             };
-
-            if (userPermissions.canManageStatus) {
-                data.IsPending = $('#isPending').is(':checked');
-                data.IsConfirmed = $('#isConfirmed').is(':checked');
-                data.IsCheckedIn = $('#isCheckedIn').is(':checked');
-                data.IsCheckedOut = $('#isCheckedOut').is(':checked');
-                data.IsCancelled = $('#isCancelled').is(':checked');
-                data.IsNoShow = $('#isNoShow').is(':checked');
-            } else if (!options.confirm && !options.checkIn) {
-                data.IsPending = true;
-            }
 
             $.ajax({
                 type: "POST",
@@ -199,8 +139,11 @@
                 data: JSON.stringify(data),
                 contentType: "application/json",
                 success: function (res) {
-                    if (res.success) window.location.href = "/Reservation/Index";
-                    else showAlert('error', 'Error!', res.message);
+                    if (res.success) {
+                        window.location.href = "/Reservation/Index";
+                    } else {
+                        showAlert('error', 'Error!', res.message);
+                    }
                 },
                 error: function () {
                     Swal.fire("Error", "Failed to submit reservation.", "error");
@@ -208,7 +151,6 @@
             });
         }
 
-        // ===== Navigation logic =====
         function goNext() {
             if (currentTab === 1) {
                 $("#bookRoomForm").submit();
@@ -221,22 +163,16 @@
                     success: function (res) {
                         if (res.success) {
                             showToast('success', 'Success', res.message);
-
-                            // ✅ Re-render guest list
-                            renderGuestList();
-
-                            // ✅ Trigger event to move to the next tab
                             $(document).trigger("guestFormSuccess");
                         } else {
                             showAlert('error', 'Error!', res.message);
                         }
                     },
                     error: function () {
-                        Swal.fire("Error", "Failed to save guests. Please try again.", "error");
+                        Swal.fire("Error", "Failed to save guests.", "error");
                     }
                 });
-            }
-            else if (currentTab === 3) {
+            } else if (currentTab === 3) {
                 submitReservationWithStatus();
             }
         }
@@ -248,18 +184,11 @@
             }
         }
 
-        // ===== Init =====
         $(function () {
             showTab(currentTab);
 
             $(document).on("click", "#nextBtn", goNext);
             $(document).on("click", "#prevBtn", goPrev);
-            $(document).on("click", "#saveConfirmBtn", function () {
-                submitReservationWithStatus({ confirm: true });
-            });
-            $(document).on("click", "#saveCheckInBtn", function () {
-                submitReservationWithStatus({ confirm: true, checkIn: true });
-            });
 
             $(document).on("roomBookingSuccess", () => { currentTab++; showTab(currentTab); });
             $(document).on("guestFormSuccess", () => { currentTab++; showTab(currentTab); });

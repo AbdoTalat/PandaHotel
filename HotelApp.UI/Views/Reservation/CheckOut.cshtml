@@ -1,0 +1,134 @@
+﻿@model CheckOutDTO
+@{
+	TempData["Title"] = "Check Out";
+}
+
+<div class="page-header page-header-default page-header-xs">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Check Out</span></h4>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a asp-action="Index" asp-controller="Home"><i class="icon-home2 position-left"></i> Home</a></li>
+			<li><a asp-action="Index" asp-controller="Reservation">Reservations</a></li>
+			<li><a asp-action="ReservationDetails" asp-controller="Reservation" asp-route-Id="@Model.Id">Reservation #@Model.ReservationNumber</a></li>
+			<li class="active">Check Out</li>
+		</ul>
+
+		<ul class="breadcrumb-elements">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<i class="icon-gear position-left"></i>
+					Settings
+					<span class="caret"></span>
+				</a>
+
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+					<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+					<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+					<li class="divider"></li>
+					<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<div class="content">
+	<div class="row">
+		<form asp-action="CheckOut" asp-controller="Reservation" method="post">
+			<input type="hidden" asp-for="Id" value="@Model.Id"/>
+			<input type="hidden" asp-for="ReservationNumber" value="@Model.ReservationNumber" />
+			<div class="col-md-12">
+				<div class="panel panel-flat border-left-md border-left-teal">
+					@* <div class="panel-heading">
+						<div class="heading-elements">
+							<ul class="icons-list">
+								<li><a data-action="collapse" class=""></a></li>
+							</ul>
+						</div>
+					</div> *@
+
+					<div class="panel-body">
+						<div class="row">
+
+							<div class="col-md-6">
+								<legend class="text-semibold"> Reservation Data</legend>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label>Check In</label>
+											<input asp-for="CheckInDate" class="form-control" placeholder="Check In Date" readonly>
+											<span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label>Check Out </label>
+											<input asp-for="CheckOutDate" id="RoomNumber" class="form-control" placeholder="Check Out Date">
+											<span asp-validation-for="CheckOutDate" class="text-danger validation-error-label"></span>
+										</div>
+									</div>
+
+								</div>
+							</div>
+
+							<!-- Charges Summary -->
+							<div class="col-md-6">
+									<div class="panel panel-body">
+
+										<legend class="text-semibold"> <i class="icon-cash3"></i> Charges Summary</legend>
+
+										<div class="content-group">
+											<h6>Total due</h6>
+											<div class="table-responsive no-border">
+												<table class="table">
+													<tbody>
+														<tr>
+															<th>Subtotal:</th>
+															<td class="text-right">$7,000</td>
+														</tr>
+														<tr>
+															<th>Tax: <span class="text-regular">(25%)</span></th>
+															<td class="text-right">$1,750</td>
+														</tr>
+														<tr>
+															<th>Total:</th>
+															<td class="text-right text-primary"><h5 class="text-semibold">$8,750</h5></td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+
+
+									</div>
+
+							</div>
+							<!-- charges summary -->
+						</div>
+                    </div>
+				</div>
+			</div>
+
+			<div class="text-center">
+				<a class="btn btn-default btn-lg" asp-action="ReservationDetails" asp-controller="Reservation" asp-route-Id="@Model.Id"> Cancel</a>
+				<button class="btn bg-teal-400 btn-lg btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff" data-style="radius" type="submit"><i class="icon-exit3"></i> Check Out</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+
+
+
+@section Scripts {
+
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}

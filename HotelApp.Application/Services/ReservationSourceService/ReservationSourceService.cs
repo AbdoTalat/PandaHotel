@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotelApp.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HotelApp.Application.Services.ReservationSourceService
 {
@@ -24,10 +25,10 @@ namespace HotelApp.Application.Services.ReservationSourceService
 			_mapper = mapper;
 		}
 
-        public async Task<IEnumerable<DropDownDTO<string>>> GetReservationSourcesDropDownAsync()
+        public async Task<IEnumerable<SelectListItem>> GetReservationSourcesDropDownAsync()
         {
             var reservationSources = await _unitOfWork.ReservationSourceRepository
-                .GetAllAsDtoAsync<DropDownDTO<string>>(SkipBranchFilter:true);
+                .GetAllAsDtoAsync<SelectListItem>(SkipBranchFilter:true);
 
             return reservationSources;
         }

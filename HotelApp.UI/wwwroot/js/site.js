@@ -3,69 +3,54 @@
 
 // Write your JavaScript code.
 
+// Create a global SweetAlert instance with Bootstrap button styles
+
+
+// Generic showAlert using SweetAlert2 with Bootstrap button colors
 function showAlert(type, title, text) {
-    let iconClass = 'icon-info3';
-    let btnClass = 'btn-info';
-    let barClass = 'border-info';
-    let bgClass = 'bg-info';
+    let icon = 'info';
+    let confirmClass = 'btn btn-info';
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-primary',
+            cancelButton: 'btn btn-default custom-cancel-btn'
+        },
+        buttonsStyling: false
+    });
 
     switch (type) {
         case 'success':
-            iconClass = 'icon-checkmark3';
-            btnClass = 'btn-success';
-            barClass = 'border-success';
-            bgClass = 'bg-success';
+            icon = 'success';
+            confirmClass = 'btn btn-success';
             break;
         case 'error':
-            iconClass = 'icon-cross2';
-            btnClass = 'btn-danger';
-            barClass = 'border-danger';
-            bgClass = 'bg-danger';
+            icon = 'error';
+            confirmClass = 'btn btn-danger';
             break;
         case 'warning':
-            iconClass = 'icon-warning22';
-            btnClass = 'btn-warning';
-            barClass = 'border-warning';
-            bgClass = 'bg-warning';
+            icon = 'warning';
+            confirmClass = 'btn btn-warning';
             break;
         case 'info':
         default:
-            iconClass = 'icon-info3';
-            btnClass = 'btn-info';
-            barClass = 'border-info';
-            bgClass = 'bg-info';
+            icon = 'info';
+            confirmClass = 'btn btn-info';
             break;
     }
 
-    // Update icon
-    $('#alertIcon')
-        .removeClass()
-        .addClass(iconClass + ' text-white');
-
-    // Update icon wrapper background
-    $('#alertIconWrapper')
-        .removeClass('bg-info bg-success bg-danger bg-warning')
-        .addClass(bgClass);
-
-    // Update text
-    $('#alertTitle').text(title || '');
-    $('#alertText').text(text || '');
-
-    // Update button
-    $('#alertOkBtn')
-        .removeClass()
-        .addClass('btn ' + btnClass)
-        .text('OK');
-
-    // Update left bar color
-    $('#alertContainer')
-        .removeClass('border-info border-success border-danger border-warning')
-        .addClass(barClass);
-
-    // Show modal
-    $('#customAlertModal').modal('show');
+    swalWithBootstrapButtons.fire({
+        position: "top",
+        icon: icon,
+        title: title || '',
+        text: text || '',
+        confirmButtonText: 'OK',
+        buttonsStyling: false,
+        customClass: {
+            confirmButton: confirmClass
+        }
+    });
 }
-
 
 
 // Global toastr config (shared for all calls)

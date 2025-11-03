@@ -4,7 +4,7 @@
 
     <form id="bookRoomForm">
         <input type="hidden" id="ReservationId" value="@Model.ReservationId" />
-
+        <input type="hidden" id="reservationNumber" value="@Model.ReservationNumber" />
         <div class="row">
 
             <!-- ================= Stay Information ================= -->
@@ -57,12 +57,11 @@
                     </div>
                 </div>
 
-
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Reservation Source <span class="text-danger">*</span></label>
-                            <select asp-for="ReservationSourceId" data-selected="@Model?.ReservationSourceId" id="reservationSourceSelect" class="form-control select" required data-placeholder="Reservation Source">
+                            <select asp-for="ReservationSourceId" asp-items="@Model.ReservationSources" id="reservationSourceSelect" class="form-control select" required data-placeholder="Reservation Source">
                                 <option value=""></option>
                             </select>
                             <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label"></span>
@@ -103,7 +102,7 @@
                         Group
                     </label>
                 </div>
-                <table class="table table-xxs table-bordered " id="roomTable">
+                <table class="table table-xxs table-bordered" id="roomTable">
                     <thead>
                         <tr class="active">
                             <th class="col-lg-1">Room Type</th>
@@ -549,54 +548,58 @@
 
         // ======== Add / Remove Rows ========
         function addRoomRow(prefill = null) {
-            const lastRow = $('#roomTable tbody tr').last();
-            if (lastRow.length && !lastRow.find('.room-type-select').val()) {
-                toastr.warning("Please select a room type in the last row first.");
-                return;
-            }
+        const lastRow = $('#roomTable tbody tr').last();
+        if (lastRow.length && !lastRow.find('.room-type-select').val()) {
+            toastr.warning("Please select a room type in the last row first.");
+            return;
+        }
 
-            const selectedIds = $('.room-type-select').map((_, el) => $(el).val()).get().filter(Boolean);
-            let optionsHtml = `<option></option>`;
-            @foreach (var item in ViewBag.RoomTypes)
-            {
+        const selectedIds = $('.room-type-select')
+            .map((_, el) => $(el).val())
+            .get()
+            .filter(Boolean);
+
+        let optionsHtml = `<option></option>`;
+        @foreach (var item in ViewBag.RoomTypes)
+        {
                 <text>
-                    if (!(isGroupMode && selectedIds.includes("@item.Id"))) {
-                    optionsHtml += `<option value="@item.Id"
-            data-name="@item.Name"
-            data-count="@item.NumOfAvailableRooms"
-            data-max-adults="@item.MaxNumOfAdults"
-            data-max-children="@item.MaxNumOfChildrens">
-                @item.Name (@item.NumOfAvailableRooms available)
-        </option>`;
-
+                    if (!(isGroupMode && selectedIds.includes("@item.Id.ToString()"))) {
+                        optionsHtml += `
+                            <option value="@item.Id"
+                                data-name="@item.Name"
+                                data-count="@item.NumOfAvailableRooms"
+                                data-max-adults="@item.MaxNumOfAdults"
+                                data-max-children="@item.MaxNumOfChildrens">
+                                @item.Name (@item.NumOfAvailableRooms available)
+                            </option>`;
                     }
                 </text>
-            }
-
-                const $newRow = $(`
-                    <tr>
-                        <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
-                        <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
-                        <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
-                        <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
-                        <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
-                    </tr>
-                `);
-
-            $('#roomTable tbody').append($newRow);
-            initializeRow($newRow);
-
-            if (prefill) {
-                $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
-                $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
-                $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
-                $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
-            }
-
-            updateRemoveButtons();
-            refreshAllRoomTypeOptions();
-            updateRates(); // 🔹 update rates after adding a row
         }
+
+        const $newRow = $(`
+            <tr>
+                <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
+                <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
+                <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
+                <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
+                <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
+            </tr>
+        `);
+
+        $('#roomTable tbody').append($newRow);
+        initializeRow($newRow);
+
+        if (prefill) {
+            $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
+            $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
+            $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
+            $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
+        }
+
+        updateRemoveButtons();
+        refreshAllRoomTypeOptions();
+        updateRates(); // 🔹 update rates after adding a row
+    }
 
         function removeRoomRow(btn) {
             $(btn).closest('tr').remove();
@@ -764,6 +767,7 @@
             CheckInDate: $("#CheckInDate").val(),
             CheckOutDate: $("#CheckOutDate").val(),
             NumOfNights: $("#NumOfNights").val(),
+            ReservationNumber: $("#reservationNumber").val(),
             ReservationSourceId: $("#reservationSourceSelect").val(),
             RateId: $("#rateSelect").val(),
             companyId: companyIdVal ? parseInt(companyIdVal) : null,
@@ -795,7 +799,7 @@
         }
 
         $.ajax({
-            url: '/Reservation/SaveRoomToBook',
+            url: '/Reservation/SavReservationInfo',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(formData),

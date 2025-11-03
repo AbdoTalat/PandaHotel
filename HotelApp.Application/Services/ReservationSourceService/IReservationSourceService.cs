@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HotelApp.Application.Services.ReservationSourceService
 {
     public interface IReservationSourceService
     {
-        Task<IEnumerable<DropDownDTO<string>>> GetReservationSourcesDropDownAsync();
-
+        Task<IEnumerable<SelectListItem>> GetReservationSourcesDropDownAsync();
 		Task<IEnumerable<ReservationSourceDTO>> GetAllReservationSourcesAsync();
 		Task<ServiceResponse<ReservationSourceDTO>> AddReservationSourceAsync(ReservationSourceDTO dto);
 		Task<ReservationSourceDTO?> GetReservationSourceToEditByIdAsync(int Id);

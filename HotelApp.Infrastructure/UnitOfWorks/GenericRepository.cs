@@ -70,7 +70,7 @@ namespace HotelApp.Infrastructure.UnitOfWorks
                 .ProjectTo<TDto>(_mapperConfig)
                 .FirstOrDefaultAsync();
         }
-        public async Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false)
+        public async Task<T?> GetByIdAsync(int id, Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet.AsNoTracking()
                 .Where(e => EF.Property<int>(e, "Id") == id)
@@ -80,6 +80,9 @@ namespace HotelApp.Infrastructure.UnitOfWorks
             {
                 query = query.Where(predicate);
             }
+
+            foreach (var include in includes)
+                query = query.Include(include);
 
             return await query.FirstOrDefaultAsync();
         }
@@ -185,6 +188,29 @@ namespace HotelApp.Infrastructure.UnitOfWorks
 
             return await query.AnyAsync(predicate);
         }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, bool skipBranchFilter = false)
+        {
+            IQueryable<T> query = _dbSet.AsNoTracking()
+                .BranchFilter(skipBranchFilter);
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return await query.CountAsync();
+        }
+
+        public async Task<int> SumAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, int>> selector, bool skipBranchFilter = false)
+        {
+            IQueryable<T> query = _dbSet.AsNoTracking()
+                .BranchFilter(skipBranchFilter);
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return await query.SumAsync(selector);
+        }
+
         #endregion
 
 

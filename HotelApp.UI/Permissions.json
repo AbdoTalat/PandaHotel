@@ -20,8 +20,7 @@
     "Reservation.CheckIn",
     "Reservation.CheckOut",
     "Reservation.Cancel",
-    "Reservation.NoShow",
-    "Reservation.ManageStatus"
+    "Reservation.NoShow"
   ],
   "User": [
     "User.View",

@@ -12,6 +12,7 @@ using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -58,13 +59,6 @@ namespace HotelApp.UI.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.View")]
-		public async Task<IActionResult> ReservationDetails(int Id)
-		{
-			var model = await _reservationService.GetReservationDetailsByIdAsync(Id);
-			return View(model);
-		}
-		[HttpGet]
-		[Authorize(Policy = "Reservation.View")]
 		public async Task<IActionResult> GetReservationJson([FromQuery] ReservationFilterDTO model)
 		{
 			var filteredReservations = await _reservationService.GetFilteredReservationsAsync(model);
@@ -85,17 +79,33 @@ namespace HotelApp.UI.Controllers
 
 			return Json(new { success = true, data = result });
 		}
+		
+		[HttpGet]
+		[Authorize(Policy = "Reservation.View")]
+		public async Task<IActionResult> ReservationDetails(int Id)
+		{
+			var model = await _reservationService.GetReservationDetailsByIdAsync(Id);
+			return View(model);
+		}
+
 
 		[HttpGet]
 		[Authorize(Policy = "Reservation.Add")]
 		public async Task<IActionResult> AddReservation()
 		{
 			ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
-			return View();
+            var model = new ReservationDTO()
+			{
+				ReservationInfoDto = new ReservationInfoDTO
+				{
+					ReservationSources = await _reservationSourceService.GetReservationSourcesDropDownAsync()
+                }
+			};
+            return View(model);
 		}
 
         [HttpPost]
-        public async Task<IActionResult> SaveRoomToBook([FromBody] ReservationInfoDTO model)
+        public async Task<IActionResult> SavReservationInfo([FromBody] ReservationInfoDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -118,6 +128,12 @@ namespace HotelApp.UI.Controllers
                 amount = 1000 
             });
         }
+
+		[HttpGet]
+		public IActionResult LoadConfirmForm()
+		{
+			return PartialView("_ConfirmReservationPartial");
+		}
 
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
@@ -153,12 +169,6 @@ namespace HotelApp.UI.Controllers
 			return Json(new { success = result.Success, message = result.Message });
 		}
 
-		[HttpGet]
-		public IActionResult LoadConfirmForm()
-		{
-			return PartialView("_ConfirmReservationPartial");
-		}
-
         [HttpPost]
         [Authorize(Policy = "Reservation.Edit")]
         public async Task<IActionResult> ChangeReservationDates([FromBody] ChangeReservationDatesDTO model)
@@ -171,16 +181,70 @@ namespace HotelApp.UI.Controllers
             return Json(new { success = result.Success, message = result.Message });
         }
 
-
 		[HttpGet]
-		[Authorize(Policy = "Reservation.Edit")]
-        public async Task<IActionResult> EditReservation(int Id)
+        [Authorize]
+        public async Task<IActionResult> EditReservation(int Id, string? mode)
 		{
-			var model = await _reservationService.GetReservationToEditByIdAsync(Id);
+            if (!(User.HasClaim("Permission", "Reservation.Edit") || User.HasClaim("Permission", "Reservation.CheckIn")))
+            {
+                return Forbid();
+            }
+			if(!User.HasClaim("Permission", "Reservation.CheckIn") && mode == "checkIn")
+			{
+                return Forbid();
+            }
+            var model = await _reservationService.GetReservationToEditByIdAsync(Id);
             ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
+			ViewBag.PageTitle = "Edit Reservation";
+
+            if (string.Equals(mode, "checkIn", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewBag.PageTitle = "Check In Reservation";
+                model.ConfirmDto.IsPending = true;
+                model.ConfirmDto.IsConfirmed = true;
+                model.ConfirmDto.IsCheckedIn = true;
+            }
+			model.ReservationInfoDto.ReservationSources = 
+				await _reservationSourceService.GetReservationSourcesDropDownAsync();
+
 
             return View(model);
 		}
 
+		[HttpPost]
+		[Authorize(Policy = "Reservation.CheckIn")]
+		public async Task<IActionResult> QuickCheckIn(int Id)
+		{
+			var result = await _reservationService.QuickCheckInByIdAsync(Id, UserId);
+
+			return Json(new { success = result.Success, message = result.Message });
+		}
+
+		[HttpGet]
+		[Authorize(Policy = "Reservation.CheckOut")]
+        public async Task<IActionResult> CheckOut(int Id)
+		{
+			var model = await _reservationService.GetCheckOutReservationByIdAsync(Id);
+			return View(model);
+		}
+
+        [HttpPost]
+		[ValidateAntiForgeryToken]
+        [Authorize(Policy = "Reservation.CheckOut")]
+        public async Task<IActionResult> CheckOut(CheckOutDTO model)
+        {
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+            var result = await _reservationService.CheckOutReservationAsync(model, UserId);
+			if (result.Success)
+			{
+				TempData["Success"] = result.Message;
+				return RedirectToAction("ReservationDetails", new { Id = model.Id });
+			}
+            return View(model);
+        }
     }
 }
