@@ -12,6 +12,7 @@ using System.Web.Mvc;
 using HotelApp.Helper;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Domain.Enums;
 
 namespace HotelApp.Application.Services.RoomService
 {
@@ -235,13 +236,15 @@ namespace HotelApp.Application.Services.RoomService
 
             return roomsData;
         }
-        public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name)
+        public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name, int roomTypeId, DateTime checkInDate, DateTime checkOutDate)
         {
             var rooms = await _unitOfWork.RoomRepository
-                .GetAllAsDtoAsync<GetAvailableRoomsDTO>(r => r.RoomNumber.Contains(name) && r.IsActive && r.RoomStatus.IsReservable);
+                .GetAvailableRoomsAsync(name, roomTypeId, checkInDate, checkOutDate);
 
             return rooms;
         }
+
+
         public async Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto)
         {
             var result = await _roomRepository.GetFilteredRoomsAsync(dto);

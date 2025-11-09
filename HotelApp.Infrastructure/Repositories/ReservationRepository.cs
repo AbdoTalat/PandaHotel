@@ -47,15 +47,15 @@ namespace HotelApp.Infrastructure.Repositories
 						ReservationSourceId = r.ReservationSourceId,
 						CompanyId = r.CompanyId,
 						RateId = (int)r.RateId,
-						RoomsIDs = r.ReservationsRooms.Select(rr => rr.RoomId).ToList(),
 						RoomTypeToBookDTOs = r.ReservationRoomTypes
 							.Select(rt => new RoomTypeToBookDTO
 							{
 								RoomTypeId = rt.RoomTypeId,
 								NumOfRooms = rt.Quantity,
 								NumOfAdults = rt.NumOfAdults,
-								NumOfChildrens = rt.NumOfChildren
-							})
+								NumOfChildrens = rt.NumOfChildren,
+                                RoomIds = r.ReservationsRooms.Select(rr => rr.RoomId).ToList(),
+                            })
 							.ToList()
 					},
 					GuestDtos = r.guestReservations

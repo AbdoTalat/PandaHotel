@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
@@ -50,9 +51,9 @@ namespace HotelApp.Application.Services.RoomTypeService
 			var roomType = await _unitOfWork.RoomTypeRepository.GetByIdAsDtoAsync<RoomTypeDTO>(Id);
 			return roomType;
 		}
-        public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync()
+        public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync(RoomAvailabilityRequestDTO dto)
 		{
-			var roomTypes = await _unitOfWork.RoomTypeRepository.GetRoomTypesForReservation();
+			var roomTypes = await _unitOfWork.RoomTypeRepository.GetRoomTypesForReservationAsync(dto);
 			
 			return roomTypes;
         }
@@ -145,5 +146,14 @@ namespace HotelApp.Application.Services.RoomTypeService
 				return ServiceResponse<RoomType>.ResponseFailure($"Error Occurred While Deleting: {ex.Message}");
 			}
 		}
-	}
+
+		public async Task<int> GetAvailableRoomCountAsync(int branchId, int roomTypeId, DateTime checkInDate, DateTime checkOutDate, int? reservationId)
+		{
+			var availableRooms = await _unitOfWork.RoomTypeRepository
+				.GetAvailableRoomCountAsync(branchId, roomTypeId, checkInDate, checkOutDate, reservationId);
+			
+			return availableRooms;
+        }
+
+    }
 }

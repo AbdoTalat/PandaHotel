@@ -111,22 +111,22 @@ namespace HotelApp.UI.Controllers
 			});
 		}
 
-        [HttpGet]
-        public async Task<IActionResult> GetRoomTypesForReservationJson()
-        {
-            var roomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
+        //[HttpGet]
+        //public async Task<IActionResult> GetRoomTypesForReservationJson()
+        //{
+        //    var roomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
 
-            var result = roomTypes.Select(rt => new
-            {
-                id = rt.Id,
-                name = rt.Name,
-                numOfAvailableRooms = rt.NumOfAvailableRooms,
-                maxNumOfAdults = rt.MaxNumOfAdults,
-                maxNumOfChildrens = rt.MaxNumOfChildrens
-            }).ToList();
+        //    var result = roomTypes.Select(rt => new
+        //    {
+        //        id = rt.Id,
+        //        name = rt.Name,
+        //        numOfAvailableRooms = rt.NumOfAvailableRooms,
+        //        maxNumOfAdults = rt.MaxNumOfAdults,
+        //        maxNumOfChildrens = rt.MaxNumOfChildrens
+        //    }).ToList();
 
-            return Json(result);
-        }
+        //    return Json(result);
+        //}
 
     }
 }

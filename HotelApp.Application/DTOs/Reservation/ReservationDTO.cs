@@ -23,24 +23,26 @@ namespace HotelApp.Application.DTOs.Reservation
         public IEnumerable<SelectListItem> ReservationSources { get; set; } = new List<SelectListItem>();
         public int ReservationId { get; set; }
 		public string ReservationNumber { get; set; }
-        public DateTime CheckInDate { get; set; }
-		public DateTime CheckOutDate { get; set; }
+		[Required]
+        public DateTime? CheckInDate { get; set; }
+		[Required]
+		public DateTime? CheckOutDate { get; set; }
 		public int NumOfNights { get; set; }
 		public int RateId { get; set; }
 		public int ReservationSourceId { get; set; }
 		public int? CompanyId { get; set; }
 
 		public List<RoomTypeToBookDTO> RoomTypeToBookDTOs { get; set; } = new List<RoomTypeToBookDTO>();
-		public List<int> RoomsIDs { get; set; } = new List<int>();
 	}
-	public class RoomTypeToBookDTO
-	{
-		public int RoomTypeId { get; set; }
-		public int NumOfRooms { get; set; }
-		public int NumOfAdults { get; set; }
-		public int NumOfChildrens { get; set; }
-	}
-	public class ReservationGuestDTO
+    public class RoomTypeToBookDTO
+    {
+        public int RoomTypeId { get; set; }
+        public int NumOfRooms { get; set; }
+        public int NumOfAdults { get; set; }
+        public int NumOfChildrens { get; set; }
+        public List<int> RoomIds { get; set; } = new List<int>(); 
+    }
+    public class ReservationGuestDTO
 	{
 		public int GuestId { get; set; }
 		public bool IsPrimary { get; set; }

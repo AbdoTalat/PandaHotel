@@ -17,5 +17,6 @@ namespace HotelApp.Application.Interfaces.IRepositories
         Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
         Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
         Task<int> GetOccupancyPercentAsync();
+        Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name, int roomTypeId, DateTime checkInDate, DateTime checkOutDate);
     }
 }

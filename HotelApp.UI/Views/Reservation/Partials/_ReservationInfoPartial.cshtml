@@ -21,8 +21,10 @@
                             <input type="text" autocomplete="off"
                                    class="form-control daterange-time"
                                    id="CheckInVisible"
-                                   placeholder="check-in Date"
-                                   value="@(Model.CheckInDate != DateTime.MinValue ? Model.CheckInDate.ToString("dd/MM/yyyy hh:mm tt") : "")" />
+                                   placeholder="Check-in Date"
+                                   value="@(Model.CheckInDate.HasValue
+                                                               ? Model.CheckInDate.Value.ToString("dd/MM/yyyy hh:mm tt")
+                                                               : string.Empty)" />
                             <input type="hidden" asp-for="CheckInDate" id="CheckInDate" />
                         </div>
                         <span asp-validation-for="CheckInDate" class="text-danger validation-error-label"></span>
@@ -33,9 +35,9 @@
                         <div class="form-group">
                             <label>Nights</label>
                             <input type="text" class="form-control" asp-for="NumOfNights" id="NumOfNights" placeholder="Nights" readonly
-                                   value="@(Model.CheckInDate != DateTime.MinValue && Model.CheckOutDate != DateTime.MinValue
-                             ? Math.Floor((Model.CheckOutDate - Model.CheckInDate).TotalDays).ToString()
-                             : "")" />
+                                   value="@(Model.CheckInDate.HasValue && Model.CheckOutDate.HasValue
+                                                           ? Math.Floor((Model.CheckOutDate.Value - Model.CheckInDate.Value).TotalDays).ToString()
+                                                           : string.Empty)" />
                             <span asp-validation-for="NumOfNights" class="text-danger validation-error-label"></span>
                         </div>
                     </div>
@@ -48,8 +50,10 @@
                             <input type="text" autocomplete="off"
                                    class="form-control"
                                    id="CheckOutVisible"
-                                   placeholder="check-out Date"
-                                   value="@(Model.CheckOutDate != DateTime.MinValue ? Model.CheckOutDate.ToString("dd/MM/yyyy hh:mm tt") : "")"
+                                   placeholder="Check-out Date"
+                                   value="@(Model.CheckOutDate.HasValue
+                                                               ? Model.CheckOutDate.Value.ToString("dd/MM/yyyy hh:mm tt")
+                                                               : string.Empty)"
                                    readonly />
                             <input type="hidden" asp-for="CheckOutDate" id="CheckOutDate" />
                         </div>
@@ -62,7 +66,7 @@
                         <div class="form-group">
                             <label>Reservation Source <span class="text-danger">*</span></label>
                             <select asp-for="ReservationSourceId" asp-items="@Model.ReservationSources" id="reservationSourceSelect" class="form-control select" required data-placeholder="Reservation Source">
-                                <option value=""></option>
+                                    <option value=""></option>
                             </select>
                             <span asp-validation-for="ReservationSourceId" class="text-danger validation-error-label"></span>
                         </div>
@@ -102,19 +106,22 @@
                         Group
                     </label>
                 </div>
-                <table class="table table-xxs table-bordered" id="roomTable">
-                    <thead>
-                        <tr class="active">
-                            <th class="col-lg-1">Room Type</th>
-                            <th class="col-lg-1">No. of Rooms</th>
-                            <th class="col-lg-1">Adults</th>
-                            <th class="col-lg-1">Children</th>
-                            <th class="col-lg-1"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-xxs table-bordered" id="roomTable">
+                        <thead>
+                            <tr class="active">
+                                <th class="col-lg-2">Room Type</th>
+                                <th class="col-lg-1">No. of Rooms</th>
+                                <th class="col-lg-1">Adults</th>
+                                <th class="col-lg-1">Children</th>
+                                <th class="col-lg-4">Rooms</th>
+                                <th class="col-lg-1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
                 <span asp-validation-for="RoomTypeToBookDTOs" class="text-danger validation-error-label"></span>
 
                 <div id="addRoomWrapper" style="margin-top:10px;">
@@ -124,7 +131,7 @@
                 </div>
 
                 <div class="row" style="margin-top:30px;">
-                    <div class="col-md-6">
+@*                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Select Available Rooms</label>
                             <div class="input-group">
@@ -136,9 +143,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-md-6">
+                    </div> *@
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label>Rate <span class="text-danger">*</span></label>
                             <div class="input-group">
@@ -265,8 +271,6 @@
 
 
 
-
-
 <script>
     $(function () {
         const $companySelect = $('#companySelect');
@@ -351,413 +355,6 @@
 </script>
 
 <script>
-    $(function () {
-        function clearDates() {
-            $('#CheckInDate, #CheckOutDate, #NumOfNights').val('');
-            $('#CheckInVisible, #CheckOutVisible').val('');
-        }
-
-        // Determine start/end only if values exist
-        let startCheckIn = $('#CheckInVisible').val() || null;
-        let endCheckOut = $('#CheckOutVisible').val() || null;
-
-        $('.daterange-time').daterangepicker({
-            timePicker: true,
-            timePicker24Hour: false,
-            autoUpdateInput: false,
-            locale: {
-                cancelLabel: 'Clear',
-                format: 'DD/MM/YYYY hh:mm A'
-            },
-            applyClass: 'bg-slate-600',
-            cancelClass: 'btn-default',
-            startDate: startCheckIn ? moment(startCheckIn, 'DD/MM/YYYY hh:mm A') : undefined,
-            endDate: endCheckOut ? moment(endCheckOut, 'DD/MM/YYYY hh:mm A') : undefined
-        });
-
-        $('.daterange-time').on('apply.daterangepicker', function (ev, picker) {
-            const checkIn = picker.startDate;
-            const checkOut = picker.endDate;
-
-            if (!checkIn || !checkOut || checkIn >= checkOut) {
-                showAlert('error', 'Invalid Dates', 'Check-out must be after check-in.');
-                clearDates();
-                return;
-            }
-
-            $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm')).trigger('change');
-            $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm')).trigger('change');
-
-            $('#CheckInVisible').val(checkIn.format('DD/MM/YYYY hh:mm A'));
-            $('#CheckOutVisible').val(checkOut.format('DD/MM/YYYY hh:mm A'));
-
-            const nights = Math.floor(checkOut.diff(checkIn, 'days', true));
-            $('#NumOfNights').val(nights);
-        });
-
-        $('.daterange-time').on('cancel.daterangepicker', function () {
-            clearDates();
-        });
-    });
-</script>
-
-<script>
-    $(document).ready(function () {
-        const $roomsSelect = $('#roomsSelect');
-        const selectedRoomIds = @Html.Raw(Json.Serialize(Model.RoomsIDs)); // already selected rooms from model
-
-        // Initialize Select2
-        $roomsSelect.select2({
-            placeholder: "Search & select available rooms...",
-            minimumInputLength: 2,
-            ajax: {
-                url: '/Room/GetAvailableRooms',
-                dataType: 'json',
-                delay: 250,
-                data: params => ({
-                    name: params.term // search term
-                }),
-                processResults: data => {
-                    if (data.success) {
-                        return {
-                            results: data.data // expected format [{id:1, text:'Room 101'}, ...]
-                        };
-                    }
-                    return { results: [] };
-                },
-                cache: true
-            }
-        });
-
-        // ========== Preselect rooms for edit ==========
-        if (selectedRoomIds && selectedRoomIds.length > 0) {
-            $.ajax({
-                url: '/Room/GetRoomsForEditReservationByIDs',
-                type: 'GET',
-                data: { ids: selectedRoomIds },
-                traditional: true, // allows ?ids=1&ids=2&ids=3
-                success: function (data) {
-                    if (data.success && Array.isArray(data.data)) {
-                        data.data.forEach(room => {
-                            // Create and append option if not exists
-                            if ($roomsSelect.find("option[value='" + room.id + "']").length === 0) {
-                                const option = new Option(room.text, room.id, true, true);
-                                $roomsSelect.append(option);
-                            }
-                        });
-                        $roomsSelect.trigger('change'); // refresh UI
-                    }
-                }
-            });
-        }
-    });
-</script>
-
-<script>
-    let isGroupMode = false;
-
-    $(function () {
-
-        $('#addRoomBtn').on('click', function (e) {
-            e.preventDefault();
-            addRoomRow();
-        });
-        // ======== Elements ========
-        const $rateSelect = $('#rateSelect');
-        const $checkIn = $('#CheckInDate');
-        const $checkOut = $('#CheckOutDate');
-        const $modal = $('#rateModal');
-        const $rateDetails = $('#rateDetails');
-
-        // Prefill check-out and rate ID from model
-        const modelCheckOut = '@Model.CheckOutDate.ToString("yyyy-MM-ddTHH:mm")';
-        if (modelCheckOut) $checkOut.val(modelCheckOut);
-
-        const modelCheckIn = '@Model.CheckInDate.ToString("yyyy-MM-ddTHH:mm")';
-        if (modelCheckIn) $checkIn.val(modelCheckIn);
-
-
-        const modelRateId = '@Model.RateId';
-
-        // ======== Helpers ========
-        function fillOptions($select, start, end, selected = null) {
-            $select.empty().append('<option></option>');
-            for (let i = start; i <= end; i++) $select.append(`<option value="${i}">${i}</option>`);
-            if (selected !== null && selected >= start && selected <= end) {
-                $select.val(selected).trigger('change.select2');
-            }
-        }
-
-        function updateRowCapacities($row) {
-            const $roomType = $row.find('.room-type-select');
-            const $numRooms = $row.find('.num-rooms-select');
-            const $adults = $row.find('.num-adults-select');
-            const $children = $row.find('.num-children-select');
-
-            const opt = $roomType.find('option:selected');
-            if (!opt.length) return;
-
-            const maxRooms = +opt.data('count') || 0;
-            const maxAdults = +opt.data('maxAdults') || 0;
-            const maxChildren = +opt.data('maxChildren') || 0; // ✅ fixed line
-            const rooms = +$numRooms.val() || 1;
-
-            fillOptions($numRooms, 1, maxRooms, rooms);
-            fillOptions($adults, 1, maxAdults * rooms, +$adults.val() || 1);
-            fillOptions($children, 0, maxChildren * rooms, +$children.val() || 0);
-        }
-
-
-        function refreshAllRoomTypeOptions() {
-            const allSelects = $('.room-type-select');
-            const selected = allSelects.map((_, el) => $(el).val()).get().filter(Boolean);
-            allSelects.each(function () {
-                const current = $(this).val();
-                $(this).find('option').each(function () {
-                    const val = $(this).val();
-                    $(this).prop('disabled', isGroupMode && val && val !== current && selected.includes(val));
-                });
-            }).trigger('change.select2');
-        }
-
-        function initializeRow($row) {
-            const $roomType = $row.find('.room-type-select');
-            const $numRooms = $row.find('.num-rooms-select');
-
-            $roomType.select2({ width: '100%', placeholder: $roomType.data('placeholder') })
-                .on('change', function () {
-                    const $row = $(this).closest('tr');
-                    updateRowCapacities($row);
-                    refreshAllRoomTypeOptions();
-                    updateRates(); // 🔹 call rates update on room type change
-                });
-
-            $numRooms.select2({ width: '100%' }).on('change', function () {
-                const $row = $(this).closest('tr');
-                updateRowCapacities($row);
-                updateRates(); // 🔹 update rates when quantity changes
-            });
-
-            $row.find('.num-adults-select, .num-children-select').select2({ width: '100%' });
-        }
-
-        function updateRemoveButtons() {
-            const rows = $('#roomTable tbody tr');
-            rows.find('.remove-room-btn').toggle(rows.length > 1);
-        }
-
-        // ======== Add / Remove Rows ========
-        function addRoomRow(prefill = null) {
-        const lastRow = $('#roomTable tbody tr').last();
-        if (lastRow.length && !lastRow.find('.room-type-select').val()) {
-            toastr.warning("Please select a room type in the last row first.");
-            return;
-        }
-
-        const selectedIds = $('.room-type-select')
-            .map((_, el) => $(el).val())
-            .get()
-            .filter(Boolean);
-
-        let optionsHtml = `<option></option>`;
-        @foreach (var item in ViewBag.RoomTypes)
-        {
-                <text>
-                    if (!(isGroupMode && selectedIds.includes("@item.Id.ToString()"))) {
-                        optionsHtml += `
-                            <option value="@item.Id"
-                                data-name="@item.Name"
-                                data-count="@item.NumOfAvailableRooms"
-                                data-max-adults="@item.MaxNumOfAdults"
-                                data-max-children="@item.MaxNumOfChildrens">
-                                @item.Name (@item.NumOfAvailableRooms available)
-                            </option>`;
-                    }
-                </text>
-        }
-
-        const $newRow = $(`
-            <tr>
-                <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
-                <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
-                <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
-                <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
-                <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
-            </tr>
-        `);
-
-        $('#roomTable tbody').append($newRow);
-        initializeRow($newRow);
-
-        if (prefill) {
-            $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
-            $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
-            $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
-            $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
-        }
-
-        updateRemoveButtons();
-        refreshAllRoomTypeOptions();
-        updateRates(); // 🔹 update rates after adding a row
-    }
-
-        function removeRoomRow(btn) {
-            $(btn).closest('tr').remove();
-            updateRemoveButtons();
-            refreshAllRoomTypeOptions();
-            updateRates(); // 🔹 update rates after removing a row
-        }
-
-        // ======== Modes ========
-        function setToSingleMode() {
-            isGroupMode = false;
-            $('#addRoomWrapper').hide();
-
-            $('#singleBtn').prop('checked', true);
-            $('#groupBtn').prop('checked', false);
-
-            const rows = $('#roomTable tbody tr');
-            if (rows.length > 1) rows.slice(1).remove();
-            refreshAllRoomTypeOptions();
-            updateRates();
-        }
-
-        function setToGroupMode() {
-            isGroupMode = true;
-            $('#addRoomWrapper').show();
-
-            $('#groupBtn').prop('checked', true);
-            $('#singleBtn').prop('checked', false);
-            refreshAllRoomTypeOptions();
-            updateRates();
-        }
-
-
-        // ======== Rates Handling ========
-        function updateRates() {
-            const roomTypeIds = $('#roomTable .room-type-select').map(function () {
-                return $(this).val() || null;
-            }).get().filter(Boolean);
-
-            if (!roomTypeIds.length || !$checkIn.val() || !$checkOut.val()) {
-                resetRates();
-                return;
-            }
-
-            $.ajax({
-                url: '/Rate/GetRatesByRoomTypes',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    RoomTypeIds: roomTypeIds,
-                    CheckInDate: new Date($checkIn.val()),
-                    CheckOutDate: new Date($checkOut.val())
-                })
-            })
-                .done(rates => {
-                    $rateSelect.empty().append(new Option('Select Rate', '', false, false));
-                    rates.forEach(rate => {
-                        const roomTypeInfo = rate.roomTypeRateForReservations.map(rt => `${rt.typeName} ($${rt.dailyPrice})`).join(' - ');
-                        const optionText = `${rate.name}|||${roomTypeInfo}`;
-                        $rateSelect.append(new Option(optionText, rate.id, false, false));
-                    });
-
-                    $rateSelect.select2({
-                        width: '100%',
-                        placeholder: "Choose Rate",
-                        templateResult: formatRateOption,
-                        templateSelection: formatRateOption
-                    });
-
-                    if (modelRateId) $rateSelect.val(modelRateId).trigger('change');
-                })
-                .fail(xhr => { console.error(xhr.responseText); resetRates(); });
-        }
-
-        function resetRates() {
-            $rateSelect.empty().append(new Option('Select Rate', '', false, false)).val(null).trigger('change');
-            $rateDetails.empty().hide();
-        }
-
-        function formatRateOption(option) {
-            if (!option.id) return option.text;
-            const [name, types] = option.text.split('|||');
-            return $(`<div><span class="text-success"><b>${name}</b></span><small> - ${types}</small></div>`);
-        }
-
-        function loadRateDetails() {
-            const rateId = $rateSelect.val();
-            const checkIn = $checkIn.val();
-            const checkOut = $checkOut.val();
-
-            if (!rateId || !checkIn || !checkOut) {
-                $rateDetails.html('<p class="text-danger">Please select a rate, check-in, and check-out.</p>').show();
-                return;
-            }
-
-            const roomTypeQuantities = [];
-            $('#roomTable tbody tr').each(function () {
-                const roomTypeId = $(this).find('.room-type-select').val();
-                const quantity = $(this).find('.num-rooms-select').val();
-                if (roomTypeId && quantity) roomTypeQuantities.push({ RoomTypeId: parseInt(roomTypeId), Quantity: parseInt(quantity) });
-            });
-
-            if (!roomTypeQuantities.length) {
-                $rateDetails.html('<p class="text-danger">Please add at least one room with quantity.</p>').show();
-                return;
-            }
-
-            $.ajax({
-                url: '/Rate/GetReservationChargesSummary',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    RateId: parseInt(rateId),
-                    CheckIn: new Date(checkIn),
-                    CheckOut: new Date(checkOut),
-                    roomTypeQuantities: roomTypeQuantities
-                })
-            })
-                .done(res => {
-                    if (!res.success || !res.data) {
-                        $rateDetails.html(`<p class="text-danger">${res.message || 'No calculation available.'}</p>`).show();
-                        return;
-                    }
-                    const summary = res.data.chargesSummary;
-                    let html = `<table class="table table-bordered">
-                                    <thead><tr><th>Charge</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead>
-                                    <tbody>`;
-                    summary.forEach(item => {
-                        if (item.charge) html += `<tr><td>${item.charge}</td><td>${item.unit}</td><td>${item.rate}</td><td>${item.total}</td></tr>`;
-                    });
-                    html += `</tbody></table><h4 class="text-success">Total Price: ${res.data.totalPrice}</h4>`;
-                    $rateDetails.html(html).show();
-                })
-                .fail(xhr => { console.error(xhr.responseText); $rateDetails.html('<p class="text-danger">Error loading charges summary.</p>').show(); });
-        }
-
-        $modal.on('show.bs.modal', loadRateDetails);
-        $modal.on('click', '[data-action="reload"]', e => { e.preventDefault(); loadRateDetails(); });
-
-        // ======== Init ========
-        $('#singleBtn').on('click', setToSingleMode);
-        $('#groupBtn').on('click', setToGroupMode);
-        $(document).on('click', '.remove-room-btn', function () { removeRoomRow(this); });
-        $(document).on('change', '#CheckInDate, #CheckOutDate', updateRates);
-
-        // Prefill rows for edit mode
-        const prefillRooms = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RoomTypeToBookDTOs ?? []));
-        if (prefillRooms.length) {
-            if (prefillRooms.length > 1) setToGroupMode();
-                prefillRooms.forEach(r => addRoomRow(r));
-        } else addRoomRow();
-
-        updateRemoveButtons();
-        updateRates();
-    });
-</script>
-
-<script>
     $("#bookRoomForm").on("submit", function (e) {
         e.preventDefault();
 
@@ -770,33 +367,30 @@
             ReservationNumber: $("#reservationNumber").val(),
             ReservationSourceId: $("#reservationSourceSelect").val(),
             RateId: $("#rateSelect").val(),
-            companyId: companyIdVal ? parseInt(companyIdVal) : null,
-            roomTypeToBookDTOs: [],
-            RoomsIDs: [] // ✅ init list for room IDs
+            CompanyId: companyIdVal ? parseInt(companyIdVal) : null,
+            RoomTypeToBookDTOs: []
         };
 
-        // ✅ Extract selected room types from the dynamic table
+        // ✅ Extract selected room types and room IDs from the dynamic table
         $("#roomTable tbody tr").each(function () {
-            const roomTypeId = $(this).find("select").eq(0).val();
+            const roomTypeId = $(this).find(".room-type-select").val();
             const numOfRooms = $(this).find(".num-rooms-select").val();
             const numAdults = $(this).find(".num-adults-select").val();
             const numChildren = $(this).find(".num-children-select").val();
+            const selectedRoomIds = $(this).find(".rooms-select").val() || [];
 
             if (roomTypeId && numOfRooms > 0) {
-                formData.roomTypeToBookDTOs.push({
+                formData.RoomTypeToBookDTOs.push({
                     RoomTypeId: parseInt(roomTypeId),
                     NumOfRooms: parseInt(numOfRooms),
                     NumOfAdults: parseInt(numAdults || 0),
-                    NumOfChildrens: parseInt(numChildren || 0)
+                    NumOfChildrens: parseInt(numChildren || 0),
+                    RoomIds: selectedRoomIds.map(id => parseInt(id))
                 });
             }
         });
 
-        // ✅ Add selected rooms from Select2
-        const selectedRooms = $("#roomsSelect").val(); // array of selected IDs as strings
-        if (selectedRooms && selectedRooms.length > 0) {
-            formData.RoomsIDs = selectedRooms.map(id => parseInt(id));
-        }
+        console.log("Submitting form data:", formData); // For debugging
 
         $.ajax({
             url: '/Reservation/SavReservationInfo',
@@ -821,16 +415,657 @@
                     }
 
                     $(document).trigger("roomBookingSuccess");
+
+                    // Redirect to edit page if this was an add operation and we got a reservation ID back
+                    if (response.reservationId && !formData.ReservationId) {
+                        setTimeout(() => {
+                            window.location.href = '/Reservation/Edit/' + response.reservationId;
+                        }, 1500);
+                    }
                 } else {
-                    $("#bookRoomContainer").html(response);
-                    showAlert('error', 'Validation Error', response.message);
+                    showAlert('error', 'Validation Error', response.message || 'Failed to save reservation.');
                 }
             },
-            error: function () {
-                Swal.fire("Error", "Failed to save room booking.", "error");
+            error: function (xhr) {
+                let errorMessage = "Failed to save room booking.";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                Swal.fire("Error", errorMessage, "error");
             }
         });
+    });</script>
+
+<script>
+    $(function () {
+        let dateChangeInProgress = false;
+        let cachedRoomTypes = [];
+
+        // ======== Cached Elements ========
+        const $rateSelect = $('#rateSelect');
+        const $checkIn = $('#CheckInDate');
+        const $checkOut = $('#CheckOutDate');
+        const $modal = $('#rateModal');
+        const $rateDetails = $('#rateDetails');
+        const reservationId = '@Model.ReservationId';
+
+        const modelRateId = '@Model.RateId';
+        const prefillRooms = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RoomTypeToBookDTOs ?? []));
+
+        // Use the correct format that matches your hidden inputs
+        const modelCheckIn = '@(Model.CheckInDate.HasValue ? Model.CheckInDate.Value.ToString("yyyy-MM-ddTHH:mm") : "")';
+        const modelCheckOut = '@(Model.CheckOutDate.HasValue ? Model.CheckOutDate.Value.ToString("yyyy-MM-ddTHH:mm") : "")';
+
+        // ======== Form Submission Helper ========
+        function collectRoomData() {
+            const roomData = [];
+            $('#roomTable tbody tr').each(function () {
+                const $row = $(this);
+                const roomTypeId = $row.find('.room-type-select').val();
+                const numRooms = $row.find('.num-rooms-select').val();
+                const numAdults = $row.find('.num-adults-select').val();
+                const numChildren = $row.find('.num-children-select').val();
+                const selectedRoomIds = $row.find('.rooms-select').val() || [];
+
+                if (roomTypeId && numRooms) {
+                    roomData.push({
+                        RoomTypeId: parseInt(roomTypeId),
+                        NumOfRooms: parseInt(numRooms),
+                        NumOfAdults: parseInt(numAdults),
+                        NumOfChildrens: parseInt(numChildren),
+                        RoomIds: selectedRoomIds.map(id => parseInt(id))
+                    });
+                }
+            });
+            return roomData;
+        }
+
+        // ======== Add Button State Helper ========
+        function checkAddButtonState() {
+            const allRowsValid = $('#roomTable tbody tr').toArray().every(row => {
+                const $row = $(row);
+                const roomTypeId = $row.find('.room-type-select').val();
+                return roomTypeId && roomTypeId !== '';
+            });
+            
+            // Enable/disable the add button based on state
+            $('#addRoomBtn').prop('disabled', !allRowsValid);
+        }
+
+        // ======== Date Picker Initialization ========
+        function initializeDatePicker() {
+            function clearDates() {
+                dateChangeInProgress = true;
+                $('#CheckInDate, #CheckOutDate, #NumOfNights').val('');
+                $('#CheckInVisible, #CheckOutVisible').val('');
+                dateChangeInProgress = false;
+
+                // Clear room data when dates are cleared
+                cachedRoomTypes = [];
+                $('#roomTable tbody').empty();
+                resetRates();
+            }
+
+            // Get current dates or set to undefined
+            const currentCheckIn = $('#CheckInVisible').val() ? moment($('#CheckInVisible').val(), 'DD/MM/YYYY hh:mm A') : undefined;
+            const currentCheckOut = $('#CheckOutVisible').val() ? moment($('#CheckOutVisible').val(), 'DD/MM/YYYY hh:mm A') : undefined;
+
+            $('.daterange-time').daterangepicker({
+                timePicker: true,
+                timePicker24Hour: false,
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'DD/MM/YYYY hh:mm A'
+                },
+                applyClass: 'bg-slate-600',
+                cancelClass: 'btn-default',
+                startDate: currentCheckIn,
+                endDate: currentCheckOut,
+                minDate: moment()
+            });
+
+            $('.daterange-time').on('apply.daterangepicker', function (ev, picker) {
+                const checkIn = picker.startDate;
+                const checkOut = picker.endDate;
+
+                if (!checkIn || !checkOut || checkIn >= checkOut) {
+                    showAlert('error', 'Invalid Dates', 'Check-out must be after check-in.');
+                    clearDates();
+                    return;
+                }
+
+                dateChangeInProgress = true;
+
+                // Update hidden fields (API format)
+                $('#CheckInDate').val(checkIn.format('YYYY-MM-DDTHH:mm'));
+                $('#CheckOutDate').val(checkOut.format('YYYY-MM-DDTHH:mm'));
+
+                // Update visible fields (display format)
+                $('#CheckInVisible').val(checkIn.format('DD/MM/YYYY hh:mm A'));
+                $('#CheckOutVisible').val(checkOut.format('DD/MM/YYYY hh:mm A'));
+
+                const nights = Math.floor(checkOut.diff(checkIn, 'days', true));
+                $('#NumOfNights').val(nights);
+
+                dateChangeInProgress = false;
+
+                // Load available room types
+                loadAvailableRoomTypesAfterDateChange();
+            });
+
+            $('.daterange-time').on('cancel.daterangepicker', function () {
+                clearDates();
+            });
+        }
+
+        // ======== Room Loading After Date Change ========
+        function loadAvailableRoomTypesAfterDateChange() {
+            const checkIn = $checkIn.val();
+            const checkOut = $checkOut.val();
+
+            if (!checkIn || !checkOut) {
+                toastr.warning("Please select both Check-In and Check-Out dates first.");
+                return;
+            }
+
+            cachedRoomTypes = [];
+            $('#roomTable tbody').empty();
+
+            loadAvailableRoomTypes(() => {
+                // For edit mode, restore pre-filled rooms, otherwise add empty row
+                if (prefillRooms.length > 0) {
+                    prefillRooms.forEach(r => addRoomRow(r));
+                } else {
+                    addRoomRow();
+                }
+                updateRates();
+            }, true);
+        }
+
+        // ======== Utility Helpers ========
+        function fillOptions($select, start, end, selected = null) {
+            $select.empty().append('<option></option>');
+            for (let i = start; i <= end; i++) {
+                $select.append($('<option>', {
+                    value: i,
+                    text: i
+                }));
+            }
+            if (selected) $select.val(selected).trigger('change.select2');
+        }
+
+        function updateRowCapacities($row) {
+            const opt = $row.find('.room-type-select option:selected');
+            if (!opt.length) return;
+
+            const maxRooms = +opt.data('count') || 0;
+            const maxAdults = +opt.data('maxAdults') || 0;
+            const maxChildren = +opt.data('maxChildren') || 0;
+            const $numRooms = $row.find('.num-rooms-select');
+            const $adults = $row.find('.num-adults-select');
+            const $children = $row.find('.num-children-select');
+
+            const rooms = +$numRooms.val() || 1;
+
+            fillOptions($numRooms, 1, maxRooms, rooms);
+            fillOptions($adults, 1, maxAdults * rooms, +$adults.val() || 1);
+            fillOptions($children, 0, maxChildren * rooms, +$children.val() || 0);
+        }
+
+        function refreshAllRoomTypeOptions() {
+            const allSelects = $('.room-type-select');
+            const selected = allSelects.map((_, el) => $(el).val()).get().filter(Boolean);
+            allSelects.each(function () {
+                const current = $(this).val();
+                $(this).find('option').each(function () {
+                    const val = $(this).val();
+                    $(this).prop('disabled', val && val !== current && selected.includes(val));
+                });
+            }).trigger('change.select2');
+        }
+
+        function updateRemoveButtons() {
+            const rows = $('#roomTable tbody tr');
+            rows.find('.remove-room-btn').toggle(rows.length > 1);
+        }
+
+        // ======== Room Selection Functions ========
+        function initializeRoomSelect($select, roomTypeId = null, prefillRoomIds = []) {
+            // Store roomTypeId in the element data for later use
+            $select.data('roomTypeId', roomTypeId);
+
+            $select.select2({
+                placeholder: "Search & select available rooms...",
+                minimumInputLength: 2,
+                multiple: true,
+                ajax: {
+                    url: '/Room/GetAvailableRooms',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            name: params.term,
+                            roomTypeId: roomTypeId,
+                            checkInDate: $checkIn.val(),
+                            checkOutDate: $checkOut.val(),
+                            reservationId: reservationId
+                        };
+                    },
+                    processResults: function (data) {
+                        if (data.success) {
+                            return {
+                                results: data.data
+                            };
+                        }
+                        return { results: [] };
+                    },
+                    cache: true
+                }
+            });
+
+            // Preselect rooms if provided
+            if (prefillRoomIds && prefillRoomIds.length > 0) {
+                setTimeout(() => {
+                    loadAndPreselectRooms($select, prefillRoomIds);
+                }, 200);
+            }
+        }
+
+        function loadAndPreselectRooms($select, roomIds) {
+            if (!roomIds || roomIds.length === 0) return;
+
+            $.ajax({
+                url: '/Room/GetRoomsForEditReservationByIDs',
+                type: 'GET',
+                data: { ids: roomIds },
+                traditional: true,
+                success: function (data) {
+                    if (data.success && Array.isArray(data.data)) {
+                        // Clear any existing options
+                        $select.empty();
+                        
+                        // Add and select the rooms
+                        data.data.forEach(room => {
+                            const option = new Option(room.text, room.id, true, true);
+                            $select.append(option);
+                        });
+                        
+                        // Trigger change to update Select2 UI
+                        $select.trigger('change');
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Failed to load pre-selected rooms:', xhr.responseText);
+                }
+            });
+        }
+
+        function updateRoomSelection($row) {
+            const roomTypeId = $row.find('.room-type-select').val();
+            const $roomSelect = $row.find('.rooms-select');
+
+            if (roomTypeId) {
+                // Update the stored roomTypeId
+                $roomSelect.data('roomTypeId', roomTypeId);
+
+                // Store current selection before reinitializing
+                const selectedRooms = $roomSelect.val();
+                
+                // Destroy and reinitialize the select2 with new roomTypeId
+                $roomSelect.select2('destroy');
+                initializeRoomSelect($roomSelect, roomTypeId, selectedRooms);
+            }
+        }
+
+        // ======== Room Row Management ========
+        function loadAvailableRoomTypes(callback, forceReload = false) {
+        const checkIn = $checkIn.val();
+        const checkOut = $checkOut.val();
+
+        if (!checkIn || !checkOut) {
+            if (callback) callback([]);
+            return;
+        }
+
+        if (cachedRoomTypes.length && !forceReload) {
+            if (callback) callback(cachedRoomTypes);
+            return;
+        }
+
+        $.ajax({
+            url: '/Reservation/GetAvailableRoomTypes',
+            type: 'GET',
+            data: {
+                checkInDate: checkIn,
+                checkOutDate: checkOut,
+                reservationId: reservationId // Make sure reservationId is defined in scope
+            },
+            success: function (data) {
+                cachedRoomTypes = data || [];
+                if (callback) callback(cachedRoomTypes);
+            },
+            error: xhr => {
+                console.error(xhr.responseText);
+                toastr.error("Failed to load available room types.");
+                if (callback) callback([]);
+            }
+        });
+    }
+
+
+        function addRoomRow(prefill = null) {
+            const checkIn = $checkIn.val();
+            const checkOut = $checkOut.val();
+
+            // For edit mode with prefill data, we don't need dates to be set yet
+            if (!prefill && (!checkIn || !checkOut)) {
+                toastr.warning("Please select Check-In and Check-Out dates first.");
+                return;
+            }
+
+            // Check if all previous rows have room type selected (only for new rows, not prefill)
+            if (!prefill) {
+                const previousRowsValid = $('#roomTable tbody tr').toArray().every(row => {
+                    const $row = $(row);
+                    const roomTypeId = $row.find('.room-type-select').val();
+                    return roomTypeId && roomTypeId !== '';
+                });
+                
+                if (!previousRowsValid) {
+                    toastr.warning("Please select room type for all existing rows before adding a new row.");
+                    return;
+                }
+            }
+
+            // If we have prefill data but no cached room types, we need to load them first
+            if (prefill && !cachedRoomTypes.length && checkIn && checkOut) {
+                loadAvailableRoomTypes(() => {
+                    addRoomRowWithData(prefill);
+                }, true);
+                return;
+            }
+
+            addRoomRowWithData(prefill);
+        }
+
+        function addRoomRowWithData(prefill = null) {
+            const selectedIds = $('.room-type-select')
+                .map((_, el) => $(el).val())
+                .get()
+                .filter(Boolean);
+
+            let optionsHtml = '<option></option>';
+
+             
+            // Only add room type options if we have cached room types
+            if (cachedRoomTypes.length) {
+                cachedRoomTypes.forEach(rt => {
+                    const disabled = rt.numOfAvailableRooms === 0 ? "disabled" : "";
+                    const availableText = rt.numOfAvailableRooms > 0
+                        ? `(${rt.numOfAvailableRooms} Available)`
+                        : `(Unavailable)`;
+
+                    if (!selectedIds.includes(rt.id.toString())) {
+                        optionsHtml += `
+                            <option value="${rt.id}" ${disabled}
+                                    data-name="${rt.name}"
+                                    data-count="${rt.numOfAvailableRooms}"
+                                    data-max-adults="${rt.maxNumOfAdults}"
+                                    data-max-children="${rt.maxNumOfChildrens}">
+                                ${rt.name} ${availableText}
+                            </option>`;
+                    }
+                });
+            }
+
+
+            const $newRow = $(`
+                <tr>
+                    <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
+                    <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
+                    <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
+                    <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
+                    <td><select class="form-control rooms-select" multiple="multiple"></select></td>
+                    <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
+                </tr>
+            `);
+
+            $('#roomTable tbody').append($newRow);
+            initializeRow($newRow, prefill);
+
+            if (prefill) {
+                // Set values after a small delay to ensure select2 is initialized
+                setTimeout(() => {
+                    $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
+                    $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
+                    $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
+                    $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
+                }, 100);
+            }
+
+            updateRemoveButtons();
+            refreshAllRoomTypeOptions();
+            updateRates();
+            checkAddButtonState();
+        }
+
+        function removeRoomRow(btn) {
+            $(btn).closest('tr').remove();
+            updateRemoveButtons();
+            refreshAllRoomTypeOptions();
+            updateRates();
+            checkAddButtonState();
+        }
+
+        function initializeRow($row, prefill = null) {
+            const $roomTypeSelect = $row.find('.room-type-select');
+            const $roomSelect = $row.find('.rooms-select');
+            const prefillRoomIds = prefill ? prefill.RoomIds : [];
+
+            $roomTypeSelect.select2({
+                width: '100%',
+                placeholder: "Select Room Type"
+            }).on('change', function () {
+                updateRowCapacities($(this).closest('tr'));
+                updateRoomSelection($(this).closest('tr'));
+                refreshAllRoomTypeOptions();
+                updateRates();
+                checkAddButtonState();
+            });
+
+            $row.find('.num-rooms-select').select2({ width: '100%' })
+                .on('change', function () {
+                    updateRowCapacities($(this).closest('tr'));
+                    updateRates();
+                });
+
+            $row.find('.num-adults-select, .num-children-select').select2({ width: '100%' });
+
+            // Initialize room selection with the actual room type ID and pre-filled room IDs
+            const initialRoomTypeId = prefill ? prefill.RoomTypeId : null;
+            initializeRoomSelect($roomSelect, initialRoomTypeId, prefillRoomIds);
+        }
+
+        // ======== Rates Handling ========
+        function updateRates() {
+            const roomTypeIds = $('#roomTable .room-type-select').map((_, el) => $(el).val()).get().filter(Boolean);
+            if (!roomTypeIds.length || !$checkIn.val() || !$checkOut.val()) {
+                resetRates();
+                return;
+            }
+
+            $.ajax({
+                url: '/Rate/GetRatesByRoomTypes',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RoomTypeIds: roomTypeIds,
+                    CheckInDate: new Date($checkIn.val()),
+                    CheckOutDate: new Date($checkOut.val())
+                })
+            })
+            .done(rates => {
+                $rateSelect.empty().append(new Option('Select Rate', '', false, false));
+                rates.forEach(rate => {
+                    const types = rate.roomTypeRateForReservations.map(rt => `${rt.typeName} ($${rt.dailyPrice})`).join(' - ');
+                    const optionText = `${rate.name}|||${types}`;
+                    $rateSelect.append(new Option(optionText, rate.id, false, false));
+                });
+                $rateSelect.select2({
+                    width: '100%',
+                    placeholder: "Choose Rate",
+                    templateResult: formatRateOption,
+                    templateSelection: formatRateOption
+                });
+                if (modelRateId) $rateSelect.val(modelRateId).trigger('change');
+            })
+            .fail(() => resetRates());
+        }
+
+        function resetRates() {
+            $rateSelect.empty().append(new Option('Select Rate', '', false, false)).val(null).trigger('change');
+            $rateDetails.empty().hide();
+        }
+
+        function formatRateOption(option) {
+            if (!option.id) return option.text;
+            const [name, types] = option.text.split('|||');
+            return $(`<div><b class="text-success">${name}</b> <small>- ${types}</small></div>`);
+        }
+
+        function loadRateDetails() {
+            const rateId = $rateSelect.val();
+            const checkIn = $checkIn.val();
+            const checkOut = $checkOut.val();
+
+            if (!rateId || !checkIn || !checkOut) {
+                $rateDetails.html('<p class="text-danger">Please select a rate, check-in, and check-out.</p>').show();
+                return;
+            }
+
+            const roomTypeQuantities = $('#roomTable tbody tr').map(function () {
+                const roomTypeId = $(this).find('.room-type-select').val();
+                const qty = $(this).find('.num-rooms-select').val();
+                return roomTypeId && qty ? { RoomTypeId: +roomTypeId, Quantity: +qty } : null;
+            }).get();
+
+            if (!roomTypeQuantities.length) {
+                $rateDetails.html('<p class="text-danger">Please add at least one room.</p>').show();
+                return;
+            }
+
+            $.ajax({
+                url: '/Rate/GetReservationChargesSummary',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RateId: +rateId,
+                    CheckIn: new Date(checkIn),
+                    CheckOut: new Date(checkOut),
+                    roomTypeQuantities
+                })
+            })
+            .done(res => {
+                if (!res.success || !res.data) {
+                    $rateDetails.html(`<p class="text-danger">${res.message || 'No calculation available.'}</p>`).show();
+                    return;
+                }
+
+                const summary = res.data.chargesSummary;
+                let html = `<table class="table table-bordered"><thead><tr><th>Charge</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead><tbody>`;
+                summary.forEach(item => {
+                    html += `<tr><td>${item.charge}</td><td>${item.unit}</td><td>${item.rate}</td><td>${item.total}</td></tr>`;
+                });
+                html += `</tbody></table><h4 class="text-success">Total Price: ${res.data.totalPrice}</h4>`;
+                $rateDetails.html(html).show();
+            })
+            .fail(() => $rateDetails.html('<p class="text-danger">Error loading charges summary.</p>').show());
+        }
+
+        // ======== Event Bindings ========
+        $('#addRoomBtn').on('click', function (e) { 
+            e.preventDefault(); 
+            
+            // Check if all previous rows have room type selected
+            const allRowsValid = $('#roomTable tbody tr').toArray().every(row => {
+                const $row = $(row);
+                const roomTypeId = $row.find('.room-type-select').val();
+                return roomTypeId && roomTypeId !== '';
+            });
+            
+            if (!allRowsValid) {
+                toastr.warning("Please select room type for all existing rows before adding a new row.");
+                return;
+            }
+            
+            addRoomRow(); 
+        });
+        
+        $(document).on('click', '.remove-room-btn', function () { removeRoomRow(this); });
+        $modal.on('show.bs.modal', loadRateDetails);
+        $modal.on('click', '[data-action="reload"]', e => { e.preventDefault(); loadRateDetails(); });
+
+        // ======== Initialize ========
+        initializeDatePicker();
+
+        // Initialize dates from model for edit mode
+        if (modelCheckIn) {
+            $('#CheckInDate').val(modelCheckIn);
+            const displayCheckIn = moment(modelCheckIn).format('DD/MM/YYYY hh:mm A');
+            $('#CheckInVisible').val(displayCheckIn);
+        }
+        if (modelCheckOut) {
+            $('#CheckOutDate').val(modelCheckOut);
+            const displayCheckOut = moment(modelCheckOut).format('DD/MM/YYYY hh:mm A');
+            $('#CheckOutVisible').val(displayCheckOut);
+
+            if (modelCheckIn) {
+                const nights = moment(modelCheckOut).diff(moment(modelCheckIn), 'days');
+                $('#NumOfNights').val(nights);
+            }
+        }
+
+        // Initialize rooms
+        if (prefillRooms.length) {
+            // Edit mode - we have pre-filled rooms
+            // Load room types first, then add pre-filled rows
+            if ($checkIn.val() && $checkOut.val()) {
+                loadAvailableRoomTypes(() => {
+                    prefillRooms.forEach(r => addRoomRow(r));
+                }, true);
+            } else {
+                // If no dates set, still add the rows but without room type options
+                prefillRooms.forEach(r => addRoomRow(r));
+            }
+        } else {
+            // Add mode - no pre-filled rooms
+            if ($checkIn.val() && $checkOut.val()) {
+                // Dates are set, load room types
+                loadAvailableRoomTypes(() => {
+                    addRoomRow();
+                }, true);
+            } else {
+                // No dates set, add empty row
+                const $defaultRow = $(`
+                    <tr>
+                        <td><select class="form-control select room-type-select" data-placeholder="Room Type"><option></option></select></td>
+                        <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
+                        <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
+                        <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
+                        <td><select class="form-control rooms-select" multiple="multiple"></select></td>
+                        <td><button type="button" class="btn btn-default btn-sm remove-room-btn" style="display:none;"><i class="icon-x"></i></button></td>
+                    </tr>
+                `);
+                $('#roomTable tbody').append($defaultRow);
+                initializeRow($defaultRow);
+            }
+        }
+
+        updateRemoveButtons();
+        checkAddButtonState();
+
+        // Expose collectRoomData for form submission
+        window.collectRoomData = collectRoomData;
     });
-
-
 </script>

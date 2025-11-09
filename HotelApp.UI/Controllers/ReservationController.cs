@@ -3,6 +3,7 @@ using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Guests;
 using HotelApp.Application.DTOs.Rates;
 using HotelApp.Application.DTOs.Reservation;
+using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.Services.GuestService;
 using HotelApp.Application.Services.ReservationService;
 using HotelApp.Application.Services.ReservationSourceService;
@@ -19,6 +20,7 @@ using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Claims;
+using System.Web.WebPages;
 
 namespace HotelApp.UI.Controllers
 {
@@ -93,7 +95,6 @@ namespace HotelApp.UI.Controllers
 		[Authorize(Policy = "Reservation.Add")]
 		public async Task<IActionResult> AddReservation()
 		{
-			ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
             var model = new ReservationDTO()
 			{
 				ReservationInfoDto = new ReservationInfoDTO
@@ -104,16 +105,23 @@ namespace HotelApp.UI.Controllers
             return View(model);
 		}
 
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableRoomTypes([FromQuery] RoomAvailabilityRequestDTO model)
+        {
+			model.BranchId = BranchId;
+            var roomTypes = await _roomTypeService.GetRoomTypesForReservationAsync(model);
+            return Json(roomTypes);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SavReservationInfo([FromBody] ReservationInfoDTO model)
         {
             if (!ModelState.IsValid)
             {
 				return Json(new { success = false, message = "Please fill in all required fields correctly." });
-				//return PartialView("Partial/_ReservationInfoPartial", model);
 			}
 
-			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.RoomTypeToBookDTOs, model.RoomsIDs);
+			var ValidateSelectedRooms = await _roomService.ValidateRoomSelectionsAsync(model.RoomTypeToBookDTOs, model.RoomTypeToBookDTOs.SelectMany(r => r.RoomIds).ToList());
 			if (!ValidateSelectedRooms.Success)
 			{
 				return Json(new { success = false, message = ValidateSelectedRooms.Message });
@@ -129,11 +137,7 @@ namespace HotelApp.UI.Controllers
             });
         }
 
-		[HttpGet]
-		public IActionResult LoadConfirmForm()
-		{
-			return PartialView("_ConfirmReservationPartial");
-		}
+		
 
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
@@ -156,7 +160,7 @@ namespace HotelApp.UI.Controllers
 				ConfirmDto = confirmReservationDTO
 			};
 
-			var result = await _reservationService.SaveReservation(reservationDTO, UserId);
+			var result = await _reservationService.SaveReservation(reservationDTO, BranchId,UserId);
 
 			if (result.Success)
 			{
@@ -165,6 +169,7 @@ namespace HotelApp.UI.Controllers
 
 				TempData["Success"] = result.Message;
 			}
+
 
 			return Json(new { success = result.Success, message = result.Message });
 		}
@@ -194,7 +199,7 @@ namespace HotelApp.UI.Controllers
                 return Forbid();
             }
             var model = await _reservationService.GetReservationToEditByIdAsync(Id);
-            ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
+            //ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
 			ViewBag.PageTitle = "Edit Reservation";
 
             if (string.Equals(mode, "checkIn", StringComparison.OrdinalIgnoreCase))
@@ -246,5 +251,11 @@ namespace HotelApp.UI.Controllers
 			}
             return View(model);
         }
+		
+		[HttpGet]
+		public IActionResult LoadConfirmForm()
+		{
+			return PartialView("_ConfirmReservationPartial");
+		}
     }
 }

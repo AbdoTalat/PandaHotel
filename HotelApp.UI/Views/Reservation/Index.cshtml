@@ -158,7 +158,7 @@
         <table class="table datatable-button-html5-basic dataTable" id="MyTable">
 			<thead>
                 <tr class="border-double active">
-					<th>ID#</th>
+					<th>#Number</th>
 					<th>Primary Guest</th>
 					<th>Check In Date</th>
 					<th>Check Out Date</th>
@@ -173,7 +173,7 @@
                 @foreach (var item in Model) 
 				{
 					<tr id="item-@item.Id">
-                        <td><a asp-action="ReservationDetails" asp-controller="Reservation" asp-route-Id="@item.Id">@item.Id</a></td>
+                        <td><a asp-action="ReservationDetails" asp-controller="Reservation" asp-route-Id="@item.Id">@item.ReservationNumber</a></td>
 						<td>@item.PrimaryGuestName</td>
 						<td>@item.CheckInDate.ToShortDateString()</td>
 						<td>@item.CheckOutDate.ToShortDateString()</td>

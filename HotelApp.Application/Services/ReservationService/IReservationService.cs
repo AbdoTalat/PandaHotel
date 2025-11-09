@@ -10,7 +10,7 @@ namespace HotelApp.Application.Services.ReservationService
         Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id);
         Task<ServiceResponse<object>> ChangeReservationDatesAsync(ChangeReservationDatesDTO dto);
         Task<ReservationDTO> GetReservationToEditByIdAsync(int Id);
-        Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int UserId);
+        Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int BranchId, int UserId);
         Task<ServiceResponse<string>> QuickCheckInByIdAsync(int Id, int UserId);
         Task<CheckOutDTO> GetCheckOutReservationByIdAsync(int Id);
         Task<ServiceResponse<CheckOutDTO>> CheckOutReservationAsync(CheckOutDTO dto, int UserId);

@@ -10,6 +10,7 @@ namespace HotelApp.Application.DTOs.Reservation
     public class GetAllReservationsDTO
     {
         public int Id { get; set; }
+        public string ReservationNumber { get; set; }
         public string PrimaryGuestName { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }

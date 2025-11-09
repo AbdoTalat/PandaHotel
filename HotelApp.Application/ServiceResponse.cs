@@ -30,9 +30,9 @@ namespace HotelApp.Application
 			return new ServiceResponse<T>(true, message, Data);
 		}
 		
-		public static ServiceResponse<T> ResponseFailure(string message = "An error occurred")
+		public static ServiceResponse<T> ResponseFailure(string message = "An error occurred", T Data = null)
 		{
-			return new ServiceResponse<T>(false, message);
+			return new ServiceResponse<T>(false, message, Data);
 		}
 	}
 }

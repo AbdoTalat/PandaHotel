@@ -20,7 +20,7 @@ namespace HotelApp.Application.Services.RoomService
 		Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO dto);
 		Task<ServiceResponse<Room>> DeleteRoomAsync(int Id);
 		Task<RoomReportDTO> GetRoomsReportBetweenDatesAsync(DateTime start, DateTime end);
-		Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name);
+		Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name, int roomTypeId, DateTime checkInDate, DateTime checkOutDate);
 		Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto);
 		Task<ServiceResponse<object>> ValidateRoomSelectionsAsync(List<RoomTypeToBookDTO> roomTypeToBookDTOs, List<int> selectedRoomIds);
 		Task<int> GetOccupancyPercentAsync();

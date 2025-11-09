@@ -76,12 +76,13 @@ namespace HotelApp.Application.Services.ReservationService
 
 			return dto;
 		}
-        public async Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int UserId)
+        public async Task<ServiceResponse<ReservationDTO>> SaveReservation(ReservationDTO dto, int BranchId ,int UserId)
         {
+            List<int> RoomIDs = dto.ReservationInfoDto.RoomTypeToBookDTOs.SelectMany(r => r.RoomIds).ToList();
             if (dto.ConfirmDto.IsCheckedIn)
             {
                 int expectedRoomCount = dto.ReservationInfoDto.RoomTypeToBookDTOs.Sum(rt => rt.NumOfRooms);
-                int selectedRoomCount = dto.ReservationInfoDto.RoomsIDs.Count();
+                int selectedRoomCount = RoomIDs.Count();
 
                 if (expectedRoomCount != selectedRoomCount)
                 {
@@ -174,9 +175,9 @@ namespace HotelApp.Application.Services.ReservationService
                 await _unitOfWork.ReservationRoomTypeRepository.AddRangeAsync(reservationRoomTypes);
 
                 // ===== Reservation Rooms =====
-                if (dto.ReservationInfoDto.RoomsIDs.Any())
+                if (RoomIDs.Any())
                 {
-                    var reservationRooms = dto.ReservationInfoDto.RoomsIDs.Select(rr => new ReservationRoom
+                    var reservationRooms = RoomIDs.Select(rr => new ReservationRoom
                     {
                         ReservationId = reservation.Id,
                         RoomId = rr,
@@ -186,7 +187,7 @@ namespace HotelApp.Application.Services.ReservationService
                     await _unitOfWork.ReservationRoomRepository.AddRangeAsync(reservationRooms);
 
                     var rooms = await _unitOfWork.RoomRepository
-                        .GetAllAsync(r => dto.ReservationInfoDto.RoomsIDs.Contains(r.Id));
+                        .GetAllAsync(r => RoomIDs.Contains(r.Id));
 
                     if (dto.ConfirmDto.IsCheckedIn)
                     {
@@ -214,10 +215,28 @@ namespace HotelApp.Application.Services.ReservationService
                 }).ToList();
                 await _unitOfWork.GuestReservationRepository.AddRangeAsync(guestReservations);
 
+                foreach (var rt in dto.ReservationInfoDto.RoomTypeToBookDTOs)
+                {
+                    var checkIn = dto.ReservationInfoDto.CheckInDate.Value;
+                    var checkOut = dto.ReservationInfoDto.CheckOutDate.Value;
+
+                    var check = await _unitOfWork.RoomTypeRepository
+                        .GetAvailableRoomCountAsync(BranchId, rt.RoomTypeId, checkIn, checkOut, dto.ReservationInfoDto.ReservationId);
+
+                    if(rt.NumOfRooms > check)
+                    {
+
+                        return ServiceResponse<ReservationDTO>.ResponseFailure(
+                            $"Not enough available rooms for Room Type ID: {rt.RoomTypeId}. Requested: {rt.NumOfRooms}, Available: {check}."
+                            );
+                    }
+                }
+
                 await _unitOfWork.CommitTransactionAsync();
 
                 return ServiceResponse<ReservationDTO>.ResponseSuccess(
-                    dto.ReservationInfoDto.ReservationId == 0 ? "New reservation added successfully" : "Reservation updated successfully");
+                    dto.ReservationInfoDto.ReservationId == 0 ? "New reservation added successfully" : "Reservation updated successfully",
+                    Data: dto);
             }
             catch (Exception ex)
             {

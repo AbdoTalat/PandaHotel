@@ -154,18 +154,18 @@ namespace HotelApp.UI.Controllers
         }
 
 
-		[HttpGet]
-		public async Task<IActionResult> GetAvailableRooms(string? name)
-		{
-			var rooms = await _roomService.GetAvailableRoomsAsync(name);
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableRooms(string? name, int roomTypeId, DateTime checkInDate, DateTime checkOutDate)
+        {
+            var rooms = await _roomService.GetAvailableRoomsAsync(name, roomTypeId, checkInDate, checkOutDate);
 
-			var result = rooms.Select(r => new
-			{
-				id = r.Id,
+            var result = rooms.Select(r => new
+            {
+                id = r.Id,
                 text = $"{r.RoomNumber} ({r.RoomTypeName})"
             });
-			return Json(new { success = true, data = result });
-		}
+            return Json(new { success = true, data = result });
+        }
         [HttpGet]
         public async Task<IActionResult> GetRoomsForEditReservationByIDs([FromQuery] List<int> ids)
         {

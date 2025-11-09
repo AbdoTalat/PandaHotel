@@ -1,11 +1,13 @@
-﻿using HotelApp.Domain.Entities;
+﻿using HotelApp.Application.DTOs.RoomTypes;
+using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.Configurations;
 using HotelApp.Infrastructure.Configurations.Locations;
+using HotelApp.Infrastructure.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using HotelApp.Infrastructure.Seed;
+using System.Reflection.Emit;
 
 namespace HotelApp.Infrastructure.DbContext
 {
@@ -81,6 +83,12 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new CalculationTypeConfiguration());
 			builder.ApplyConfiguration(new ReservationHistoryConfiguration());
             #endregion
+
+            builder.Entity<RoomAvailabilityResultDTO>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // This is a query type, not mapped to a table
+            });
 
             #region Seed Data
             builder.SeedRoomStatuses();

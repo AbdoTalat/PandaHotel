@@ -122,6 +122,8 @@ namespace HotelApp.Infrastructure.Repositories
                 return ServiceResponse<object>.ResponseSuccess("Reservation saved without assigning rooms. Rooms will be assigned later.");
             }
             var selectedRooms = await _context.Rooms
+                .AsNoTracking()
+                .BranchFilter()
                 .Where(r => selectedRoomIds.Contains(r.Id))
                 .Select(r => new { r.Id, r.RoomTypeId })
                 .ToListAsync();
@@ -176,7 +178,24 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return percent;
 		}
+        public async Task<IEnumerable<GetAvailableRoomsDTO>> GetAvailableRoomsAsync(string? name, int roomTypeId, DateTime checkInDate, DateTime checkOutDate)
+		{
+			var Query = _context.Rooms
+				.AsNoTracking()
+				.Include(r => r.RoomStatus)
+				.Include(r => r.RoomType)
+				.BranchFilter()
+				.Where(r => r.IsActive && r.RoomStatus.IsReservable && r.RoomTypeId == roomTypeId);
 
+			if (!string.IsNullOrWhiteSpace(name))
+				Query = Query.Where(r => r.RoomNumber.Contains(name) || (r.RoomType != null && r.RoomType.Name.Contains(name)));
+
+			Query = Query.Where(r => !r.ReservationsRooms.Any(rr => rr.StartDate < checkOutDate && rr.EndDate > checkInDate));
+
+			return await Query
+				.ProjectTo<GetAvailableRoomsDTO>(_mapperConfig)
+				.ToListAsync();
+		}
         private string GetRoomTypeName(int roomTypeId)
         {
             return _context.RoomTypes
@@ -184,5 +203,8 @@ namespace HotelApp.Infrastructure.Repositories
                 .Select(rt => rt.Name)
                 .FirstOrDefault() ?? $"RoomType {roomTypeId}";
         }
+
+
+
     }
 }
