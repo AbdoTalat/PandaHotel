@@ -243,8 +243,6 @@ namespace HotelApp.Application.Services.RoomService
 
             return rooms;
         }
-
-
         public async Task<IEnumerable<GetAllRoomsDTO>> GetFilteredRoomsAsync(RoomFilterDTO dto)
         {
             var result = await _roomRepository.GetFilteredRoomsAsync(dto);

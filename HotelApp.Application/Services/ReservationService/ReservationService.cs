@@ -220,15 +220,22 @@ namespace HotelApp.Application.Services.ReservationService
                     var checkIn = dto.ReservationInfoDto.CheckInDate.Value;
                     var checkOut = dto.ReservationInfoDto.CheckOutDate.Value;
 
+                    var availabilityDto = new RoomTypeAvailabilityRequestDTO
+                    {
+                        BranchId = BranchId,
+                        RoomTypeId = rt.RoomTypeId,
+                        CheckInDate = checkIn,
+                        CheckOutDate = checkOut,
+                        ReservationId = dto.ReservationInfoDto.ReservationId
+                    };
                     var check = await _unitOfWork.RoomTypeRepository
-                        .GetAvailableRoomCountAsync(BranchId, rt.RoomTypeId, checkIn, checkOut, dto.ReservationInfoDto.ReservationId);
+                        .GetRoomTypeAvailabilityAsync(availabilityDto);
 
                     if(rt.NumOfRooms > check)
                     {
-
                         return ServiceResponse<ReservationDTO>.ResponseFailure(
-                            $"Not enough available rooms for Room Type ID: {rt.RoomTypeId}. Requested: {rt.NumOfRooms}, Available: {check}."
-                            );
+                            $"Room Type ID { rt.RoomTypeId} no longer has enough rooms. Please review your selection.",
+                            additionalData: true);
                     }
                 }
 

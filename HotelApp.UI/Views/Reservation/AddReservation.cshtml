@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="tab-pane has-padding" id="tab3">
-                    @await Html.PartialAsync("Partials/_ConfirmReservationPartial", new ConfirmReservationDTO())
+                    @await Html.PartialAsync("Partials/_ConfirmReservationPartial", Model.ConfirmDto)
                 </div>
 
             </div>
@@ -87,12 +87,6 @@
 			loadSelect("#proofTypeSelect", "/ProofType/GetProofTypesJson", "name", "id");
 		});
 	</script>
-
-    <script>
-        $.validator.setDefaults({
-            ignore: [] // include hidden fields in validation
-        });
-    </script>
 
     <script>
         let currentTab = 1;
@@ -147,7 +141,13 @@
                 success: function (res) {
                     if (res.success) {
                         window.location.href = "/Reservation/Index";
-                    } else {
+                    } 
+                    else {
+                        if (res.roomTypeRefreshRequired) {
+                            loadAvailableRoomTypesAfterDateChange();
+                            currentTab = 1;
+                            showTab(currentTab);
+                        }
                         showAlert('error', 'Error!', res.message);
                     }
                 },
@@ -205,6 +205,9 @@
                 }
             });
         });
+
+
+
     </script>
 
 

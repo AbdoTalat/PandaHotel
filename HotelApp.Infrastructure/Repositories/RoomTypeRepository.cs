@@ -12,6 +12,7 @@ using HotelApp.Infrastructure.DbContext;
 using HotelApp.Infrastructure.UnitOfWorks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,8 +43,7 @@ namespace HotelApp.Infrastructure.Repositories
 
 			return roomTypes;
 		}
-        public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync(
-            RoomAvailabilityRequestDTO dto)
+        public async Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync(RoomTypeAvailabilityRequestDTO dto)
         {
             var roomTypes = await _context.RoomTypes
                 .BranchFilter()
@@ -57,7 +57,7 @@ namespace HotelApp.Infrastructure.Repositories
                 })
                 .ToListAsync();
 
-            var result = await GetAvailableRoomsForAllRoomTypesAsync(dto);
+            var result = await GetAllRoomTypesAvailabilityAsync(dto);
 
             foreach(var roomType in roomTypes)
             {
@@ -69,46 +69,60 @@ namespace HotelApp.Infrastructure.Repositories
             return roomTypes;
         }
 
-        public async Task<List<RoomAvailabilityResultDTO>> GetAvailableRoomsForAllRoomTypesAsync(
-            RoomAvailabilityRequestDTO dto, CancellationToken cancellationToken = default)
+        public async Task<List<RoomTypeAvailabilityResultDTO>> GetAllRoomTypesAvailabilityAsync(
+            RoomTypeAvailabilityRequestDTO dto, CancellationToken cancellationToken = default)
         {
-            var result = new List<RoomAvailabilityResultDTO>();
+            var result = new List<RoomTypeAvailabilityResultDTO>();
 
-            await using var connection = _context.Database.GetDbConnection();
-            if (connection.State != ConnectionState.Open)
-                await connection.OpenAsync(cancellationToken);
-
-            await using var command = connection.CreateCommand();
-            command.CommandText = "GetAvailableRoomsForAllRoomTypes";
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.Add(new SqlParameter("@BranchId", dto.BranchId));
-            command.Parameters.Add(new SqlParameter("@ReservationId", (object?)dto.ReservationId ?? DBNull.Value));
-            command.Parameters.Add(new SqlParameter("@CheckInDate", dto.CheckInDate));
-            command.Parameters.Add(new SqlParameter("@CheckOutDate", dto.CheckOutDate));
-
-            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-
-            while (await reader.ReadAsync(cancellationToken))
+            try
             {
-                result.Add(new RoomAvailabilityResultDTO
-                {
-                    RoomTypeId = reader.GetInt32(reader.GetOrdinal("RoomTypeId")),
-                    TotalAvailableRooms = reader.GetInt32(reader.GetOrdinal("TotalAvailable"))
-                });
-            }
+                var connection = _context.Database.GetDbConnection();
+                var transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
 
-            return result;
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync(cancellationToken);
+
+                await using var command = connection.CreateCommand();
+                command.CommandText = "GetAvailableRoomsForAllRoomTypes";
+                command.CommandType = CommandType.StoredProcedure;
+
+                // ✅ Attach the active transaction if any
+                if (transaction != null)
+                    command.Transaction = transaction;
+
+                command.Parameters.Add(new SqlParameter("@BranchId", dto.BranchId));
+                command.Parameters.Add(new SqlParameter("@ReservationId", (object?)dto.ReservationId ?? DBNull.Value));
+                command.Parameters.Add(new SqlParameter("@CheckInDate", dto.CheckInDate));
+                command.Parameters.Add(new SqlParameter("@CheckOutDate", dto.CheckOutDate));
+
+                await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+                while (await reader.ReadAsync(cancellationToken))
+                {
+                    result.Add(new RoomTypeAvailabilityResultDTO
+                    {
+                        RoomTypeId = reader.GetInt32(reader.GetOrdinal("RoomTypeId")),
+                        TotalAvailableRooms = reader.GetInt32(reader.GetOrdinal("TotalAvailable"))
+                    });
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving room type availability.", ex);
+            }
         }
 
-        public async Task<int> GetAvailableRoomCountAsync(int branchId, int roomTypeId, DateTime checkInDate, DateTime checkOutDate, int? reservationId)
+
+        public async Task<int> GetRoomTypeAvailabilityAsync(RoomTypeAvailabilityRequestDTO dto)
 		{
-            var branchParam = new SqlParameter("@BranchId", branchId);
-            var roomTypeParam = new SqlParameter("@RoomTypeId", roomTypeId);
-            var reservationParam = new SqlParameter("@ReservationId", (object?)reservationId ?? DBNull.Value);
+            var branchParam = new SqlParameter("@BranchId", dto.BranchId);
+            var roomTypeParam = new SqlParameter("@RoomTypeId", dto.RoomTypeId);
+            var reservationParam = new SqlParameter("@ReservationId", (object?)dto.ReservationId ?? DBNull.Value);
             var quantityParam = new SqlParameter("@Quantity", DBNull.Value);
-            var checkInParam = new SqlParameter("@CheckInDate", checkInDate);
-            var checkOutParam = new SqlParameter("@CheckOutDate", checkOutDate);
+            var checkInParam = new SqlParameter("@CheckInDate", dto.CheckInDate);
+            var checkOutParam = new SqlParameter("@CheckOutDate", dto.CheckOutDate);
             var totalAvailableParam = new SqlParameter
             {
                 ParameterName = "@TotalAvailableRooms",

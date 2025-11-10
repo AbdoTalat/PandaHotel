@@ -84,11 +84,6 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new ReservationHistoryConfiguration());
             #endregion
 
-            builder.Entity<RoomAvailabilityResultDTO>(entity =>
-            {
-                entity.HasNoKey();
-                entity.ToView(null); // This is a query type, not mapped to a table
-            });
 
             #region Seed Data
             builder.SeedRoomStatuses();

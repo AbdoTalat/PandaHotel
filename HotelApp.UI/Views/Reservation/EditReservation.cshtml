@@ -141,7 +141,13 @@
                 success: function (res) {
                     if (res.success) {
                         window.location.href = "/Reservation/Index";
-                    } else {
+                    } 
+                    else {
+                        if (res.roomTypeRefreshRequired) {
+                            loadAvailableRoomTypesAfterDateChange();
+                            currentTab = 1;
+                            showTab(currentTab);
+                        }
                         showAlert('error', 'Error!', res.message);
                     }
                 },
@@ -198,12 +204,6 @@
                     e.preventDefault();
                 }
             });
-        });
-    </script>
-
-    <script>
-        $.validator.setDefaults({
-            ignore: [] // include hidden fields in validation
         });
     </script>
 

@@ -43,7 +43,8 @@ namespace HotelApp.UI.Controllers
             _reservationSourceService = reservationSourceService;
         }
 
-		[HttpGet]
+        #region List/View 
+        [HttpGet]
 		[Authorize(Policy = "Reservation.View")]
 		public async Task<IActionResult> Index([FromQuery] ReservationFilterDTO? model)
 		{
@@ -89,9 +90,9 @@ namespace HotelApp.UI.Controllers
 			var model = await _reservationService.GetReservationDetailsByIdAsync(Id);
 			return View(model);
 		}
+        #endregion
 
-
-		[HttpGet]
+        [HttpGet]
 		[Authorize(Policy = "Reservation.Add")]
 		public async Task<IActionResult> AddReservation()
 		{
@@ -104,14 +105,6 @@ namespace HotelApp.UI.Controllers
 			};
             return View(model);
 		}
-
-        [HttpGet]
-        public async Task<IActionResult> GetAvailableRoomTypes([FromQuery] RoomAvailabilityRequestDTO model)
-        {
-			model.BranchId = BranchId;
-            var roomTypes = await _roomTypeService.GetRoomTypesForReservationAsync(model);
-            return Json(roomTypes);
-        }
 
         [HttpPost]
         public async Task<IActionResult> SavReservationInfo([FromBody] ReservationInfoDTO model)
@@ -136,8 +129,6 @@ namespace HotelApp.UI.Controllers
                 amount = 1000 
             });
         }
-
-		
 
 		[HttpPost]
 		public async Task<IActionResult> SubmitReservation([FromBody] ConfirmReservationDTO confirmReservationDTO)
@@ -169,23 +160,23 @@ namespace HotelApp.UI.Controllers
 
 				TempData["Success"] = result.Message;
 			}
+			else
+			{
+                if (result.AdditionalData != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = result.Message,
+                        roomTypeRefreshRequired = true
+                    });
 
+                }
+            }
 
 			return Json(new { success = result.Success, message = result.Message });
 		}
-
-        [HttpPost]
-        [Authorize(Policy = "Reservation.Edit")]
-        public async Task<IActionResult> ChangeReservationDates([FromBody] ChangeReservationDatesDTO model)
-        {
-            if (!ModelState.IsValid)
-                return Json(new { success = false, message = "Invalid input data." });
-
-            var result = await _reservationService.ChangeReservationDatesAsync(model);
-
-            return Json(new { success = result.Success, message = result.Message });
-        }
-
+		
 		[HttpGet]
         [Authorize]
         public async Task<IActionResult> EditReservation(int Id, string? mode)
@@ -199,7 +190,6 @@ namespace HotelApp.UI.Controllers
                 return Forbid();
             }
             var model = await _reservationService.GetReservationToEditByIdAsync(Id);
-            //ViewBag.RoomTypes = await _roomTypeService.GetRoomTypesForReservationAsync();
 			ViewBag.PageTitle = "Edit Reservation";
 
             if (string.Equals(mode, "checkIn", StringComparison.OrdinalIgnoreCase))
@@ -216,7 +206,29 @@ namespace HotelApp.UI.Controllers
             return View(model);
 		}
 
-		[HttpPost]
+        [HttpPost]
+        [Authorize(Policy = "Reservation.Edit")]
+        public async Task<IActionResult> ChangeReservationDates([FromBody] ChangeReservationDatesDTO model)
+        {
+            if (!ModelState.IsValid)
+                return Json(new { success = false, message = "Invalid input data." });
+
+            var result = await _reservationService.ChangeReservationDatesAsync(model);
+
+            return Json(new { success = result.Success, message = result.Message });
+        }
+
+		
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableRoomTypes([FromQuery] RoomTypeAvailabilityRequestDTO model)
+        {
+			model.BranchId = BranchId;
+            var roomTypes = await _roomTypeService.GetRoomTypesForReservationAsync(model);
+            return Json(roomTypes);
+        }
+
+        #region CheckIn/CheckOut
+        [HttpPost]
 		[Authorize(Policy = "Reservation.CheckIn")]
 		public async Task<IActionResult> QuickCheckIn(int Id)
 		{
@@ -251,8 +263,9 @@ namespace HotelApp.UI.Controllers
 			}
             return View(model);
         }
-		
-		[HttpGet]
+        #endregion
+
+        [HttpGet]
 		public IActionResult LoadConfirmForm()
 		{
 			return PartialView("_ConfirmReservationPartial");

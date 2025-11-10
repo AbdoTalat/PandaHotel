@@ -44,7 +44,7 @@ namespace HotelApp.Application.DTOs.Reservation
     }
     public class ReservationGuestDTO
 	{
-		public int GuestId { get; set; }
+        public int GuestId { get; set; }
 		public bool IsPrimary { get; set; }
 		public string FullName { get; set; }
 		public string? Email { get; set; }

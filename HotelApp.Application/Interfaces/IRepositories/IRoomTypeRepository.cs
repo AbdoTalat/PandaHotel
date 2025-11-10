@@ -11,7 +11,8 @@ namespace HotelApp.Application.Interfaces.IRepositories
     public interface IRoomTypeRepository : IGenericRepository<RoomType>
     {
         Task<IEnumerable<RoomType>> GetRoomTypesByIDsAsync(List<int> roomTypeIds);
-        Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync(RoomAvailabilityRequestDTO dto);
-        Task<int> GetAvailableRoomCountAsync(int branchId, int roomTypeId, DateTime checkIn, DateTime checkOut, int? reservationId);
+        Task<IEnumerable<GetRoomTypesForReservationDTO>> GetRoomTypesForReservationAsync(RoomTypeAvailabilityRequestDTO dto);
+        Task<List<RoomTypeAvailabilityResultDTO>> GetAllRoomTypesAvailabilityAsync(RoomTypeAvailabilityRequestDTO dto, CancellationToken cancellationToken = default);
+        Task<int> GetRoomTypeAvailabilityAsync(RoomTypeAvailabilityRequestDTO dto);
     }
 }

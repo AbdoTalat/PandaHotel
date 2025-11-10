@@ -20,6 +20,7 @@ namespace HotelApp.UI.Controllers
 			_guestService = guestService;
 		}
 
+
 		[HttpGet]
         [Authorize(Policy = "Guest.View")]
         public async Task<IActionResult> Index()
@@ -117,18 +118,8 @@ namespace HotelApp.UI.Controllers
 		public async Task<IActionResult> AddOrEditGuest([FromBody] GuestDTO dto)
 		{
             if (!ModelState.IsValid)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Please fill in all required fields correctly."
-                });
-            }
-            if (dto == null)
-			{
-				return Json(new { success = false, message = "Invalid guest data." });
-			}
-
+				return Json(new { success = false, message = "Please fill in all required fields correctly." });
+			
 			var result = await _guestService.AddOrEditGuestsAsync(dto);
 			if (result.Success)
 			{

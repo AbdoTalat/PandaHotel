@@ -390,7 +390,7 @@
             }
         });
 
-        console.log("Submitting form data:", formData); // For debugging
+        //console.log("Submitting form data:", formData); // For debugging
 
         $.ajax({
             url: '/Reservation/SavReservationInfo',
@@ -436,7 +436,7 @@
         });
     });</script>
 
-<script>
+ <script>
     $(function () {
         let dateChangeInProgress = false;
         let cachedRoomTypes = [];
@@ -1067,5 +1067,6 @@
 
         // Expose collectRoomData for form submission
         window.collectRoomData = collectRoomData;
+        window.loadAvailableRoomTypesAfterDateChange = loadAvailableRoomTypesAfterDateChange;
     });
-</script>
+</script> 

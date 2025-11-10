@@ -135,7 +135,7 @@
         const container = $('#guestDisplayList');
         if (!container.length)
             return;
-        console.log("renderGuestList called, guestList:", guestList);
+        //console.log("renderGuestList called, guestList:", guestList);
 
         container.empty();
 
@@ -190,7 +190,7 @@
                 url: '/Guest/GetGuestJson/' + guestId,
                 type: 'GET',
                 success: function (guest) {
-                    console.log("Guest Data", guest);
+                    //console.log("Guest Data", guest);
 
                     $('#guestId').val(guest.id);
                     $('#FullName').val(guest.fullName);

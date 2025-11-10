@@ -112,4 +112,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helper\" />
+    <Folder Include="wwwroot\js\Reservation\" />
+  </ItemGroup>
+
 </Project>

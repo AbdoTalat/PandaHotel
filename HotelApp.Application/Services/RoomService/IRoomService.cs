@@ -12,9 +12,9 @@ namespace HotelApp.Application.Services.RoomService
 	public interface IRoomService
 	{
 		Task<IEnumerable<GetAllRoomsDTO>> GetAllRoomsAsync();
-		GetRoomsReview GetRoomsReview();
-		Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id);
 		Task<GetRoomByIdDTO?> GetRoomByIdAsync(int Id);
+		Task<EditRoomDTO?> GetRoomToEditByIdAsync(int Id);
+		GetRoomsReview GetRoomsReview();
 		Task<ServiceResponse<AddRoomDTO>> AddRoomAsync(AddRoomDTO dto);
 		Task<ServiceResponse<AddRoomDTO>> AddManyRoomsAsync(AddRoomDTO dto);
 		Task<ServiceResponse<EditRoomDTO>> EditRoomAsync(EditRoomDTO dto);

@@ -201,8 +201,6 @@ $(document).ready(function () {
     });
 });
 
-
-
 $(document).ready(function () {
 
     // Generic DataTable loader
@@ -266,3 +264,12 @@ $(document).ready(function () {
     // Expose globally
     window.initEntityTable = initEntityTable;
 });
+
+
+
+
+
+
+
+
+
