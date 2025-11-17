@@ -325,6 +325,131 @@ namespace HotelApp.Infrastructure.Migrations
                     b.ToTable("GuestReservations");
                 });
 
+            modelBuilder.Entity("HotelApp.Domain.Entities.MasterDataItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MasterDataTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<short>("Value")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MasterDataTypeId");
+
+                    b.ToTable("MasterDataItems");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            MasterDataTypeId = 1,
+                            Name = "Payment",
+                            Value = (short)1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsActive = true,
+                            MasterDataTypeId = 1,
+                            Name = "Refund",
+                            Value = (short)2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "Cash",
+                            Value = (short)1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "CreditCard",
+                            Value = (short)2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "DebitCard",
+                            Value = (short)3
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "BankTransfer",
+                            Value = (short)4
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "Wallet",
+                            Value = (short)5
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IsActive = true,
+                            MasterDataTypeId = 2,
+                            Name = "Cheque",
+                            Value = (short)6
+                        });
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.MasterDataType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MasterDataTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "TransactionType"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "PaymentMethod"
+                        });
+                });
+
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
                 {
                     b.Property<int>("Id")
@@ -388,6 +513,70 @@ namespace HotelApp.Infrastructure.Migrations
                     b.HasIndex("LastModifiedById");
 
                     b.ToTable("Options");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GuestId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LastModifiedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("GuestId");
+
+                    b.HasIndex("LastModifiedById");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("TransactionTypeId");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
@@ -1533,6 +1722,17 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Navigation("Reservation");
                 });
 
+            modelBuilder.Entity("HotelApp.Domain.Entities.MasterDataItem", b =>
+                {
+                    b.HasOne("HotelApp.Domain.Entities.MasterDataType", "MasterDataType")
+                        .WithMany("MasterDataItems")
+                        .HasForeignKey("MasterDataTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MasterDataType");
+                });
+
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
                 {
                     b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
@@ -1555,6 +1755,62 @@ namespace HotelApp.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("LastModifiedBy");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("HotelApp.Domain.Entities.Branch", "Branch")
+                        .WithMany("Payments")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HotelApp.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HotelApp.Domain.Entities.Guest", "Guest")
+                        .WithMany("Payments")
+                        .HasForeignKey("GuestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelApp.Domain.Entities.User", "LastModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("LastModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HotelApp.Domain.Entities.MasterDataItem", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelApp.Domain.Entities.Reservation", "Reservation")
+                        .WithMany("Payments")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelApp.Domain.Entities.MasterDataItem", "TransactionType")
+                        .WithMany()
+                        .HasForeignKey("TransactionTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Guest");
+
+                    b.Navigation("LastModifiedBy");
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("TransactionType");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.ProofType", b =>
@@ -2007,6 +2263,8 @@ namespace HotelApp.Infrastructure.Migrations
 
                     b.Navigation("Options");
 
+                    b.Navigation("Payments");
+
                     b.Navigation("Rates");
 
                     b.Navigation("Reservations");
@@ -2039,7 +2297,14 @@ namespace HotelApp.Infrastructure.Migrations
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Guest", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("guestReservations");
+                });
+
+            modelBuilder.Entity("HotelApp.Domain.Entities.MasterDataType", b =>
+                {
+                    b.Navigation("MasterDataItems");
                 });
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Option", b =>
@@ -2059,6 +2324,8 @@ namespace HotelApp.Infrastructure.Migrations
 
             modelBuilder.Entity("HotelApp.Domain.Entities.Reservation", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("ReservationHistories");
 
                     b.Navigation("ReservationRoomTypes");

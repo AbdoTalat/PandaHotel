@@ -10,7 +10,9 @@ using BenchmarkDotNet.Attributes;
 using HotelApp.Domain.Entities;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-//using HotelApp.UI.Helper;
+using HotelApp.Application.Services.RoomTypeService;
+using HotelApp.Application.Services.FloorService;
+using HotelApp.Application.Services.RoomStatusService;
 
 namespace HotelApp.UI.Controllers
 {
@@ -19,18 +21,20 @@ namespace HotelApp.UI.Controllers
 	public class RoomController : BaseController
 	{
 		private readonly IRoomService _roomService;
-        private readonly IBranchService _branchService;
-		private readonly IAuthorizationService _authorizationService;
 		private readonly IOptionService _optionService;
+        private readonly IRoomTypeService _roomTypeService;
+        private readonly IFloorService _floorService;
+        private readonly IRoomStatusService _roomStatusService;
 
-		public RoomController(IRoomService roomService, IBranchService branchService,
-			IAuthorizationService authorizationService, IOptionService optionService)
+        public RoomController(IRoomService roomService, IOptionService optionService, 
+			IRoomTypeService roomTypeService, IFloorService floorService, IRoomStatusService roomStatusService)
 		{
 			_roomService = roomService;
-            _branchService = branchService;
-			_authorizationService = authorizationService;
 			_optionService = optionService;
-		}
+            _roomTypeService = roomTypeService;
+            _floorService = floorService;
+            _roomStatusService = roomStatusService;
+        }
         [HttpGet]
 		[Authorize(Policy = "Room.View")]
 		public async Task<IActionResult> Index()
@@ -72,8 +76,9 @@ namespace HotelApp.UI.Controllers
         [Authorize(Policy = ("Room.Add"))]
         public async Task<IActionResult> AddRoom()
         {
-			ViewBag.Options = await _optionService.GetAllOptionsAsync();
-			return View();
+            var model = new AddRoomDTO();
+            await LoadAddRoomDropdownsAsync(model);
+            return View(model);
         }
 
         [HttpPost]
@@ -83,8 +88,8 @@ namespace HotelApp.UI.Controllers
         {
 			if (!ModelState.IsValid)
 			{
-				ViewBag.Options = await _optionService.GetAllOptionsAsync();
-				return View(model);
+                await LoadAddRoomDropdownsAsync(model);
+                return View(model);
 			}
 
 			var result = model.AddManyRooms 
@@ -97,19 +102,19 @@ namespace HotelApp.UI.Controllers
 				return RedirectToAction("Index");
 			}
 
-			TempData["Error"] = result.Message;
-			ViewBag.Options = await _optionService.GetAllOptionsAsync();
-			return View(model);
+			TempData["ErrorAlert"] = result.Message;
+            await LoadAddRoomDropdownsAsync(model);
+            return View(model);
 		}
 
         [HttpGet]
         [Authorize(Policy = ("Room.Edit"))]
         public async Task<IActionResult> EditRoom(int Id)
 		{
-			var room = await _roomService.GetRoomToEditByIdAsync(Id);
-			ViewBag.Options = await _optionService.GetAllOptionsAsync();
+			var model = await _roomService.GetRoomToEditByIdAsync(Id);
+            await LoadEditRoomDropdownsAsync(model);
 
-			return View(room);
+            return View(model);
 		}
 
 		[HttpPost]
@@ -119,8 +124,8 @@ namespace HotelApp.UI.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				ViewBag.Options = await _optionService.GetAllOptionsAsync();
-				return View(model);
+                await LoadEditRoomDropdownsAsync(model);
+                return View(model);
 			}
             var result = await _roomService.EditRoomAsync(model);
 			if(result.Success)
@@ -129,9 +134,9 @@ namespace HotelApp.UI.Controllers
 				return RedirectToAction("Index");
 			}
 
-			TempData["Error"] = result.Message;
-			ViewBag.Options = await _optionService.GetAllOptionsAsync();
-			return View(model);
+			TempData["ErrorAlert"] = result.Message;
+            await LoadEditRoomDropdownsAsync(model);
+            return View(model);
 
 		}
 
@@ -191,5 +196,22 @@ namespace HotelApp.UI.Controllers
             });
         }
 
+
+        #region Helper Methods
+        private async Task LoadEditRoomDropdownsAsync(EditRoomDTO model)
+        {
+            ViewBag.Options = await _optionService.GetAllOptionsAsync();
+            model.RoomTypes = await _roomTypeService.GetRoomTypesDropDownAsync();
+            model.Floors = await _floorService.GetFloorsDropDownAsync();
+            model.RoomStatuses = await _roomStatusService.GetRoomStatusDropDownAsync();
+        }
+        private async Task LoadAddRoomDropdownsAsync(AddRoomDTO model)
+        {
+            ViewBag.Options = await _optionService.GetAllOptionsAsync();
+            model.RoomTypes = await _roomTypeService.GetRoomTypesDropDownAsync();
+            model.Floors = await _floorService.GetFloorsDropDownAsync();
+            model.RoomStatuses = await _roomStatusService.GetRoomStatusDropDownAsync();
+        }
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HotelApp.Domain.Common.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,5 +32,9 @@ namespace HotelApp.Application.DTOs.Rooms
 		public List<int> AssignOptions { get; set; } = new List<int>();
 		public List<int> SelectedOptions { get; set; } = new List<int>();
 
-	}
+        public IEnumerable<SelectListItem> Floors = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> RoomStatuses = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> RoomTypes = new List<SelectListItem>();
+
+    }
 }

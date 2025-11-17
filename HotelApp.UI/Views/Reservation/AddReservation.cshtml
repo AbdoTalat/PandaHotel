@@ -1,9 +1,8 @@
-﻿@model ReservationDTO
-﻿
+﻿@model ReservationDTO﻿
 @{
 	TempData["Title"] = "Add Reservation";
-
 }
+
 <div class="page-header page-header-default page-header-xs">
 	<div class="page-header-content">
 		<div class="page-title">
@@ -103,8 +102,8 @@
             // Only one button in the final tab
             if (index === 3) {
                 $("#nextBtn").replaceWith(`
-                        <button type="button" id="nextBtn" class="btn bg-teal-400">
-                             <i class="icon-checkmark4 position-right"></i> Submit
+                            <button type="button" id="nextBtn" class="btn bg-teal-400 btn-ladda btn-ladda-spinner ladda-button" data-spinner-color="#fff">
+                             <i class="icon-checkmark4 position-right"></i> Save
                         </button>
                     `);
             } else {

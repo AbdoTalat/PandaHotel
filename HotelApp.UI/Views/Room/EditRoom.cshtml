@@ -88,7 +88,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Floor<span class="text-danger">*</span></label>
-										<select asp-for="FloorId" id="floorSelect" data-selected="@Model?.FloorId" class="form-control select" required data-placeholder="Select Floor">
+										<select asp-for="FloorId" id="floorSelect" asp-items="@Model?.Floors" class="form-control select" required data-placeholder="Select Floor">
 											<option></option>
 										</select>
 										<span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
@@ -100,7 +100,8 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Status<span class="text-danger">*</span></label>
-										<select asp-for="RoomStatusId" id="StatusSelect" data-selected="@Model?.RoomStatusId" class="form-control select" required data-placeholder="Choose Room Status">
+										<select asp-for="RoomStatusId" id="statusSelect" asp-items="@Model?.RoomStatuses" required data-placeholder="Choose Room Status"
+												class="form-control select">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomStatusId" class="text-danger validation-error-label"></span>
@@ -109,7 +110,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Type<span class="text-danger">*</span></label>
-										<select asp-for="RoomTypeId" id="roomTypeSelect" data-selected="@Model?.RoomTypeId" class="form-control select" required data-placeholder="Choose Room Type">
+										<select id="roomTypeSelect" asp-for="RoomTypeId" asp-items="Model?.RoomTypes" class="form-control select" required data-placeholder="Choose Room Type">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomTypeId" class="text-danger validation-error-label"></span>
@@ -252,25 +253,6 @@
 
 
 @section Scripts {
-
-	@if (TempData["Error"] != null)
-	{
-		<script>
-			Swal.fire({
-				icon: 'error',
-				title: 'Error',
-				text: '@TempData["Error"]'
-			});
-		</script>
-	}
-
-	<script>
-		$(document).ready(function () {
-			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
-			loadSelect("#floorSelect", "/Floor/GetFloorsJson", "number", "id");
-			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
-		});
-	</script>
 
 	<script>
 		$(document).ready(function () {

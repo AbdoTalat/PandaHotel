@@ -2,6 +2,7 @@
 using HotelApp.Application.DTOs;
 using HotelApp.Application.DTOs.Floor;
 using HotelApp.Domain.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,9 @@ namespace HotelApp.Application.Mapping
 
 			CreateMap<FloorDTO, Floor>();
 
-            CreateMap<Floor, DropDownDTO<Int16>>()
-                .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Number));
-		}
+            CreateMap<Floor, SelectListItem>()
+                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Number))
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Id));
+        }
     }
 }

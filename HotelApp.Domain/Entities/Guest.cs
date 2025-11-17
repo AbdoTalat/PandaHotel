@@ -24,6 +24,7 @@ namespace HotelApp.Domain.Entities
         public Branch? Branch { get; set; }
 
         public ICollection<GuestReservation> guestReservations { get; set; } = new HashSet<GuestReservation>();
+        public ICollection<Payment> Payments { get; set; } = new HashSet<Payment>();
     }
 
 }

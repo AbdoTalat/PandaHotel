@@ -42,6 +42,10 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<ReservationRoom> ReservationRooms { get; set; }
 		public DbSet<CalculationType> CalculationTypes { get; set; }
 		public DbSet<ReservationHistory> ReservationHistory { get; set; }
+
+		public DbSet<Payment> Payments { get; set; }
+        public DbSet<MasterDataType> MasterDataTypes { get; set; }
+		public DbSet<MasterDataItem> MasterDataItems { get; set; }
         #endregion
 
 
@@ -82,13 +86,18 @@ namespace HotelApp.Infrastructure.DbContext
 
 			builder.ApplyConfiguration(new CalculationTypeConfiguration());
 			builder.ApplyConfiguration(new ReservationHistoryConfiguration());
+
+			builder.ApplyConfiguration(new PaymentConfiguration());
+            builder.ApplyConfiguration(new MasterDataTypeConfiguration());
+            builder.ApplyConfiguration(new MasterDataItemConfiguration());
             #endregion
 
 
             #region Seed Data
             builder.SeedRoomStatuses();
             builder.SeedReservationSources();
-            #endregion
-        }
+			builder.SeedDropDownTypesAndItems();
+			#endregion
+		}
 	}
 }

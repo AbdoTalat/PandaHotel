@@ -26,17 +26,17 @@ namespace HotelApp.UI.Controllers
 			return View(floors);
 		}
 
-		public async Task<IActionResult> GetFloorsJson()
-		{
-			var floors = await _floorService.GetFloorsDropDownAsync();
+		//public async Task<IActionResult> GetFloorsJson()
+		//{
+		//	var floors = await _floorService.GetFloorsDropDownAsync();
 
-			var result = floors.Select(f => new
-			{
-				Id = f.Id,
-				Number = f.DisplayText
-			});
-			return Json(result);
-		}
+		//	var result = floors.Select(f => new
+		//	{
+		//		Id = f.Id,
+		//		Number = f.DisplayText
+		//	});
+		//	return Json(result);
+		//}
 
 
         [HttpGet]

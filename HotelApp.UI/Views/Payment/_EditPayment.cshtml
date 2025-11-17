@@ -1,0 +1,88 @@
+﻿@model PaymentDTO
+<form class="form-basic ajaxEditForm" asp-action="EditPayment" asp-controller="Payment" method="post">
+	<input type="hidden" asp-for="Id" value="@Model.Id" />
+	<input type="hidden" asp-for="ReservationId" value="@Model.ReservationId" />
+	<input type="hidden" asp-for="GuestId" value="@Model.GuestId" />
+
+	<div class="panel panel-flat ">
+		<div class="panel-body">
+			<div class="">
+				<div class="row">
+					<div class="col-md-6">
+						<label>Payment Method</label>
+						<div class="form-group">
+							<select asp-for="PaymentMethodId" id="paymentMethod" asp-items="@Model.PaymentMethods" class="form-control" required data-placeholder="Payment Method">
+								<option></option>
+							</select>
+							<span asp-validation-for="PaymentMethodId" class="text-danger validation-error-label"></span>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label>Amount</label>
+						<div class="form-group has-feedback">
+							<input type="number" asp-for="Amount" class="form-control" placeholder="Amount" />
+							<div class="form-control-feedback">
+								$
+							</div>
+							<span asp-validation-for="Amount" class="text-danger validation-error-label"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<label>Payment Date</label>
+						<div class="form-group">
+							<input asp-for="PaymentDate" class="form-control" placeholder="Payment Date" />
+							<span asp-validation-for="PaymentDate" class="text-danger validation-error-label"></span>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label>Transaction Type</label>
+						<div class="form-group">
+							<select asp-for="TransactionTypeId" id="transactionType" asp-items="@Model.TransactionTypes" class="form-control" required data-placeholder="Select Transaction Type">
+								<option></option>
+							</select>
+							<span asp-validation-for="TransactionTypeId" class="text-danger validation-error-label"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<label>Notes</label>
+						<div class="form-group">
+							<textarea asp-for="Notes" class="form-control" placeholder="Notes">
+							</textarea>
+							<span asp-validation-for="Notes" class="text-danger validation-error-label"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="text-center">
+		<button class="btn btn-link" data-dismiss="modal"> Cancel</button>
+		<button type="submit" class="btn bg-teal-400 btn-lg"><i class="icon-checkmark4"></i> Save</button>
+	</div>
+
+</form>
+
+
+<script>
+	$(document).ready(function () {
+		$('#paymentMethod').select2({
+			placeholder: "Select Payment Method",
+			allowClear: true,
+		});
+	});
+
+	$(document).ready(function () {
+		$('#transactionType').select2({
+			placeholder: "Select Transaction Type",
+			allowClear: true,
+		});
+	});
+
+
+</script>

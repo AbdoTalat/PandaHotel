@@ -63,6 +63,8 @@ namespace HotelApp.Infrastructure.UnitOfWorks
             OptionRepository = new OptionRepository(_context, _mapperConfig);
             RoomTypeRateRepository = new RoomTypeRateRepository(_context, _mapperConfig);
             ReservationHistoryRepository = new ReservationHistoryRepository(_context, _mapperConfig);
+            MasterDataItemRepository = new MasterDataItemRepository(_context, _mapperConfig);
+            PaymentRepository = new PaymentRepository(_context, _mapperConfig);
         }
 
 
@@ -92,6 +94,8 @@ namespace HotelApp.Infrastructure.UnitOfWorks
         public IOptionRepository OptionRepository { get; private set; }
         public IRoomTypeRateRepository RoomTypeRateRepository { get; private set; }
         public IReservationHistoryRepository ReservationHistoryRepository { get; private set; }
+        public IMasterDataItemRepository MasterDataItemRepository { get; private set; }
+        public IPaymentRepository PaymentRepository { get; private set; }
         #endregion
 
 

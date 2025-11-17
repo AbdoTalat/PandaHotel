@@ -54,7 +54,9 @@ namespace HotelApp.Infrastructure.Repositories
 								NumOfRooms = rt.Quantity,
 								NumOfAdults = rt.NumOfAdults,
 								NumOfChildrens = rt.NumOfChildren,
-                                RoomIds = r.ReservationsRooms.Select(rr => rr.RoomId).ToList(),
+                                RoomIds = r.ReservationsRooms
+                                    .Where(rr => rr.Room.RoomTypeId == rt.RoomTypeId)
+                                    .Select(rr => rr.RoomId).ToList(),
                             })
 							.ToList()
 					},
@@ -93,23 +95,6 @@ namespace HotelApp.Infrastructure.Repositories
 				.FirstOrDefaultAsync();
 
 			return dto ?? new ReservationDTO();
-		}
-        public async Task<Reservation> GetReservationDetailsByIds(int Id)
-		{
-			var reservation = await _context.Reservations
-				.BranchFilter()
-				.Where(r => r.Id == Id)
-				.Include(r => r.ReservationSource)
-				.Include(r => r.Company)
-				.Include(r => r.ReservationsRooms)
-					.ThenInclude(r => r.Room)
-				.Include(r => r.guestReservations)
-					.ThenInclude(gr => gr.Guest)
-				.Include(r => r.ReservationRoomTypes)
-					.ThenInclude(rt => rt.RoomType)
-				.FirstOrDefaultAsync();
-
-			return reservation;
 		}
         public async Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto)
         {
@@ -214,6 +199,7 @@ namespace HotelApp.Infrastructure.Repositories
                     CreatedBy = r.CreatedBy.UserName,
                     LastModifiedBy = r.LastModifiedBy.UserName,
                     NumOfTotalRooms = r.ReservationsRooms.Count(),
+                    NumOfPayments = r.Payments.Count(),
 
                     GuestReservations = r.guestReservations.Select(gr => new ReservationDetailsGuestsDTO
                     {
@@ -226,7 +212,7 @@ namespace HotelApp.Infrastructure.Repositories
 
                     ReservationRoomTypes = r.ReservationRoomTypes.Select(rt => new ReservationDetailsRoomTypeDTO
                     {
-                        Id = rt.Id,
+                        RoomTypeId = rt.RoomTypeId,
                         RoomTypeName = rt.RoomType.Name,
                         Quantity = rt.Quantity,
                         NumOfAdults = rt.NumOfAdults,

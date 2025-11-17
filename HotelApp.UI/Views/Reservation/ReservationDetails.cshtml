@@ -125,9 +125,9 @@
                 </div>
 
                 <ul class="nav nav-lg nav-tabs nav-tabs-bottom nav-tabs-toolbar no-margin">
-                    <li class="active"><a href="#reservation-Details" data-toggle="tab"><i class="icon-menu7 position-left"></i> Reservation Details</a></li>
+                    <li class="active"><a href="#reservation-Details" data-toggle="tab"><i class="icon-calendar3 position-left"></i> Reservation Details</a></li>
                     <li><a href="#guest-Details" data-toggle="tab"><i class="icon-people position-left"></i> Guests</a></li>
-                    <li><a href="#course-schedule" data-toggle="tab"><i class="icon-calendar3 position-left"></i> Actions</a></li>
+                    <li><a href="#payments" data-toggle="tab"><i class="icon-cash3"></i> Payments & Charges</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -135,7 +135,6 @@
                         <div class="panel-body">
 
                             <div class="row">
-
                                     <!-- Reservation History -->
                                     <div class="col-md-4">
                                         <div class="panel panel-body">
@@ -159,7 +158,7 @@
                                         </div>
 
                                     </div>
-                                    <!-- reservation history -->
+
                                     <!-- Dates Of Stay-->
                                     <div class="col-md-4 ">
                                         <div class="panel panel-body">
@@ -209,7 +208,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- dates Of Stay-->
+
                                     <!-- Charges Summary -->
                                     <div class="col-md-4">
                                         <div class="panel panel-body">
@@ -241,7 +240,6 @@
 
                                         </div>
                                     </div>
-                                    <!-- charges summary -->
                             </div>
 
                             <div class="row">
@@ -272,6 +270,7 @@
                                                     @foreach (var item in Model.ReservationRoomTypes)
                                                     {
                                                         var rooms = Model.ReservationRooms
+                                                        .Where(r => r.RoomTypeId == item.RoomTypeId)
                                                         .Select(r => r.RoomNumber)
                                                         .ToList();
                                                         <tr>
@@ -291,7 +290,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- accommodations -->
+
                                 <!-- Actions Links -->
                                 <div class="col-md-6">
                                     <div class="panel panel-body">
@@ -329,7 +328,17 @@
                                                 <div class="col-md-4">
                                                     <div class="content-group">
                                                         <ul class="list list-unstyled">
-                                                            <li><a href="#">Add Payment</a></li>
+                                                            <li>
+                                                                <a class="btnOpenModal" data-title="Add Payment"
+                                                                   data-url="@Url.Action("AddPayment", "Payment", new { 
+                                                                        reservationId = Model.Id, 
+                                                                        guestId = Model.GuestReservations.FirstOrDefault(g => g.IsPrimaryGuest)?.Id ?? 0 
+                                                                   })">
+                                                                    Add Payment
+                                                                </a>
+
+                                                            </li>
+                                                            <li><a href="#">Payments/Charges(@Model.NumOfPayments)</a></li>
                                                             <li><a href="#">Assign Rooms</a></li>
                                                         </ul>
                                                     </div>
@@ -346,7 +355,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- actions links -->
                             </div>
 
                         </div>
@@ -364,9 +372,9 @@
                                     </a>
                                 </legend>
 
+                                <!-- ===== Primary Guest Card  ===== -->
                                 <div class="col-md-6">
-
-                                    <!-- ===== Primary Guest Card (Top) ===== -->
+                                    
                                     @if (Model.GuestReservations.Any(g => g.IsPrimaryGuest))
                                     {
                                         var primary = Model.GuestReservations.FirstOrDefault(g => g.IsPrimaryGuest);
@@ -380,43 +388,46 @@
                                                         </a>
                                                     </div>
                                                     <div class="media-body">
-                                                        <h6 class="media-heading text-semibold text-primary"><i class="icon-crown"></i> @primary.FullName</h6>
+                                                        <h6 class="media-heading text-semibold"><span class=" label label-primary">  Primary </span></h6>
                                                         <div class="text-muted mt-5">
+                                                            <i class="icon-user position-left"></i><span class="text-size-large text-primary text-semibold">@primary.FullName</span>  <br />
                                                             <i class="icon-phone position-left"></i> @primary.Phone<br>
-                                                            <i class="icon-mail5 position-left"></i>
-                                                            <a href="mailto:@primary.Email">@primary.Email</a>
+                                                            <i class="icon-mail5 position-left"></i> <a href="mailto:@primary.Email">@primary.Email</a>
                                                         </div>
                                                     </div>
                                                     <div class="media-right media-middle">
-                                                        <ul class="icons-list">
-                                                            <li class="dropdown">
-                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                                    <i class="icon-menu7"></i>
-                                                                </a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
-                                                                    <li><a href="#" data-toggle="modal" data-target="#change"><i class="icon-loop text-info"></i> Change</a></li>
-                                                                    <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
+                                                                <ul class="icons-list text-nowrap">
+                                                                    <li class="dropdown">
+                                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                                            <i class="icon-menu9"></i>
+                                                                        </a>
+                                                                        <ul class="dropdown-menu dropdown-menu-right">
+                                                                            <li><a href="#" data-toggle="modal" data-target="#edit"><i class="icon-pencil7 text-success"></i> Edit</a></li>
+                                                                            <li><a href="#" data-toggle="modal" data-target="#change"><i class="icon-loop text-info"></i> Change</a></li>
+                                                                            <li><a href="#" data-toggle="modal" data-target="#remove"><i class="icon-trash text-danger"></i> Remove</a></li>
+                                                                        </ul>
+                                                                    </li>
                                                                 </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                            </div>
                                                 </div>
                                             </div>
                                         }
                                     }
 
-                                    <!-- ===== Other Guests Collapsible Section ===== -->
-                                    @if (Model.GuestReservations.Any(g => !g.IsPrimaryGuest))
-                                    {
+                                </div>
+
+                                <!-- ===== Other Guests  ===== -->
+                                <div class="col-md-6">                                     
+                                    <div class="panel panel-body">
                                         <legend class="text-semibold">
-                                            Other Guests
-                                            <a class="control-arrow collapsed" data-toggle="collapse" data-target="#guestList" aria-expanded="false">
+                                            Guests
+                                            <a class="control-arrow collapsed" data-toggle="collapse" data-target="#guestList" aria-expanded="false">        
                                                 <i class="icon-circle-down2"></i>
                                             </a>
                                         </legend>
-
-                                        <div class="collapse" id="guestList">
+                                        @if (Model.GuestReservations.Any(g => !g.IsPrimaryGuest))
+                                        {
+                                            <div class="collapse" id="guestList">
                                             <ul class="media-list">
                                                 @foreach (var guest in Model.GuestReservations.Where(g => !g.IsPrimaryGuest))
                                                 {
@@ -460,22 +471,68 @@
                                                 }
                                             </ul>
                                         </div>
-                                    }
-
-                                    @if (!Model.GuestReservations.Any())
-                                    {
-                                        <div class="text-muted text-center mt-10">No guests added yet.</div>
-                                    }
-
+                                        }
+                                        @if (!Model.GuestReservations.Any(g => !g.IsPrimaryGuest))
+                                        {
+                                            <div class="text-muted text-center mt-10">No guests added yet.</div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="course-schedule">
-                        <div class="panel-body">
-                            <div class="schedule"></div>
-                        </div>
+                    <div class="tab-pane fade" id="payments" style="margin-top:15px">
+                        <div class="panel-heading">
+							<h5 class="panel-title"></h5>
+							<div class="heading-elements" >
+                                
+                                <button type="button" class="btn border-teal text-teal-800 btn-flat btnOpenModal" data-title="Add Payment"
+                                      data-url="@Url.Action("AddPayment", "Payment", new { reservationId = Model.Id, guestId = Model.GuestReservations.FirstOrDefault(g => g.IsPrimaryGuest)?.Id ?? 0 })">
+                                      <i class="icon-plus2"></i> Add Payment
+                                </button>
+
+		                	</div>
+						</div>
+
+						<div class="panel-body">
+                            <div class="panel panel-body panel-body-accent" style="margin-bottom:-10px">
+								<div class="row text-center">
+									<div class="col-xs-4">
+                                        <h5 class="text-semibold no-margin">$555.00</h5>
+										<span class="text-muted text-size-small">Total</span>										
+									</div>
+
+									<div class="col-xs-4">
+										<h5 class="text-semibold no-margin">$00.00</h5>
+										<span class="text-muted text-size-small">Paid</span>
+									</div>
+
+									<div class="col-xs-4">
+										<h5 class="text-semibold no-margin">$969.25</h5>
+										<span class="text-muted text-size-small">Balance</span>
+									</div>
+								</div>
+							</div>
+
+						</div>
+
+						<table class="table datatable-basic" id="paymentsTable">
+							<thead>
+								<tr class="border-double active">
+									<th>ID</th>
+									<th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+								</tr>
+							</thead>
+							<tbody id="paymentsBody">
+
+                            </tbody>
+						</table>
                     </div>
                 </div>
             </div>
@@ -487,8 +544,6 @@
 
 
 
-
-<!-- Modals -->
 
 <!-- Change Dates Modal -->
 <div id="changeDatesModal" class="modal fade" tabindex="-1" role="dialog">
@@ -527,9 +582,40 @@
     </div>
 </div>
 
-<!-- modals -->
 
 @section Scripts{
+    <script>
+        $(document).ready(function () {
+            let loaded = false;
+
+            $('a[href="#payments"]').on('shown.bs.tab', function () {
+                if (loaded) return;
+                loaded = true;
+
+                let reservationId = @Model.Id;
+
+                $.ajax({
+                    url: '/Payment/GetPayments',
+                    data: { reservationId: reservationId },
+                    type: 'GET',
+                    success: function (html) {
+                        if ($.fn.DataTable.isDataTable('#paymentsTable')) {
+                            $('#paymentsTable').DataTable().destroy();
+                        }
+                    
+                        $("#paymentsBody").html(html);
+                    
+                        $('#paymentsTable').DataTable();
+                    },
+                    error: function () {
+                        alert("Failed to load payments.");
+                        $("#paymentsBody").html('<tr><td colspan="7" class="text-center">Error loading payments</td></tr>');
+                    }
+                });
+            });
+        });
+    </script>
+
     <script>
         $(document).ready(function () {
             const toastData = localStorage.getItem("toastData");

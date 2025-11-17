@@ -5,6 +5,7 @@ using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using HotelApp.Helper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,11 +34,11 @@ namespace HotelApp.Application.Services.RoomStatusService
 
             return roomStatus;
         }
-		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomStatusDropDownAsync()
+		public async Task<IEnumerable<SelectListItem>> GetRoomStatusDropDownAsync()
 		{
 			int? branchId = BranchContext.CurrentBranchId;
 			var roomStatus = await _unitOfWork.RoomStatusRepository
-	        .GetAllAsDtoAsync<DropDownDTO<string>>(
+	        .GetAllAsDtoAsync<SelectListItem>(
 		        rs => rs.IsSystem || rs.BranchId == branchId, SkipBranchFilter: true );
 
 			return roomStatus;

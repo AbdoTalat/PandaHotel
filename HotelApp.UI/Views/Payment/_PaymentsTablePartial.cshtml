@@ -1,0 +1,26 @@
+﻿@model IEnumerable<GetPaymentDTO>
+
+@foreach (var p in Model)
+{
+    <tr>
+        <td>@p.Id</td>
+        <td>@p.PaymentDate.ToString("dd-MM-yyyy")</td>
+        <td>@p.Amount</td>
+        <td>@p.PaymentMethod</td>
+        <td>@p.TransactionType</td>
+        <td>@p.Notes</td>
+        <td>
+            @if (User.HasClaim("permission", "Payment.Edit"))
+            {
+                <a data-title="Edit Payment" data-url="/Payment/EditPayment/@p.Id" class="text-teal-600 btnEditOpenModal"><i class="icon-pencil7" style="font-size:20px; margin-right:8px"></i> </a>
+            }
+            @if (User.HasClaim("permission", "Payment.Delete"))
+            {
+                <a data-url="/Payment/DeletePayment/@p.Id"
+                   class="text-danger-600 btn-delete">
+                    <i class="icon-trash" style="font-size:20px;margin-right:8px"></i>
+                </a>
+            }
+        </td>
+    </tr>
+}

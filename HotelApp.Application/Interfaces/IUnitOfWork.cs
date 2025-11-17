@@ -56,5 +56,7 @@ namespace HotelApp.Application.Interfaces
         ISystemSettingRepositroy SystemSettingRepository { get; }
         #endregion
 
+        IPaymentRepository PaymentRepository { get; }
+        IMasterDataItemRepository MasterDataItemRepository { get; }
     }
 }

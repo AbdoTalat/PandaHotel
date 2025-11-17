@@ -11,7 +11,6 @@ namespace HotelApp.Application.Interfaces.IRepositories
     public interface IReservationRepository : IGenericRepository<Reservation>
     {
         Task<ReservationDTO> GetReservationToEditByIdAsync(int Id);
-        Task<Reservation> GetReservationDetailsByIds(int Id);
         Task<IEnumerable<GetAllReservationsDTO>> GetFilteredReservationsAsync(ReservationFilterDTO dto);
         Task<GetReservationDetailsByIdDTO> GetReservationDetailsByIdAsync(int Id);
         Task<CheckOutDTO> GetCheckOutReservationByIdAsync(int Id);

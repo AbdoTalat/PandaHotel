@@ -138,9 +138,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Floor<span class="text-danger">*</span></label>
-										<select asp-for="FloorId" id="floorSelect" required data-placeholder="Choose Floor"
-												class="form-control select"
-												data-selected="@Model?.FloorId">
+										<select asp-for="FloorId" id="floorSelect" asp-items="@Model?.Floors" required data-placeholder="Choose Floor"
+												class="form-control select">
 											<option value=""></option>
 										</select>
                                         <span asp-validation-for="FloorId" class="text-danger validation-error-label"></span>
@@ -152,9 +151,8 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Status<span class="text-danger">*</span></label>
-										<select asp-for="RoomStatusId" id="statusSelect" required data-placeholder="Choose Room Status"
-												class="form-control select"
-												data-selected="@Model?.RoomStatusId">
+										<select asp-for="RoomStatusId" id="statusSelect" asp-items="@Model?.RoomStatuses" required data-placeholder="Choose Room Status"
+												class="form-control select">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomStatusId" class="text-danger validation-error-label"></span>
@@ -163,8 +161,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Room Type<span class="text-danger">*</span></label>
-										<select asp-for="RoomTypeId" id="roomTypeSelect" class="form-control select" required data-placeholder="Choose Room Type"
-												data-selected="@Model?.RoomTypeId">
+										<select id="roomTypeSelect" asp-for="RoomTypeId" asp-items="Model?.RoomTypes" class="form-control select" required data-placeholder="Choose Room Type">
 											<option value=""></option>
 										</select>
 										<span asp-validation-for="RoomTypeId" class="text-danger validation-error-label"></span>
@@ -310,24 +307,6 @@
 
 
 @section Scripts {
-
-    @if (TempData["Error"] != null)
-    {
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: '@TempData["Error"]'
-            });
-        </script>
-    }
-	<script>
-		$(document).ready(function () {
-			loadSelect("#roomTypeSelect", "/RoomType/GetRoomTypesJson", "typeName", "id");
-			loadSelect("#floorSelect", "/Floor/GetFloorsJson", "number", "id");
-			loadSelect("#statusSelect", "/RoomStatus/GetRoomStatusJson", "displayText", "id");
-		});
-	</script>
 
 	<script>
 		$(document).ready(function () {

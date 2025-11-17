@@ -4,6 +4,7 @@ using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Application.DTOs.RoomStatus;
 using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Domain.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,16 +58,17 @@ namespace HotelApp.Application.Mapping
 			CreateMap<RoomTypeDTO, RoomType>();
 			CreateMap<RoomTypeDTO, RoomType>();
 
-			CreateMap<RoomType, DropDownDTO<string>>()
-				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
+			CreateMap<RoomType, SelectListItem>()
+				.ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Name))
+				.ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Id));
 
+            /* Room Status */
+            CreateMap<RoomStatus, GetAllRoomStatusDTO>();
+			CreateMap<RoomStatus, SelectListItem>()
+                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Id));
 
-			/* Room Status */
-			CreateMap<RoomStatus, GetAllRoomStatusDTO>();
-			CreateMap<RoomStatus, DropDownDTO<string>>()
-				.ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
-
-			CreateMap<RoomStatusDTO, RoomStatus>();
+            CreateMap<RoomStatusDTO, RoomStatus>();
 			CreateMap<RoomStatusDTO, RoomStatus>();
 			CreateMap<RoomStatus, RoomStatusDTO>();
 			

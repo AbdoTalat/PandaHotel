@@ -75,13 +75,13 @@ namespace HotelApp.UI.Controllers
 			return Json(new {success = result.Success, message = result.Message});
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> GetRoomStatusJson()
-		{
-			var roomStatus = await _roomStatusService.GetRoomStatusDropDownAsync();
+		//[HttpGet]
+		//public async Task<IActionResult> GetRoomStatusJson()
+		//{
+		//	var roomStatus = await _roomStatusService.GetRoomStatusDropDownAsync();
 
-			return Json(roomStatus);
-		}
+		//	return Json(roomStatus);
+		//}
 
 		public async Task<IActionResult> GetRoomStatusWithOutBranchFilterJson()
 		{

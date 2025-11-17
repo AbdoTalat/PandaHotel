@@ -6,6 +6,7 @@ using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,9 +27,9 @@ namespace HotelApp.Application.Services.FloorService
             _mapper = mapper;
 		}
          
-        public async Task<IEnumerable<DropDownDTO<Int16>>> GetFloorsDropDownAsync()
+        public async Task<IEnumerable<SelectListItem>> GetFloorsDropDownAsync()
         {
-			var floors = await _unitOfWork.FloorRepository.GetAllAsDtoAsync<DropDownDTO<Int16>>();
+			var floors = await _unitOfWork.FloorRepository.GetAllAsDtoAsync<SelectListItem>();
             return floors;
         }
 		public async Task<IEnumerable<GetAllFloorsDTO>> GetAllFloorsAsync()

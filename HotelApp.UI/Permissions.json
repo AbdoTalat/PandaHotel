@@ -96,5 +96,11 @@
     "ReservationSource.Add",
     "ReservationSource.Edit",
     "ReservationSource.Delete"
+  ],
+  "Payment": [
+    "Payment.View",
+    "Payment.Add",
+    "Payment.Edit",
+    "Payment.Delete"
   ]
 }

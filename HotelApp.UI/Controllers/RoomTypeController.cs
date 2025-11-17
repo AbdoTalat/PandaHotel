@@ -24,18 +24,18 @@ namespace HotelApp.UI.Controllers
             return View(roomTypes);
         }
 
-        public async Task<IActionResult> GetRoomTypesJson()
-        {
-            var roomTypes = await _roomTypeService.GetRoomTypesDropDownAsync();
+  //      public async Task<IActionResult> GetRoomTypesJson()
+  //      {
+  //          var roomTypes = await _roomTypeService.GetRoomTypesDropDownAsync();
 
-            var result = roomTypes.Select(rt => new
-            {
-                Id = rt.Id,
-                typeName = rt.DisplayText
-            });
+  //          var result = roomTypes.Select(rt => new
+  //          {
+  //              Id = rt.Id,
+  //              typeName = rt.DisplayText
+  //          });
 
-			return Json(result);
-		}
+		//	return Json(result);
+		//}
 
 
         [HttpGet]

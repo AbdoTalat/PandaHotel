@@ -131,19 +131,6 @@
                 </div>
 
                 <div class="row" style="margin-top:30px;">
-@*                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Select Available Rooms</label>
-                            <div class="input-group">
-                                <select id="roomsSelect" class="form-control" multiple="multiple"></select>
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rateModal">
-                                        <i class="icon-search4 text-size-base"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div> *@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Rate <span class="text-danger">*</span></label>
@@ -616,15 +603,48 @@
         function refreshAllRoomTypeOptions() {
             const allSelects = $('.room-type-select');
             const selected = allSelects.map((_, el) => $(el).val()).get().filter(Boolean);
-            allSelects.each(function () {
-                const current = $(this).val();
-                $(this).find('option').each(function () {
-                    const val = $(this).val();
-                    $(this).prop('disabled', val && val !== current && selected.includes(val));
-                });
-            }).trigger('change.select2');
-        }
 
+            allSelects.each(function () {
+                const $select = $(this);
+                const current = $select.val();
+
+                // Rebuild full options list so every select has the same DOM options.
+                let optionsHtml = '<option></option>';
+                if (cachedRoomTypes.length) {
+                    cachedRoomTypes.forEach(rt => {
+                        const val = rt.id.toString();
+                        const isUnavailable = Number(rt.numOfAvailableRooms) === 0;
+                        const selectedElsewhere = val && val !== current && selected.includes(val);
+                        const shouldDisable = isUnavailable || selectedElsewhere;
+                        const availableText = isUnavailable ? `(Unavailable)` : `(${rt.numOfAvailableRooms} Available)`;
+                        const disabledAttr = shouldDisable ? 'disabled' : '';
+
+                        optionsHtml += `
+                            <option value="${rt.id}" ${disabledAttr}
+                                    data-name="${rt.name}"
+                                    data-count="${rt.numOfAvailableRooms}"
+                                    data-max-adults="${rt.maxNumOfAdults}"
+                                    data-max-children="${rt.maxNumOfChildrens}">
+                                ${rt.name} ${availableText}
+                            </option>`;
+                    });
+                }
+
+                // Safely update Select2: destroy, replace options, restore value, reinit
+                try { $select.select2('destroy'); } catch (e) { /* ignore if not initialized */ }
+                $select.html(optionsHtml);
+
+                // Keep current value if present (even if disabled) so edit mode stays consistent.
+                if (current) {
+                    $select.val(current);
+                }
+
+                $select.select2({
+                    width: '100%',
+                    placeholder: "Select Room Type"
+                });
+            });
+        }
         function updateRemoveButtons() {
             const rows = $('#roomTable tbody tr');
             rows.find('.remove-room-btn').toggle(rows.length > 1);
@@ -795,27 +815,22 @@
                 .get()
                 .filter(Boolean);
 
-            let optionsHtml = '<option></option>';
+                        let optionsHtml = '<option></option>';
 
-             
-            // Only add room type options if we have cached room types
+            // Always include all room types; refreshAllRoomTypeOptions will disable those selected elsewhere.
             if (cachedRoomTypes.length) {
                 cachedRoomTypes.forEach(rt => {
-                    const disabled = rt.numOfAvailableRooms === 0 ? "disabled" : "";
                     const availableText = rt.numOfAvailableRooms > 0
                         ? `(${rt.numOfAvailableRooms} Available)`
                         : `(Unavailable)`;
-
-                    if (!selectedIds.includes(rt.id.toString())) {
-                        optionsHtml += `
-                            <option value="${rt.id}" ${disabled}
-                                    data-name="${rt.name}"
-                                    data-count="${rt.numOfAvailableRooms}"
-                                    data-max-adults="${rt.maxNumOfAdults}"
-                                    data-max-children="${rt.maxNumOfChildrens}">
-                                ${rt.name} ${availableText}
-                            </option>`;
-                    }
+                    optionsHtml += `
+                        <option value="${rt.id}"
+                                data-name="${rt.name}"
+                                data-count="${rt.numOfAvailableRooms}"
+                                data-max-adults="${rt.maxNumOfAdults}"
+                                data-max-children="${rt.maxNumOfChildrens}">
+                            ${rt.name} ${availableText}
+                        </option>`;
                 });
             }
 

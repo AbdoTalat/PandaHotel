@@ -1,5 +1,7 @@
 ﻿using HotelApp.Application.DTOs.Branches;
 using HotelApp.Application.Services.BranchService;
+using HotelApp.Application.Services.DropdownService;
+using HotelApp.Domain.Common;
 using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
@@ -18,21 +20,26 @@ namespace HotelApp.UI.Controllers
         private readonly ApplicationDbContext _context;
 		private readonly UserManager<User> _userManager;
 		private readonly SignInManager<User> _signInManager;
+        private readonly IDropdownService dropdownService;
 
-		public BranchController(IBranchService branchService, ApplicationDbContext context,
-            UserManager<User> userManager, SignInManager<User> signInManager)
+        public BranchController(IBranchService branchService, ApplicationDbContext context,
+            UserManager<User> userManager, SignInManager<User> signInManager, IDropdownService dropdownService)
         {
             _branchService = branchService;
             _context = context;
 			_userManager = userManager;
 			_signInManager = signInManager;
-		}
+            this.dropdownService = dropdownService;
+        }
 
         [Authorize(Policy = "Branch.View")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var branches = await _branchService.GetAllBranchesAsync();
+
+            //var items = await dropdownService.GetDropDownItemsAsync(DropDownTypesConstants.TransactionTypeId);
+
             return View(branches);
         }
         public async Task<IActionResult> GetBranchesJson()

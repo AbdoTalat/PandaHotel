@@ -49,6 +49,8 @@ namespace HotelApp.Infrastructure
             services.AddScoped<IRateRepository, RateRepository>();
             services.AddScoped<ISystemSettingRepositroy, SystemSettingRepositroy>();
             services.AddScoped<IDashboardRepository, DashboardRepository>();
+            services.AddScoped<IMasterDataItemRepository, MasterDataItemRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
 
             services.AddHttpContextAccessor();
 

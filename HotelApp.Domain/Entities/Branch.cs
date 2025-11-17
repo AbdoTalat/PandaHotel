@@ -35,5 +35,6 @@ namespace HotelApp.Domain.Entities
         public ICollection<Rate> Rates { get; set; } = new HashSet<Rate>();
         public ICollection<Option> Options { get; set; } = new HashSet<Option>();   
         public ICollection<Company> Companies { get; set; } = new HashSet<Company>();   
+        public ICollection<Payment> Payments { get; set; } = new HashSet<Payment>();
     }
 }

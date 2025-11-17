@@ -23,8 +23,8 @@ namespace HotelApp.Application.DTOs.Reservation
 		public string Notes { get; set; }
 		public string CreatedBy { get; set; }
 		public string LastModifiedBy { get; set; }
-
 		public int NumOfTotalRooms { get; set; }
+		public int NumOfPayments { get; set; }
 
         public List<ReservationDetailsGuestsDTO> GuestReservations { get; set; } = new();
 		public List<ReservationDetailsRoomTypeDTO> ReservationRoomTypes { get; set; } = new();
@@ -42,7 +42,7 @@ namespace HotelApp.Application.DTOs.Reservation
     }
 	public class ReservationDetailsRoomTypeDTO
     {
-		public int Id { get; set; }
+		public int RoomTypeId { get; set; }
 		public string RoomTypeName { get; set; }
 		public int Quantity { get; set; }
 		public int NumOfAdults { get; set; }

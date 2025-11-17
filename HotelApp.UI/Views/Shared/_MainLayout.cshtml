@@ -689,8 +689,8 @@
 	<div id="ajaxModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="false">
 		<div class="modal-dialog" role="document" style="min-width:900px">
 			<div class="modal-content" style="min-height:300px;">
-				<div class="modal-header bg-teal-400">
-					<h5 class="modal-title">
+				<div class="modal-header">
+					<h5 class="modal-title text-center">
 						<i class="icon-file-text2 position-left"></i>
 						Form
 					</h5>
@@ -751,7 +751,29 @@
 			});
 		});
 	</script>
+
+
 	<script>
+		$(document).ready(function () {
+			var successMessage = '@TempData["SuccessAlert"]';
+			var errorMessage = '@TempData["ErrorAlert"]';
+			var warningMessage = '@TempData["WarningAlert"]';
+			var infoMessage = '@TempData["InfoAlert"]';
+
+			if (successMessage && successMessage.trim() !== "") {
+				showAlert('success', 'Success', successMessage);
+			}
+			if (errorMessage && errorMessage.trim() !== "") {
+				showAlert('error', 'Error', errorMessage);
+			}
+			if (warningMessage && warningMessage.trim() !== "") {
+				showAlert('warning', 'Warning', warningMessage);
+			}
+			if (infoMessage && infoMessage.trim() !== "") {
+				showAlert('info', 'Info', infoMessage);
+			}
+		});
+
 		$(document).ready(function () {
 			var successMessage = '@TempData["Success"]';
 			var errorMessage = '@TempData["Error"]';

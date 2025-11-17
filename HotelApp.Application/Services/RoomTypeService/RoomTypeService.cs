@@ -6,6 +6,7 @@ using HotelApp.Application.Interfaces;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -34,10 +35,10 @@ namespace HotelApp.Application.Services.RoomTypeService
 
 			return roomTypes;
 		}
-		public async Task<IEnumerable<DropDownDTO<string>>> GetRoomTypesDropDownAsync()
+		public async Task<IEnumerable<SelectListItem>> GetRoomTypesDropDownAsync()
 		{
 			var roomTypes = await _unitOfWork.RoomTypeRepository
-				.GetAllAsDtoAsync<DropDownDTO<string>>();
+				.GetAllAsDtoAsync<SelectListItem>();
 
 			return roomTypes;
 		}
