@@ -215,20 +215,20 @@ namespace HotelApp.Infrastructure.UnitOfWorks
 
 
         #region Helper Methods
-        private static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> CombineSetProperties(
-            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> first,
-            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> second)
-        {
-            var param = Expression.Parameter(typeof(SetPropertyCalls<T>), "p");
+        //private static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> CombineSetProperties(
+        //    Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> first,
+        //    Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> second)
+        //{
+        //    var param = Expression.Parameter(typeof(SetPropertyCalls<T>), "p");
 
-            // Invoke first(p)
-            var firstBody = Expression.Invoke(first, param);
+        //    // Invoke first(p)
+        //    var firstBody = Expression.Invoke(first, param);
 
-            // Invoke second(first(p))
-            var secondBody = Expression.Invoke(second, firstBody);
+        //    // Invoke second(first(p))
+        //    var secondBody = Expression.Invoke(second, firstBody);
 
-            return Expression.Lambda<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>(secondBody, param);
-        }
+        //    return Expression.Lambda<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>(secondBody, param);
+        //}
         #endregion
 
     }

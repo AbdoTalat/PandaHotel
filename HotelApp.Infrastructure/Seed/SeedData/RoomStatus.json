@@ -1,0 +1,57 @@
+[
+  {
+    "Id": 1,
+    "Name": "Available",
+    "Code": "Available",
+    "Description": "Room is ready to be booked",
+    "Color": "#20BF7E",
+    "IsReservable": true,
+    "IsActive": true,
+    "IsSystem": true,
+    "BranchId": null
+  },
+  {
+    "Id": 2,
+    "Name": "Reserved",
+    "Code": "Reserved",
+    "Description": "Room is reserved by a guest",
+    "Color": "#FFD166",
+    "IsReservable": false,
+    "IsActive": true,
+    "IsSystem": true,
+    "BranchId": null
+  },
+  {
+    "Id": 3,
+    "Name": "Occupied",
+    "Code": "Occupied",
+    "Description": "Room is currently occupied",
+    "Color": "#FF9F1C",
+    "IsReservable": false,
+    "IsActive": true,
+    "IsSystem": true,
+    "BranchId": null
+  },
+  {
+    "Id": 4,
+    "Name": "Maintenance",
+    "Code": "Maintenance",
+    "Description": "Room is under maintenance",
+    "Color": "#EF476F",
+    "IsReservable": false,
+    "IsActive": true,
+    "IsSystem": true,
+    "BranchId": null
+  },
+  {
+    "Id": 5,
+    "Name": "Cleaning",
+    "Code": "Cleaning",
+    "Description": "Room is being cleaned",
+    "Color": "#3A86FF",
+    "IsReservable": false,
+    "IsActive": true,
+    "IsSystem": true,
+    "BranchId": null
+  }
+]

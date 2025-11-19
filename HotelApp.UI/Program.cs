@@ -1,13 +1,14 @@
-using HotelApp.Infrastructure;
-using HotelApp.Helper;
-using System;
-using HotelApp.Infrastructure.Seed;
-using HotelApp.Infrastructure.Repositories;
 using HotelApp.Application;
 using HotelApp.Application.Validators;
+using HotelApp.Helper;
+using HotelApp.Infrastructure;
+using HotelApp.Infrastructure.DbContext;
+using HotelApp.Infrastructure.Repositories;
+using HotelApp.Infrastructure.Seed;
 using HotelApp.UI.Controllers;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using System;
 
 namespace HotelApp.PL
 {
@@ -37,8 +38,8 @@ namespace HotelApp.PL
 				await DefaultPermissionsSeeder.SeedAsync(serviceProvider);
 			}
 
-			// Global error handling for production
-			if (!app.Environment.IsDevelopment())
+            // Global error handling for production
+            if (!app.Environment.IsDevelopment())
 			{
 				app.UseExceptionHandler("/Home/Error");
 			}

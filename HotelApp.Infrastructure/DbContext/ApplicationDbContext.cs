@@ -1,8 +1,10 @@
 ﻿using HotelApp.Application.DTOs.RoomTypes;
+using HotelApp.Domain.Common;
 using HotelApp.Domain.Entities;
 using HotelApp.Infrastructure.Configurations;
 using HotelApp.Infrastructure.Configurations.Locations;
 using HotelApp.Infrastructure.Seed;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +15,11 @@ namespace HotelApp.Infrastructure.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<User, Role, int>
     {
-		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
-		}
+        }
 
 		#region DbSets
 		public DbSet<Branch> Branches { get; set; }
@@ -32,7 +35,7 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<RoomOption> RoomOptions { get; set; }
 		public DbSet<Rate> Rates { get; set; }
 		public DbSet<RoomTypeRate> RoomTypeRates { get; set; }
-		public DbSet<ReservationSource> ReservationSources { get; set; }
+		public DbSet<Domain.Entities.ReservationSource> ReservationSources { get; set; }
 		public DbSet<Country> Countries { get; set; }
 		public DbSet<State> States { get; set; }
 		public DbSet<ReservationRoomType> ReservationRoomTypes { get; set; }
@@ -92,12 +95,13 @@ namespace HotelApp.Infrastructure.DbContext
             builder.ApplyConfiguration(new MasterDataItemConfiguration());
             #endregion
 
-
             #region Seed Data
-            builder.SeedRoomStatuses();
-            builder.SeedReservationSources();
-			builder.SeedDropDownTypesAndItems();
+   //         builder.SeedRoomStatuses();
+   //         builder.SeedReservationSources();
+			//builder.SeedDropDownTypesAndItems();
 			#endregion
 		}
-	}
+
+
+    }
 }

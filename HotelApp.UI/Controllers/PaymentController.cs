@@ -35,12 +35,11 @@ namespace HotelApp.UI.Controllers
         [Authorize(Policy = "Payment.Add")]
         public async Task<IActionResult> AddPayment(int reservationId, int guestId)
         {
-            var now = DateTime.Now;
             var model = new PaymentDTO
             {
                 ReservationId = reservationId,
                 GuestId = guestId,
-                PaymentDate = now.AddMicroseconds(-now.Millisecond)
+                PaymentDate = DateTime.Now
             };
             await LoadPaymentDropdownsAsync(model);
             return PartialView("_AddPayment", model);

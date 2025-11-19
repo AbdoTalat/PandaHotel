@@ -19,10 +19,6 @@ using HotelApp.Application.Services.RoomTypeService;
 using HotelApp.Application.Services.SystemSettingService;
 using HotelApp.Application.Services.UserService;
 using HotelApp.Application.Validators;
-using HotelApp.Domain;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -87,7 +83,13 @@ namespace HotelApp.Application
 			services.AddFluentValidationAutoValidation();
 			services.AddFluentValidationClientsideAdapters();
 
-			return services;
+
+
+            //services.AddValidatorsFromAssemblyContaining<GuestValidator>();
+            //services.AddValidatorsFromAssemblyContaining<ReservationDTOValidator>();
+
+
+            return services;
         }
     }
 }

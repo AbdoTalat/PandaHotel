@@ -4,7 +4,6 @@ using HotelApp.Application.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Application.DTOs.Users;
-using System.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using HotelApp.Domain.Entities;

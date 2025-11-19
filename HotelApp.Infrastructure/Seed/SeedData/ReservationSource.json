@@ -1,0 +1,27 @@
+[
+  {
+    "Id": 1,
+    "Name": "Walk In",
+    "IsActive": true
+  },
+  {
+    "Id": 2,
+    "Name": "Hotel Website",
+    "IsActive": true
+  },
+  {
+    "Id": 3,
+    "Name": "Admin Panel",
+    "IsActive": true
+  },
+  {
+    "Id": 4,
+    "Name": "Government",
+    "IsActive": true
+  },
+  {
+    "Id": 5,
+    "Name": "Mobile App",
+    "IsActive": true
+  }
+]

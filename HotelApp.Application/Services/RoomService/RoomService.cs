@@ -7,8 +7,6 @@ using HotelApp.Application.Services.RoomTypeService;
 using Microsoft.EntityFrameworkCore;
 using HotelApp.Application.DTOs.RoleBased;
 using HotelApp.Domain.Entities;
-using BenchmarkDotNet.Running;
-using System.Web.Mvc;
 using HotelApp.Helper;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.Interfaces.IRepositories;

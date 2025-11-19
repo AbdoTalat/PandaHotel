@@ -1,25 +1,26 @@
-﻿using HotelApp.Domain;
+﻿using HotelApp.Application.Authorization;
+using HotelApp.Application.Interfaces;
+using HotelApp.Application.Interfaces.IRepositories;
+using HotelApp.Domain;
+using HotelApp.Domain.Entities;
+using HotelApp.Helper;
 using HotelApp.Infrastructure.DbContext;
 using HotelApp.Infrastructure.Repositories;
+using HotelApp.Infrastructure.Seed;
+using HotelApp.Infrastructure.UnitOfWorks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using HotelApp.Domain.Entities;
-using HotelApp.Helper;
-using HotelApp.Application.Interfaces.IRepositories;
-using HotelApp.Application.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
-using HotelApp.Application.Authorization;
-using Microsoft.AspNetCore.Authorization;
-using HotelApp.Infrastructure.UnitOfWorks;
+using System.Threading.Tasks;
 
 namespace HotelApp.Infrastructure
 {
@@ -51,8 +52,8 @@ namespace HotelApp.Infrastructure
             services.AddScoped<IDashboardRepository, DashboardRepository>();
             services.AddScoped<IMasterDataItemRepository, MasterDataItemRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
-
             services.AddHttpContextAccessor();
+
 
             return services;
         }
