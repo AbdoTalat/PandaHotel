@@ -38,7 +38,8 @@ namespace HotelApp.Infrastructure.Seed
         {
             builder.Entity<MasterDataType>().HasData(
                 new MasterDataType { Id = (int)MasterDataTypeEnum.TransactionType, Name = MasterDataTypeEnum.TransactionType.ToString() },
-                new MasterDataType { Id = (int)MasterDataTypeEnum.PaymentMethod, Name = MasterDataTypeEnum.PaymentMethod.ToString() }
+                new MasterDataType { Id = (int)MasterDataTypeEnum.PaymentMethod, Name = MasterDataTypeEnum.PaymentMethod.ToString() },
+                new MasterDataType { Id = (int)MasterDataTypeEnum.CalculationType, Name = MasterDataTypeEnum.CalculationType.ToString() }
             );
 
             builder.Entity<MasterDataItem>().HasData(
@@ -50,8 +51,9 @@ namespace HotelApp.Infrastructure.Seed
                 new MasterDataItem { Id = 5, Value = (int)PaymentMethod.DebitCard, MasterDataTypeId = (int)MasterDataTypeEnum.PaymentMethod, Name = PaymentMethod.DebitCard.ToString(), IsActive = true },
                 new MasterDataItem { Id = 6, Value = (int)PaymentMethod.BankTransfer, MasterDataTypeId = (int)MasterDataTypeEnum.PaymentMethod, Name = PaymentMethod.BankTransfer.ToString(), IsActive = true },
                 new MasterDataItem { Id = 7, Value = (int)PaymentMethod.Wallet, MasterDataTypeId = (int)MasterDataTypeEnum.PaymentMethod, Name = PaymentMethod.Wallet.ToString(), IsActive = true },
-                new MasterDataItem { Id = 8, Value = (int)PaymentMethod.Cheque, MasterDataTypeId = (int)MasterDataTypeEnum.PaymentMethod, Name = PaymentMethod.Cheque.ToString(), IsActive = true }
+                new MasterDataItem { Id = 8, Value = (int)PaymentMethod.Cheque, MasterDataTypeId = (int)MasterDataTypeEnum.PaymentMethod, Name = PaymentMethod.Cheque.ToString(), IsActive = true },
 
+                new MasterDataItem { Id = 9, Value = (int)CalculationType.ByAlert, MasterDataTypeId = (int)MasterDataTypeEnum.CalculationType, Name = CalculationType.ByAlert.ToString(), IsActive = true }
             );
         }
     }

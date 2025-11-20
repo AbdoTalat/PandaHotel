@@ -10,7 +10,7 @@ namespace HotelApp.Application.Services.SystemSettingService
 {
 	public interface ISystemSettingService
 	{
-		Task<SystemSettingDTO?> GetSystemSettingForEditAsync();
+		Task<SystemSettingDTO> GetSystemSettingForEditAsync();
 		Task<ServiceResponse<SystemSettingDTO>> EditSystemSettingAsync(SystemSettingDTO systemSettingDTO);
 		GetSystemSettingForValidationDTO? GetSystemSettingForValidation();
 	}

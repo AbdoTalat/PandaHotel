@@ -16,11 +16,6 @@ namespace HotelApp.Application.Mapping
         {
             CreateMap<SystemSetting, SystemSettingDTO>();
             CreateMap<SystemSettingDTO, SystemSetting>();
-
-
-            /* Calculation Type */
-            CreateMap<CalculationType, DropDownDTO<string>>()
-                .ForMember(dest => dest.DisplayText, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

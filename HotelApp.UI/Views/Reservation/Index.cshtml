@@ -164,6 +164,9 @@
 					<th>Check Out Date</th>
                     <th>Nights</th>
                     <th>People</th>
+                    <th>Total Price</th>
+                    <th>Total Payments</th>
+                    <th>Balance</th>
                     <th>Source</th>
 					<th>Status</th>
 					<th>Actions</th>
@@ -179,6 +182,9 @@
 						<td>@item.CheckOutDate.ToShortDateString()</td>
                         <td>@item.NumberOfNights</td>
                         <td>@item.NumberOfPeople</td>
+                        <td>@item.TotalPrice</td>
+                        <td>@item.TotalPayments</td>
+                        <td>@item.Balance</td>
                         <td>@item.ReservationSource</td>
                         <td>
                             <div class="btn-group">
@@ -201,8 +207,6 @@
                                 </ul>
                             </div>
                         </td>
-
-
 
 						<td class="text-center">
 

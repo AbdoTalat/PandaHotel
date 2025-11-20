@@ -23,12 +23,12 @@ namespace HotelApp.Application.Services.SystemSettingService
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
-        public async Task<SystemSettingDTO?> GetSystemSettingForEditAsync()
+        public async Task<SystemSettingDTO> GetSystemSettingForEditAsync()
 		{
 			var systemSetting = await _unitOfWork.SystemSettingRepository
 				.FirstOrDefaultAsDtoAsync<SystemSettingDTO>();
 
-			return systemSetting;
+			return systemSetting ?? new SystemSettingDTO();
 		}
         public async Task<ServiceResponse<SystemSettingDTO>> EditSystemSettingAsync(SystemSettingDTO systemSettingDTO)
 		{

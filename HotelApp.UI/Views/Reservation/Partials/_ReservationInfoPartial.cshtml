@@ -161,15 +161,12 @@
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">×</button>
-                <h5 class="modal-title">Rate Details</h5>
+                <h5 class="modal-title">Rooms Charges Summary</h5>
             </div>
 
             <div class="modal-body">
-                <div class="panel">
-
-                    <div class="panel-body">
-                        <div id="rateDetails" class="col-md-12"></div>
-                    </div>
+                <div class="panel panel-flat">
+                    <div id="rateDetails"></div>
                 </div>
             </div>
 
@@ -571,18 +568,23 @@
         }
 
         // ======== Utility Helpers ========
-        function fillOptions($select, start, end, selected = null) {
-            $select.empty().append('<option></option>');
-            for (let i = start; i <= end; i++) {
-                $select.append($('<option>', {
-                    value: i,
-                    text: i
-                }));
-            }
-            if (selected) $select.val(selected).trigger('change.select2');
+         function fillOptions($select, start, end, selected = null) {
+        $select.empty().append('<option></option>');
+        for (let i = start; i <= end; i++) {
+            $select.append($('<option>', {
+                value: i,
+                text: i
+            }));
         }
+        // Accept 0 as a valid selection (don't use truthy check)
+        if (selected !== null && selected !== undefined) {
+            $select.val(selected).trigger('change.select2');
+        }
+    }
+
 
         function updateRowCapacities($row) {
+            debugger;
             const opt = $row.find('.room-type-select option:selected');
             if (!opt.length) return;
 
@@ -601,6 +603,7 @@
         }
 
         function refreshAllRoomTypeOptions() {
+            debugger;
             const allSelects = $('.room-type-select');
             const selected = allSelects.map((_, el) => $(el).val()).get().filter(Boolean);
 
@@ -612,6 +615,7 @@
                 let optionsHtml = '<option></option>';
                 if (cachedRoomTypes.length) {
                     cachedRoomTypes.forEach(rt => {
+                        debugger;
                         const val = rt.id.toString();
                         const isUnavailable = Number(rt.numOfAvailableRooms) === 0;
                         const selectedElsewhere = val && val !== current && selected.includes(val);
@@ -645,6 +649,7 @@
                 });
             });
         }
+
         function updateRemoveButtons() {
             const rows = $('#roomTable tbody tr');
             rows.find('.remove-room-btn').toggle(rows.length > 1);
@@ -775,6 +780,7 @@
 
 
         function addRoomRow(prefill = null) {
+            debugger;
             const checkIn = $checkIn.val();
             const checkOut = $checkOut.val();
 
@@ -805,66 +811,78 @@
                 }, true);
                 return;
             }
-
+            debugger;
             addRoomRowWithData(prefill);
         }
 
-        function addRoomRowWithData(prefill = null) {
-            const selectedIds = $('.room-type-select')
-                .map((_, el) => $(el).val())
-                .get()
-                .filter(Boolean);
+    function addRoomRowWithData(prefill = null) {
+           let optionsHtml = '<option></option>';
 
-                        let optionsHtml = '<option></option>';
+           if (cachedRoomTypes.length) {
+               cachedRoomTypes.forEach(rt => {
+                   const availableText = rt.numOfAvailableRooms > 0
+                       ? `(${rt.numOfAvailableRooms} Available)`
+                       : `(Unavailable)`;
+                   optionsHtml += `
+                       <option value="${rt.id}"
+                               data-name="${rt.name}"
+                               data-count="${rt.numOfAvailableRooms}"
+                               data-max-adults="${rt.maxNumOfAdults}"
+                               data-max-children="${rt.maxNumOfChildrens}">
+                           ${rt.name} ${availableText}
+                       </option>`;
+               });
+           }
 
-            // Always include all room types; refreshAllRoomTypeOptions will disable those selected elsewhere.
-            if (cachedRoomTypes.length) {
-                cachedRoomTypes.forEach(rt => {
-                    const availableText = rt.numOfAvailableRooms > 0
-                        ? `(${rt.numOfAvailableRooms} Available)`
-                        : `(Unavailable)`;
-                    optionsHtml += `
-                        <option value="${rt.id}"
-                                data-name="${rt.name}"
-                                data-count="${rt.numOfAvailableRooms}"
-                                data-max-adults="${rt.maxNumOfAdults}"
-                                data-max-children="${rt.maxNumOfChildrens}">
-                            ${rt.name} ${availableText}
-                        </option>`;
-                });
-            }
+           const $newRow = $(`
+               <tr>
+                   <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
+                   <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
+                   <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
+                   <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
+                   <td><select class="form-control rooms-select" multiple="multiple"></select></td>
+                   <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
+               </tr>
+           `);
 
+           $('#roomTable tbody').append($newRow);
+           initializeRow($newRow, prefill);
 
-            const $newRow = $(`
-                <tr>
-                    <td><select class="form-control select room-type-select" data-placeholder="Room Type">${optionsHtml}</select></td>
-                    <td><select class="form-control select num-rooms-select" data-placeholder="Rooms"></select></td>
-                    <td><select class="form-control select num-adults-select" data-placeholder="Adults"></select></td>
-                    <td><select class="form-control select num-children-select" data-placeholder="Children"></select></td>
-                    <td><select class="form-control rooms-select" multiple="multiple"></select></td>
-                    <td><button type="button" class="btn btn-default btn-sm remove-room-btn"><i class="icon-x"></i></button></td>
-                </tr>
-            `);
+           if (prefill) {
+               // Deterministic sequence to avoid race conditions:
+               // 1) set room-type so change handler sets capacities & initializes rooms-select
+               $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
 
-            $('#roomTable tbody').append($newRow);
-            initializeRow($newRow, prefill);
+               // 2) after capacity population, set number of rooms (recomputes adults/children ranges)
+               setTimeout(() => {
+                   if (prefill.NumOfRooms !== undefined && prefill.NumOfRooms !== null) {
+                       $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
+                   }
 
-            if (prefill) {
-                // Set values after a small delay to ensure select2 is initialized
-                setTimeout(() => {
-                    $newRow.find('.room-type-select').val(prefill.RoomTypeId).trigger('change');
-                    $newRow.find('.num-rooms-select').val(prefill.NumOfRooms).trigger('change');
-                    $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
-                    $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
-                }, 100);
-            }
+                   // 3) after num-rooms change finishes, set adults/children (0 is valid)
+                   setTimeout(() => {
+                       if (prefill.NumOfAdults !== undefined && prefill.NumOfAdults !== null) {
+                           $newRow.find('.num-adults-select').val(prefill.NumOfAdults).trigger('change');
+                       }
+                       if (prefill.NumOfChildrens !== undefined && prefill.NumOfChildrens !== null) {
+                           $newRow.find('.num-children-select').val(prefill.NumOfChildrens).trigger('change');
+                       }
 
-            updateRemoveButtons();
-            refreshAllRoomTypeOptions();
-            updateRates();
-            checkAddButtonState();
-        }
+                       // 4) finally preload the actual room IDs into the rooms-select
+                       const $roomsSelect = $newRow.find('.rooms-select');
+                       if (Array.isArray(prefill.RoomIds) && prefill.RoomIds.length) {
+                           // ensure the rooms-select is initialized with correct roomTypeId and then preselect
+                           initializeRoomSelect($roomsSelect, prefill.RoomTypeId, prefill.RoomIds);
+                       }
+                   }, 80);
+               }, 80);
+           }
 
+           updateRemoveButtons();
+           refreshAllRoomTypeOptions();
+           updateRates();
+           checkAddButtonState();
+       }
         function removeRoomRow(btn) {
             $(btn).closest('tr').remove();
             updateRemoveButtons();
@@ -873,35 +891,38 @@
             checkAddButtonState();
         }
 
-        function initializeRow($row, prefill = null) {
-            const $roomTypeSelect = $row.find('.room-type-select');
-            const $roomSelect = $row.find('.rooms-select');
-            const prefillRoomIds = prefill ? prefill.RoomIds : [];
+    function initializeRow($row, prefill = null) {
+           const $roomTypeSelect = $row.find('.room-type-select');
+           const $roomSelect = $row.find('.rooms-select');
+           const prefillRoomIds = prefill ? prefill.RoomIds : [];
 
-            $roomTypeSelect.select2({
-                width: '100%',
-                placeholder: "Select Room Type"
-            }).on('change', function () {
-                updateRowCapacities($(this).closest('tr'));
-                updateRoomSelection($(this).closest('tr'));
-                refreshAllRoomTypeOptions();
-                updateRates();
-                checkAddButtonState();
-            });
+           $roomTypeSelect.select2({
+               width: '100%',
+               placeholder: "Select Room Type"
+           }).on('change', function () {
+               updateRowCapacities($(this).closest('tr'));
+               updateRoomSelection($(this).closest('tr'));
+               refreshAllRoomTypeOptions();
+               updateRates();
+               checkAddButtonState();
+           });
 
-            $row.find('.num-rooms-select').select2({ width: '100%' })
-                .on('change', function () {
-                    updateRowCapacities($(this).closest('tr'));
-                    updateRates();
-                });
+           $row.find('.num-rooms-select').select2({ width: '100%' })
+               .on('change', function () {
+                   updateRowCapacities($(this).closest('tr'));
+                   updateRates();
+               });
 
-            $row.find('.num-adults-select, .num-children-select').select2({ width: '100%' });
+           $row.find('.num-adults-select, .num-children-select').select2({ width: '100%' });
 
-            // Initialize room selection with the actual room type ID and pre-filled room IDs
-            const initialRoomTypeId = prefill ? prefill.RoomTypeId : null;
-            initializeRoomSelect($roomSelect, initialRoomTypeId, prefillRoomIds);
-        }
+           // Initialize room selection with the actual room type ID and pre-filled room IDs
+           const initialRoomTypeId = prefill ? prefill.RoomTypeId : null;
+           initializeRoomSelect($roomSelect, initialRoomTypeId, prefillRoomIds);
 
+           // If options are already present (edit mode), ensure capacities reflect current selections
+           // run once to populate num/adult/child selects when row is created.
+           setTimeout(() => updateRowCapacities($row), 30);
+       }
         // ======== Rates Handling ========
         function updateRates() {
             const roomTypeIds = $('#roomTable .room-type-select').map((_, el) => $(el).val()).get().filter(Boolean);
@@ -978,6 +999,7 @@
                     RateId: +rateId,
                     CheckIn: new Date(checkIn),
                     CheckOut: new Date(checkOut),
+                    ReservationId: +reservationId,
                     roomTypeQuantities
                 })
             })
@@ -988,11 +1010,83 @@
                 }
 
                 const summary = res.data.chargesSummary;
-                let html = `<table class="table table-bordered"><thead><tr><th>Charge</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead><tbody>`;
-                summary.forEach(item => {
-                    html += `<tr><td>${item.charge}</td><td>${item.unit}</td><td>${item.rate}</td><td>${item.total}</td></tr>`;
+                let html = `<div>`;
+
+                // --- RATE TYPES TABLE ---
+                html += `
+                <table class="table table-framed table-hover m-0">
+                    <thead class="table-light">
+                        <tr class="border-double active">
+                            <th>RoomType/Charge</th>
+                            <th>Rooms</th>
+                            <th>Unit</th>
+                            <th>Rate</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                summary.filter(x => x.type === 'Rate').forEach(item => {
+                    const rowClass = item.charge === 'Total' ? 'success' : '';
+                    html += `
+                        <tr class="${rowClass}">
+                            <td>${item.charge}</td>
+                            <td>${item.rooms || ""}</td>
+                            <td>${item.unit || ""}</td>
+                            <td>${item.rate || ""}</td>
+                            <td>${item.total}</td>
+                        </tr>
+                    `;
                 });
-                html += `</tbody></table><h4 class="text-success">Total Price: ${res.data.totalPrice}</h4>`;
+
+                html += `</tbody></table>  <br />`;
+
+                // --- PAYMENTS TABLE ---
+                html += `
+                <table class="table table-framed table-hover m-0">
+                    <thead class="table-light">
+                        <tr class="border-double active">
+                            <th>Payment Type</th>
+                            <th colspan="4"></th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                summary.filter(x => x.type === 'Payment').forEach(item => {
+                    const rowClass = item.charge === 'Total Payments' ? 'success' : '';
+                    html += `
+                        <tr class="${rowClass}">
+                            <td>${item.charge}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>${item.total}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+
+                // --- BALANCE BOX ---
+                const balanceItem = summary.find(x => x.type === 'Balance');
+                if (balanceItem) {
+                    html += `
+                    <br />
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-primary no-border">
+                            <h5 class="text-semibold">Balance:</span> ${balanceItem.total}
+                        </div></div>
+                    </div>
+                    `;
+                }
+
+                html += `</div>`; // container
+
                 $rateDetails.html(html).show();
             })
             .fail(() => $rateDetails.html('<p class="text-danger">Error loading charges summary.</p>').show());
@@ -1040,9 +1134,10 @@
                 $('#NumOfNights').val(nights);
             }
         }
-
+        debugger;
         // Initialize rooms
         if (prefillRooms.length) {
+            debugger;
             // Edit mode - we have pre-filled rooms
             // Load room types first, then add pre-filled rows
             if ($checkIn.val() && $checkOut.val()) {

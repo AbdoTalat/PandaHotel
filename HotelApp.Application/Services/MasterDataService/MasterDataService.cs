@@ -33,5 +33,12 @@ namespace HotelApp.Application.Services.MasterDataService
                 .GetAllAsDtoAsync<SelectListItem>(pm => pm.MasterDataTypeId == (int)MasterDataTypeEnum.PaymentMethod);
             return data;
         }
+
+        public async Task<IEnumerable<SelectListItem>> GetCalculationTypesAsync()
+        {
+            var data = await _unitOfWork.MasterDataItemRepository
+                .GetAllAsDtoAsync<SelectListItem>(ct => ct.MasterDataTypeId == (int)MasterDataTypeEnum.CalculationType);
+            return data;
+        }
     }
 }

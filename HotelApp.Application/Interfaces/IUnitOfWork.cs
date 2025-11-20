@@ -47,7 +47,6 @@ namespace HotelApp.Application.Interfaces
 
         #region Rates & Calculations
         IRateRepository RateRepository { get; }
-        ICalculationTypeRepository CalculationTypeRepository { get; }
         IFloorRepository FloorRepository { get; }
         IProofTypeRepository ProofTypeRepository { get; }
         #endregion

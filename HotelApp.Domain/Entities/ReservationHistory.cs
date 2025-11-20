@@ -18,6 +18,6 @@ namespace HotelApp.Domain.Entities
         public User? PerformedBy { get; set; }
 
         public DateTime PerformedDate { get; set; }
-        public ReservationStatus Status { get; set; }
+        public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
     }
 }

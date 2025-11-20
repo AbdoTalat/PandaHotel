@@ -20,5 +20,7 @@ namespace HotelApp.Application.DTOs.Reservation
         public int NumberOfNights { get; set; }
         public int NumberOfPeople { get; set; }
         public decimal TotalPrice { get; set; }
+        public decimal TotalPayments { get; set; }
+        public decimal Balance { get; set; }
     }
 }

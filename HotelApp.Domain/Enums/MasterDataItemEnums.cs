@@ -22,5 +22,9 @@ namespace HotelApp.Domain.Enums
             Wallet = 5, 
             Cheque = 6 
         }
+        public enum CalculationType
+        {
+            ByAlert = 1
+        }
     }
 }

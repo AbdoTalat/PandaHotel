@@ -9,11 +9,16 @@ namespace HotelApp.Application.DTOs.RateCalculation
 	public class GetRateCalculationDTOResponse
 	{
 		public decimal TotalPrice { get; set; }
+		public decimal TotalPayments { get; set; }
+        public decimal Balance { get; set; }
+
         public List<ChargesSummaryDTO> ChargesSummary { get; set; } = new();
     }
     public class ChargesSummaryDTO
 	{
-		public string Charge { get; set; }
+		public string Type { get; set; }
+        public string Charge { get; set; }
+		public string Rooms { get; set; }
 		public string Unit { get; set; }
 		public string Rate {  get; set; }
 		public string Total { get; set; }
@@ -40,7 +45,9 @@ namespace HotelApp.Application.DTOs.RateCalculation
 
 	public class GetRateCalculationDTORequest
 	{
-		public int RateId { get; set; }
+		public int ReservationId { get; set; }
+		public bool IsEdit { get; set; }
+        public int RateId { get; set; }
 		public DateTime CheckIn { get; set; }
 		public DateTime CheckOut { get; set; }
         public List<RoomTypeQuantityDTO> RoomTypeQuantities { get; set; } = new();

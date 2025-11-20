@@ -9,6 +9,7 @@ namespace HotelApp.Domain.Enums
     public enum MasterDataTypeEnum
     {
         TransactionType = 1,
-        PaymentMethod = 2
+        PaymentMethod = 2,
+        CalculationType = 3
     }
 }

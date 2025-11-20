@@ -43,7 +43,6 @@ namespace HotelApp.Infrastructure.DbContext
 		public DbSet<Company> Companies { get; set; }
 		public DbSet<ProofType> ProofTypes { get; set; }
 		public DbSet<ReservationRoom> ReservationRooms { get; set; }
-		public DbSet<CalculationType> CalculationTypes { get; set; }
 		public DbSet<ReservationHistory> ReservationHistory { get; set; }
 
 		public DbSet<Payment> Payments { get; set; }
@@ -87,18 +86,17 @@ namespace HotelApp.Infrastructure.DbContext
 			builder.ApplyConfiguration(new ProofTypeConfiguration());
 			builder.ApplyConfiguration(new ReservationRoomConfiguration());
 
-			builder.ApplyConfiguration(new CalculationTypeConfiguration());
 			builder.ApplyConfiguration(new ReservationHistoryConfiguration());
 
 			builder.ApplyConfiguration(new PaymentConfiguration());
             builder.ApplyConfiguration(new MasterDataTypeConfiguration());
             builder.ApplyConfiguration(new MasterDataItemConfiguration());
-            #endregion
+			#endregion
 
-            #region Seed Data
-   //         builder.SeedRoomStatuses();
-   //         builder.SeedReservationSources();
-			//builder.SeedDropDownTypesAndItems();
+			#region Seed Data
+			builder.SeedRoomStatuses();
+			builder.SeedReservationSources();
+			builder.SeedDropDownTypesAndItems();
 			#endregion
 		}
 

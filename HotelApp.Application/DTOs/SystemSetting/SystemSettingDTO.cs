@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,9 @@ namespace HotelApp.Application.DTOs.SystemSetting
 		public bool IsGuestAddressRequired { get; set; }
 		public bool IsGuestProofTypeRequired { get; set; }
 		public bool IsGuestProofNumberRequired { get; set; }
-	}
+
+		public IEnumerable<SelectListItem> CalculationTypes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> CheckInRoomStatuses { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> CheckOutRoomStatuses { get; set; } = new List<SelectListItem>();
+    }
 }

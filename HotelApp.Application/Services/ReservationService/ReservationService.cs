@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.RateCalculation;
 using HotelApp.Application.DTOs.Reservation;
 using HotelApp.Application.DTOs.RoomStatus;
 using HotelApp.Application.DTOs.RoomTypes;
 using HotelApp.Application.Interfaces;
 using HotelApp.Application.Interfaces.IRepositories;
 using HotelApp.Application.Services.CurrentUserService;
+using HotelApp.Application.Services.RateCalculationService;
 using HotelApp.Domain;
 using HotelApp.Domain.Entities;
 using HotelApp.Domain.Enums;
@@ -18,13 +20,16 @@ namespace HotelApp.Application.Services.ReservationService
     {
         private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IRateCalculationService _rateCalculationService;
 
-        public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+        public ReservationService(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            IRateCalculationService rateCalculationService)
         {
             _unitOfWork = unitOfWork;
 			_mapper = mapper;
-            _currentUserService = currentUserService;
+            _rateCalculationService = rateCalculationService;
         }
 		public async Task<IEnumerable<GetAllReservationsDTO>> GetAllReservationAsync()
         {
@@ -98,9 +103,29 @@ namespace HotelApp.Application.Services.ReservationService
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                /* Will Be Calculated */
-                decimal totalPrice = 100;
-                decimal totalRatePerNight = 100;
+                var rateCalcRequest = new GetRateCalculationDTORequest
+                {
+                    RateId = dto.ReservationInfoDto.RateId,
+                    ReservationId = dto.ReservationInfoDto.ReservationId,
+                    CheckIn = dto.ReservationInfoDto.CheckInDate.Value,
+                    CheckOut = dto.ReservationInfoDto.CheckOutDate.Value,
+                    RoomTypeQuantities = dto.ReservationInfoDto.RoomTypeToBookDTOs
+                         .Select(rt => new RoomTypeQuantityDTO
+                         {
+                             RoomTypeId = rt.RoomTypeId,
+                             Quantity = rt.NumOfRooms
+                         }).ToList()
+                };
+
+                var rateCalcResponse = await _rateCalculationService.GetRateCalculation(rateCalcRequest);
+
+                if (!rateCalcResponse.Success)
+                {
+                    return ServiceResponse<ReservationDTO>.ResponseFailure("Failed to calculate rate: " + rateCalcResponse.Message);
+                }
+                decimal totalPrice = rateCalcResponse.Data.TotalPrice;
+                decimal totalPayments = rateCalcResponse.Data.TotalPayments;
+                decimal balance = rateCalcResponse.Data.Balance;
 
                 var statuses = ExtractStatuses(dto.ConfirmDto);
 
@@ -110,8 +135,9 @@ namespace HotelApp.Application.Services.ReservationService
                 {
                     // ===== Add New Reservation =====
                     reservation = _mapper.Map<Reservation>(dto);
-                    reservation.PricePerNight = totalRatePerNight;
                     reservation.TotalPrice = totalPrice;
+                    reservation.TotalPayments = totalPayments;
+                    reservation.Balance = balance;
                     reservation.ReservationNumber = await _unitOfWork.ReservationRepository.GenerateReservationNumberAsync(2);
                     if (statuses != null && statuses.Any())
                         reservation.Status = statuses.Last();
@@ -129,8 +155,9 @@ namespace HotelApp.Application.Services.ReservationService
                         return ServiceResponse<ReservationDTO>.ResponseFailure("Reservation not found");
 
                     _mapper.Map(dto, reservation);
-                    reservation.PricePerNight = totalRatePerNight;
                     reservation.TotalPrice = totalPrice;
+                    reservation.TotalPayments = totalPayments;
+                    reservation.Balance = balance;
                     if (statuses != null && statuses.Any())
                         reservation.Status = statuses.Last();
 

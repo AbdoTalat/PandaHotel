@@ -11,5 +11,6 @@ namespace HotelApp.Application.Services.MasterDataService
     {
         Task<IEnumerable<SelectListItem>> GetTransactionTypesAsync();
         Task<IEnumerable<SelectListItem>> GetPaymentMethodsAsync();
+        Task<IEnumerable<SelectListItem>> GetCalculationTypesAsync();
     }
 }

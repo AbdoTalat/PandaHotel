@@ -55,7 +55,6 @@ namespace HotelApp.Infrastructure.UnitOfWorks
             RoleRepository = new RoleRepository(roleManager, _context, _mapperConfig);
             SystemSettingRepository = new SystemSettingRepositroy(_context, _mapperConfig);
             RateRepository = new RateRepository(_context, _mapperConfig);
-            CalculationTypeRepository = new CalculationTypeRepository(_context, _mapperConfig);
             FloorRepository = new FloorRepository(_context, _mapperConfig);
             GuestReservationRepository = new GuestReservationRepository(_context, _mapperConfig);
             ProofTypeRepository = new ProofTypeRepository(_context, _mapperConfig);
@@ -86,7 +85,6 @@ namespace HotelApp.Infrastructure.UnitOfWorks
         public IRoleRepository RoleRepository { get; private set; }
         public ISystemSettingRepositroy SystemSettingRepository { get; private set; }
         public IRateRepository RateRepository { get; private set; }
-        public ICalculationTypeRepository CalculationTypeRepository { get; private set; }
         public IFloorRepository FloorRepository { get; private set; }
         public IGuestReservationRepository GuestReservationRepository { get; private set; }
         public IProofTypeRepository ProofTypeRepository { get; private set; }

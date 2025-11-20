@@ -40,10 +40,13 @@ namespace HotelApp.Infrastructure.Configurations
 			builder.Property(r => r.TotalPrice)
 				.HasColumnType("decimal(18,2)");
 
-			builder.Property(r => r.PricePerNight)
-				.HasColumnType("decimal(18,2)");
+            builder.Property(r => r.TotalPayments)
+                .HasColumnType("decimal(18,2)");
 
-			builder.HasOne(r => r.Branch)
+            builder.Property(r => r.Balance)
+                .HasColumnType("decimal(18,2)");
+
+            builder.HasOne(r => r.Branch)
 				.WithMany(b => b.Reservations)
 				.HasForeignKey(r => r.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
