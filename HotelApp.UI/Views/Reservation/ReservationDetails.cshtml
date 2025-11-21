@@ -135,8 +135,8 @@
                         <div class="panel-body">
 
                             <div class="row">
-                                    <!-- Reservation History -->
-                                    <div class="col-md-4">
+                                <!-- Reservation History -->
+                                <div class="col-md-4">
                                         <div class="panel panel-body">
                                             <legend class="text-semibold">
                                                 <i class="icon-reload-alt"></i> Reservation History
@@ -159,8 +159,8 @@
 
                                     </div>
 
-                                    <!-- Dates Of Stay-->
-                                    <div class="col-md-4 ">
+                                <!-- Dates Of Stay-->
+                                <div class="col-md-4">
                                         <div class="panel panel-body">
 
                                             <legend class="text-semibold">
@@ -199,47 +199,56 @@
                                                             <td>Nights</td>
                                                             <td class="text-right">@Model.NumberOfNights</td>
                                                         </tr>
-                                                        <tr>
+                                                       @*  <tr>
                                                             <td>Notes</td>
                                                             <td class="text-right">@Model.Notes</td>
-                                                        </tr>
+                                                        </tr> *@
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Charges Summary -->
-                                    <div class="col-md-4">
-                                        <div class="panel panel-body">
-
-                                            <legend class="text-semibold"> <i class="icon-cash3"></i> Charges Summary</legend>
-
-                                            <div class="content-group">
-                                                <h6>Total due</h6>
-                                                <div class="table-responsive no-border">
-                                                    <table class="table">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>Subtotal:</th>
-                                                                <td class="text-right">$7,000</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Tax: <span class="text-regular">(25%)</span></th>
-                                                                <td class="text-right">$1,750</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Total:</th>
-                                                                <td class="text-right text-primary"><h5 class="text-semibold">$8,750</h5></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                <!-- Charges Summary -->
+                                <div class="col-md-4">
+                                        <div class="panel">
+                                            <div class="panel-heading">
+					                            <h5> <i class="icon-cash3"></i> Charges Summary</h5>
+					                            <div class="heading-elements">
+						                            <button class="control-arrow btn border-teal text-teal-800 btn-flat" data-toggle="modal" data-target="#rateModal" data-toggle="collapse" data-target="#demo2" aria-expanded="true">
+                                                       <i class="icon-info22"></i> Details
+                                                    </button>
                                                 </div>
+					                            <hr style="margin:0px" />
+				                            </div>
+                                            @* <legend class="text-semibold"> 
+                                                <i class="icon-cash3"></i> Charges Summary
+                                                <button class="control-arrow btn border-teal text-teal-800 btn-flat" data-toggle="modal" data-target="#rateModal" data-toggle="collapse" data-target="#demo2" aria-expanded="true">
+                                                   
+                                                </button>
+                                                
+                                            </legend> *@
+                                            <div class="panel-body">
+                                                <div class="panel panel-body  panel-body-accent" style="margin-bottom:-10px">
+								                    <div class="row text-center">
+									                    <div class="col-xs-4">
+                                                            <h5 class="text-semibold no-margin">$@Model.TotalPrice</h5>
+										                    <span class="text-muted text-size-small">Total</span>										
+									                    </div>
+
+									                    <div class="col-xs-4">
+										                    <h5 class="text-semibold no-margin">$@Model.TotalPayments</h5>
+										                    <span class="text-muted text-size-small">Paid</span>
+									                    </div>
+
+									                    <div class="col-xs-4">
+										                    <h5 class="text-semibold no-margin">$@Model.Balance</h5>
+										                    <span class="text-muted text-size-small">Balance</span>
+									                    </div>
+								                    </div>
+							                    </div>
                                             </div>
-
-
-                                        </div>
-                                    </div>
+                                        </div>       
+                                </div>  
                             </div>
 
                             <div class="row">
@@ -491,7 +500,6 @@
                                       data-url="@Url.Action("AddPayment", "Payment", new { reservationId = Model.Id, guestId = Model.GuestReservations.FirstOrDefault(g => g.IsPrimaryGuest)?.Id ?? 0 })">
                                       <i class="icon-plus2"></i> Add Payment
                                 </button>
-
 		                	</div>
 						</div>
 
@@ -499,17 +507,17 @@
                             <div class="panel panel-body panel-body-accent" style="margin-bottom:-10px">
 								<div class="row text-center">
 									<div class="col-xs-4">
-                                        <h5 class="text-semibold no-margin">$555.00</h5>
+                                        <h5 class="text-semibold no-margin">$@Model.TotalPrice</h5>
 										<span class="text-muted text-size-small">Total</span>										
 									</div>
 
 									<div class="col-xs-4">
-										<h5 class="text-semibold no-margin">$00.00</h5>
+										<h5 class="text-semibold no-margin">$@Model.TotalPayments</h5>
 										<span class="text-muted text-size-small">Paid</span>
 									</div>
 
 									<div class="col-xs-4">
-										<h5 class="text-semibold no-margin">$969.25</h5>
+										<h5 class="text-semibold no-margin">$@Model.Balance</h5>
 										<span class="text-muted text-size-small">Balance</span>
 									</div>
 								</div>
@@ -581,9 +589,146 @@
         </div>
     </div>
 </div>
+<div id="rateModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h5 class="modal-title">Reservation Charges Summary</h5>
+            </div>
+
+            <div class="modal-body">
+                <div class="panel panel-flat">
+                    <div id="rateDetails"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 @section Scripts{
+<script>
+$(document).ready(function () {
+    const $rateDetails = $('#rateDetails');
+
+    const rateId = @Model.RateId; // integer
+    const reservationId = @Model.Id; // integer
+    const checkIn = "@Model.CheckInDate.ToString("yyyy-MM-ddTHH:mm:ss")";
+    const checkOut = "@Model.CheckOutDate.ToString("yyyy-MM-ddTHH:mm:ss")";
+
+    const roomTypeQuantities = @Html.Raw(
+        Json.Serialize(
+            Model.ReservationRoomTypes.Select(r => new {
+                RoomTypeId = r.RoomTypeId,
+                Quantity = r.Quantity
+            })
+        )
+    );
+
+    // Load Charges Summary when modal opens
+    $('#rateModal').on('show.bs.modal', function () {
+        if (!rateId || !checkIn || !checkOut) {
+            $rateDetails.html('<p class="text-danger">Please select a rate, check-in, and check-out.</p>');
+            return;
+        }
+
+        if (!roomTypeQuantities.length) {
+            $rateDetails.html('<p class="text-danger">Please add at least one room.</p>');
+            return;
+        }
+
+        $rateDetails.html('Loading...');
+
+        $.ajax({
+            url: '/Rate/GetReservationChargesSummary',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                RateId: +rateId,
+                CheckIn: new Date(checkIn),
+                CheckOut: new Date(checkOut),
+                ReservationId: +reservationId,
+                RoomTypeQuantities: roomTypeQuantities
+            })
+        })
+        .done(res => {
+            if (!res.success || !res.data) {
+                $rateDetails.html(`<p class="text-danger">${res.message || 'No calculation available.'}</p>`);
+                return;
+            }
+
+            const summary = res.data.chargesSummary;
+            let html = `<div class="pre-scrollable" style="min-height:500px">`;
+
+            // RATE TYPES
+            html += `<table class="table table-framed table-hover m-0">
+                        <thead class="table-light">
+                            <tr class="border-double active">
+                                <th>RoomType/Charge</th>
+                                <th>Rooms</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            summary.filter(x => x.type === 'Rate').forEach(item => {
+                const rowClass = item.charge === 'Total' ? 'success' : '';
+                html += `<tr class="${rowClass}">
+                            <td>${item.charge}</td>
+                            <td>${item.rooms || ""}</td>
+                            <td>${item.unit || ""}</td>
+                            <td>${item.rate || ""}</td>
+                            <td>${item.total}</td>
+                         </tr>`;
+            });
+            html += `</tbody></table><br/>`;
+
+            // PAYMENTS
+            html += `<table class="table table-framed table-hover m-0">
+                        <thead class="table-light">
+                            <tr class="border-double active">
+                                <th>Payment Type</th>
+                                <th colspan="4"></th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            summary.filter(x => x.type === 'Payment').forEach(item => {
+                const rowClass = item.charge === 'Total Payments' ? 'success' : '';
+                html += `<tr class="${rowClass}">
+                            <td>${item.charge}</td>
+                            <td colspan="4"></td>
+                            <td>${item.total}</td>
+                         </tr>`;
+            });
+            html += `</tbody></table>`;
+
+            // BALANCE
+            const balanceItem = summary.find(x => x.type === 'Balance');
+            if (balanceItem) {
+                html += `<br/>
+                         <div class="alert alert-primary no-border">
+                             <h5 class="text-semibold">Balance: ${balanceItem.total}</h5>
+                         </div>`;
+            }
+
+            html += `</div>`; // container
+            $rateDetails.html(html);
+        })
+        .fail(() => $rateDetails.html('<p class="text-danger">Error loading charges summary.</p>'));
+    });
+});
+</script>
+    
+    
     <script>
         $(document).ready(function () {
             let loaded = false;

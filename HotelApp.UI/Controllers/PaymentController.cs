@@ -81,7 +81,7 @@ namespace HotelApp.UI.Controllers
                 await LoadPaymentDropdownsAsync(model);
                 return PartialView("_EditPayment", model);
             }
-            var result = await _paymentService.EditPaymentByIdAsyc(model);
+            var result = await _paymentService.EditPaymentByIdAsync(model);
             return Json(new { success = result.Success, message = result.Message });
         }
 

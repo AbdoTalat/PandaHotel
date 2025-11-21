@@ -33,7 +33,7 @@ namespace HotelApp.Infrastructure.UnitOfWorks
         }
 
         #region Get Methods
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet.AsNoTracking()
                 .BranchFilter(SkipBranchFilter);
@@ -46,7 +46,7 @@ namespace HotelApp.Infrastructure.UnitOfWorks
 
             return await query.ToListAsync();
         }
-        public async Task<IEnumerable<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class
+        public async Task<List<TDto>> GetAllAsDtoAsync<TDto>(Expression<Func<T, bool>>? predicate = null, bool SkipBranchFilter = false) where TDto : class
         {
             IQueryable<T> query = _dbSet.AsNoTracking()
                 .BranchFilter(SkipBranchFilter);

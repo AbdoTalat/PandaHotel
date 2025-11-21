@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelApp.Application.DTOs;
+using HotelApp.Application.DTOs.RateCalculation;
 using HotelApp.Application.DTOs.Rooms;
 using HotelApp.Application.DTOs.RoomStatus;
 using HotelApp.Application.DTOs.RoomTypes;
@@ -61,6 +62,10 @@ namespace HotelApp.Application.Mapping
 			CreateMap<RoomType, SelectListItem>()
 				.ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Name))
 				.ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Id));
+
+			CreateMap<ReservationRoomType, RoomTypeQuantityDTO>()
+				.ForMember(dest => dest.RoomTypeId, opt => opt.MapFrom(src => src.RoomType.Id))
+				.ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
 
             /* Room Status */
             CreateMap<RoomStatus, GetAllRoomStatusDTO>();

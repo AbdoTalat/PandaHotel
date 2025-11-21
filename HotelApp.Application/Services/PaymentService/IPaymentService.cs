@@ -12,7 +12,7 @@ namespace HotelApp.Application.Services.PaymentService
         Task<IEnumerable<GetPaymentDTO>> GetPaymentsByReservationIdAsync(int reservationId);
         Task<ServiceResponse<PaymentDTO>> AddPaymentAsync(PaymentDTO dto);
         Task<PaymentDTO> GetPaymentToEditByIdAsync(int paymentId);
-        Task<ServiceResponse<PaymentDTO>> EditPaymentByIdAsyc(PaymentDTO dto);
+        Task<ServiceResponse<PaymentDTO>> EditPaymentByIdAsync(PaymentDTO dto);
         Task<ServiceResponse<object>> DeletePaymentByIdAsync(int paymentId);
     }
 }

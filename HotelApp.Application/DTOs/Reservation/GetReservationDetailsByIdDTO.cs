@@ -15,11 +15,14 @@ namespace HotelApp.Application.DTOs.Reservation
         public DateTime CheckInDate { get; set; }
 		public DateTime CheckOutDate { get; set; }
 		public string RateCode { get; set; }
-		public ReservationStatus Status { get; set; }
+		public int RateId { get; set; }
+        public ReservationStatus Status { get; set; }
         public int NumberOfNights { get; set; }
 		public int NumberOfPeople { get; set; }
 		public decimal TotalPrice { get; set; }
-		public string ReservationSource { get; set; }
+		public decimal TotalPayments { get; set; }
+		public decimal Balance { get; set; }
+        public string ReservationSource { get; set; }
 		public string Notes { get; set; }
 		public string CreatedBy { get; set; }
 		public string LastModifiedBy { get; set; }
